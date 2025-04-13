@@ -1,0 +1,57 @@
+\chapter{Quantics Tensor Cross Interpolation}
+\label{chap:2}
+The widespread and increasing interest in tensor network methodologies - with explicit focus on \textit{matrix product states} (MPSs) \cite{Fannes1992} - outside of the many-body community has facilitated the development of a pivotal\footnote{A rather playful wording choice given the context, as it will become clearer in the subsequent sections.} extension to the tensor network set of tools: the Tensor Cross Interpolation (TCI) algorithm.
+
+
+\section{The algorithm}
+\note{Introduction}{Sign problem-free integration, \textit{superhigh-resolution}, exponential reductions in computational costs (\textit{curse of dimensionality}) $\to$ low-rank = calculations in polynomial time, uncover hidden structures}\vspace{\baselineskip}\\
+\note{Other methods}{High dimensional integrals and exponential complexity of QMB systems, Quantum Montecarlo shortcomings: sign problem and slow convergence ($1 / \sqrt{N}$), different from TN for wave function variational ansatz (DMRG)}\vspace{\baselineskip}\\
+
+\subsection{Matrix Cross Interpolation and prrLU}
+\note{Matrix Cross Interpolation}{Main paper: \cite{Goreinov1997}, Error is at most $O(\chi^2)$ the optimal error of SVD, CI vs prrLU, exact for the selected rows and columns (\textit{interpolation}) $A(\mathcal{I},\mathcal{J})*A(\mathcal{I},\mathcal{J})^{-1}A(\mathcal{I},\mathds{J}) = A(\mathcal{I},\mathds{J})  $ and for $\rank{A} = \chi$, heuristic \textit{maxvol principle} = maximise determinant of the pivot matrix, using continuous MCI already reduces the complexity of integration and derivation, CI is numerically unstable for large $\chi$}\vspace{\baselineskip}\\
+\note{Nice Sentences}{The RHS contains only small subparts of the original matrix. }\vspace{\baselineskip}\\
+
+\todo{Insert a numerical example of CI and prrLU $\to$ use the DFT matrix}
+
+
+\subsection{Tensor Cross Interpolation}
+\note{Tensor Cross Interpolation}{Main paper: \cite{Fernandez2024}, Main TCI ref: \cite{OSELEDETS201070}, polynomial dimension scaling, matrix cross interpolation \cite{Goreinov1997}, function learning, N-dimensional integrals, \textit{$\epsilon$-factorizability} of continuous functions $\to$ reduction from N to one-dimensional integrals independent of function sign ($\int \text{d}\mathbf{x} f(x_1, ... , x_N) \approx \prod\limits_{\alpha = 1 }^N\int \text{d}x_1 T_\alpha(x_\alpha)P_\alpha^{-1}$) and $|| f - f_\text{TCI} || < \epsilon $, N-dimensional integral $O(Nd\chi^2)$ (not $d^N$) (??) , tensor representation $O(N\chi^2)$ (??), \textit{active machine learning} \cite{settles2012active}: find the region with the largest approximation error, main challenge: bookkeeping and notation, \textit{maxvol} principle \cite{DOLGOV2020106869}, exact if $\rank{TT} = \chi$ like MCI (see Naive Approach \cite{PhysRevX.12.041018}), \textit{multi-indices} and \texttt{Vector}\{\textit{multi-indices}\}, $\bigoplus$= concatenation of multi-indices, \textit{nesting condition} \cite{doi:10.1137/090752286,DOLGOV2020106869}$\to$ $\mathcal{I}_\alpha \subset \mathcal{I}_{\alpha -1 } \bigoplus \mathds{K}_\alpha$ and $\mathcal{J}_\alpha \subset \mathds{K}_\alpha \bigoplus \mathcal{J}_{\alpha +1 }$(this guarantees exact interpolation for $f$(pivots)), function calls: $O(Nd\chi^2) \ll d^N$, $\Pi_\alpha$ and the \textit{error function} $\epsilon_\Pi = |f - f_\text{TCI}|(i, x_\alpha, x_{\alpha +1}, j)$ $\to$ find the maximum of $\epsilon_\Pi$ before adding new pivots (add the pivots that yields the largest improvement of the local accuracy), pivot search: \textit{full}, \textit{rook}, \textit{block-rook}, \textit{alternate}(alternate:single pivot $O(d\chi)$, total search $O(d\chi^2)$ \cite{PhysRevX.12.041018}), \textit{environment-aware} $\epsilon_\Pi$ $\to$ error function related to the error of the integral that takes in consideration the volume contribution to the integral, \textit{environment} vectors $L_i$ and $R_j$, }\vspace{\baselineskip}\\
+
+\todo{Insert Algorithm description (see below)}
+\begin{algorithm}
+\caption{An algorithm with caption}\label{alg:cap}
+\begin{algorithmic}
+\If{something}
+    \State do something else
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+\note{Applications}{Feynmann diagramm expansion \cite{PhysRevX.12.041018}: high-order real-time nonequilibrium Schwinger-Keldysh perturbation expansions (convergence $1/N^2$, $N$ function evaluations)}\vspace{\baselineskip}\\
+\note{Nice sentences}{The approximation is systematically controlled by $\chi$. TCI is a generalization of the matrix cross interpolation to $N$-dimensional tensors and functions. Summation is implicit over the indices connecting two  tensors. TCI representation is defined by the selected $\mathcal{I}$ and $\mathcal{J}$, so an accurate interpolation amounts to optimizing this selection. TCI approximation of $f$ is built from one-dimensional slices  of $f$. Tensor network methods offer a new appraoch to high-dimensional integration. It significantly outperform Monte-Carlo and quasi-Monte-Carlo methods in differente applications. The limiting factor of TCI (rank of the $\epsilon$-factorization) is entirely orthogonal to that of sampling methods. The tensor cross interpolation (TCI) algorithm is a rank-revealing algorithm for decom-
+posing low-rank, high-dimensional tensors into tensor trains/matrix product states (MPS).}\vspace{\baselineskip}\\
+\note{General references}{\cite{OSELEDETS201070, doi:10.1137/090752286, 6076873, SAVOSTYANOV2014217, DOLGOV2020106869}}\vspace{\baselineskip}\\
+\note{Open questions}{Generality of $\epsilon$-factorizability property}
+
+
+
+
+\section{Computational Fallbacks: Localised Functions}
+\subsection{Localised Function and Memory Consumption}
+
+
+Another cool list:
+\begin{itemize}
+	\item item 1
+	\item item 2\footnote{Some foot note}
+	\item item 3
+    \item item 3\item item 3\item item 3\item item 3\item item 3\item item 3
+\end{itemize}
+
+
+% \begin{figure}
+% 	\centering
+% 	\includegraphics[width=.75\textwidth]{example-image-duck}
+% 	\caption{Another cool duck}
+% 	\label{fig:figure2}
+% \end{figure}

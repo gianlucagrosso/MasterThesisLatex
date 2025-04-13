@@ -1,0 +1,48 @@
+\documentclass{masterthesis}
+\emergencystretch=1em
+
+% \usepackage{duckuments}
+% \usepackage{epigraph}
+\usepackage{lipsum}
+
+
+
+
+\pagestyle{mystyle}
+
+\begin{document}
+\input{extras/mycommands}
+\frontmatter 
+\myFrontCover
+\copyrightpage
+\mytitle
+\abstractpage
+\input{frontmatter/abstract}
+\acknowledgments
+\input{frontmatter/acknowledgements}
+\tableofcontents
+%\addcontentsline{toc}{chapter}{\protect List of Figures}
+%\addcontentsline{toc}{chapter}{\protect List of Tables}
+
+
+\mainmatter
+\setcounter{page}{1}
+\include{chapters/Intro}
+\include{chapters/QTCI}
+\include{chapters/chap3}
+\include{chapters/chap4}
+\include{chapters/chap5}
+
+
+\appendix
+\include{backmatter/app1}
+\include{backmatter/app2}
+\include{backmatter/app3
+}
+
+\backmatter
+\listoftables
+\listoffigures
+\printbibliography
+
+\end{document}
