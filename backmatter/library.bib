@@ -18,7 +18,7 @@ url={https://doi.org/10.1007/BF02099178}
 
 
 
-@article{PhysRevLett.69.2863,
+@article{White1992,
   title = {Density matrix formulation for quantum renormalization groups},
   author = {White, Steven R.},
   journal = {Phys. Rev. Lett.},
@@ -33,7 +33,7 @@ url={https://doi.org/10.1007/BF02099178}
   url = {https://link.aps.org/doi/10.1103/PhysRevLett.69.2863}
 }
 
-@article{SCHOLLWOCK201196,
+@article{Schollwock2011,
 title = {The density-matrix renormalization group in the age of matrix product states},
 journal = {Annals of Physics},
 volume = {326},
@@ -48,7 +48,7 @@ author = {Ulrich Schollwöck},
 abstract = {The density-matrix renormalization group method (DMRG) has established itself over the last decade as the leading method for the simulation of the statics and dynamics of one-dimensional strongly correlated quantum lattice systems. In the further development of the method, the realization that DMRG operates on a highly interesting class of quantum states, so-called matrix product states (MPS), has allowed a much deeper understanding of the inner structure of the DMRG method, its further potential and its limitations. In this paper, I want to give a detailed exposition of current DMRG thinking in the MPS language in order to make the advisable implementation of the family of DMRG algorithms in exclusively MPS terms transparent. I then move on to discuss some directions of potentially fruitful further algorithmic development: while DMRG is a very mature method by now, I still see potential for further improvements, as exemplified by a number of recently introduced algorithms.}
 }
 
-@article{PhysRevLett.91.147902,
+@article{Vidal2003,
   title = {Efficient Classical Simulation of Slightly Entangled Quantum Computations},
   author = {Vidal, Guifr\'e},
   journal = {Phys. Rev. Lett.},
@@ -63,10 +63,9 @@ abstract = {The density-matrix renormalization group method (DMRG) has establish
   url = {https://link.aps.org/doi/10.1103/PhysRevLett.91.147902}
 }
 
-@misc{verstraete2004renormalizationalgorithmsquantummanybody,
+@article{VerstraeteCirac2004,
       title={Renormalization algorithms for Quantum-Many Body Systems in two and higher dimensions}, 
       author={F. Verstraete and J. I. Cirac},
-      year={2004},
       eprint={cond-mat/0407066},
       archivePrefix={arXiv},
       primaryClass={cond-mat.str-el},
@@ -75,7 +74,7 @@ abstract = {The density-matrix renormalization group method (DMRG) has establish
 
 @misc{vonDelftTNNotes,
     author       = {von Delft, Jan},
-    title        = {Lecture Notes on Tensor Networks for Many-Body Physics},
+    title        = {{Lecture Notes on Tensor Networks for Many-Body Physics}},
     note = {Ludwig-Maximilians University of Munich, Theoretical Solid State Physics, \href{https://www2.physik.uni-muenchen.de/lehre/vorlesungen/sose_23/tensor_networks_23/skript/index.html}{Lecture Notes (2023)}},
 }
 
@@ -95,7 +94,6 @@ abstract = {The density-matrix renormalization group method (DMRG) has establish
  doi           = {10.21468/SciPostPhys.18.3.104},
  url           = {https://scipost.org/SciPostPhys.18.3.104},
  file          = {:VonDelft/Fernandez2024.pdf},
- note          = {arXiv:2407.02454 [physics.comp-ph]},
 }
 
 @Article{Goreinov1997,
@@ -115,7 +113,7 @@ doi={10.1007/BF02358985},
 url={https://doi.org/10.1007/BF02358985}
 }
 
-@article{PhysRevX.12.041018,
+@article{Fernandez2022,
   title = {Learning Feynman Diagrams with Tensor Trains},
   author = {N\'u\~nez Fern\'andez, Yuriel and Jeannin, Matthieu and Dumitrescu, Philipp T. and Kloss, Thomas and Kaye, Jason and Parcollet, Olivier and Waintal, Xavier},
   journal = {Phys. Rev. X},
@@ -130,7 +128,7 @@ url={https://doi.org/10.1007/BF02358985}
   url = {https://link.aps.org/doi/10.1103/PhysRevX.12.041018}
 }
 
-@book{settles2012active,
+@book{Settles2012,
   title={Active Learning},
   author={Settles, B.},
   isbn={978-3-031-00432-2},
@@ -139,8 +137,8 @@ url={https://doi.org/10.1007/BF02358985}
   publisher={Morgan \& Claypool}
 }
 
-@article{OSELEDETS201070,
-title = {TT-cross approximation for multidimensional arrays},
+@article{Oseledets2010,
+title = {{TT-cross approximation for multidimensional arrays}},
 journal = {Linear Algebra and its Applications},
 volume = {432},
 number = {1},
@@ -154,7 +152,7 @@ keywords = {Tensor decompositions, Multi-way arrays, Curse of dimensionality, In
 abstract = {As is well known, a rank-r matrix can be recovered from a cross of r linearly independent columns and rows, and an arbitrary matrix can be interpolated on the cross entries. Other entries by this cross or pseudo-skeleton approximation are given with errors depending on the closeness of the matrix to a rank-r matrix and as well on the choice of cross. In this paper we extend this construction to d-dimensional arrays (tensors) and suggest a new interpolation formula in which a d-dimensional array is interpolated on the entries of some TT-cross (tensor train-cross). The total number of entries and the complexity of our interpolation algorithm depend on d linearly, so the approach does not suffer from the curse of dimensionality. We also propose a TT-cross method for computation of d-dimensional integrals and apply it to some examples with dimensionality in the range from d=100 up to d=4000 and the relative accuracy of order 10-10. In all constructions we capitalize on the new tensor decomposition in the form of tensor trains (TT-decomposition).}
 }
 
-@article{doi:10.1137/090752286,
+@article{Oseledets2011,
 author = {Oseledets, I. V.},
 title = {Tensor-Train Decomposition},
 journal = {SIAM Journal on Scientific Computing},
@@ -171,29 +169,20 @@ URL = {
     
 
 },
-eprint = { 
-    
-        https://doi.org/10.1137/090752286
-    
-    
-
-}
-,
     abstract = { A simple nonrecursive form of the tensor decomposition in d dimensions is presented. It does not inherently suffer from the curse of dimensionality, it has asymptotically the same number of parameters as the canonical decomposition, but it is stable and its computation is based on low-rank approximation of auxiliary unfolding matrices. The new form gives a clear and convenient way to implement all basic operations efficiently. A fast rounding procedure is presented, as well as basic linear algebra operations. Examples showing the benefits of the decomposition are given, and the efficiency is demonstrated by the computation of the smallest eigenvalue of a 19-dimensional operator. }
 }
 
-@INPROCEEDINGS{6076873,
+@article{Savostyanov2011,
   author={Savostyanov, Dmitry and Oseledets, Ivan},
-  booktitle={The 2011 International Workshop on Multidimensional (nD) Systems}, 
   title={Fast adaptive interpolation of multi-dimensional arrays in tensor train format}, 
   year={2011},
-  volume={},
-  number={},
-  pages={1-8},
+  journal={International Workshop on Multidimensional (nD) Systems},
+  publisher = {Institute of Electrical and Electronics Engineers},
   keywords={Tensile stress;Approximation algorithms;Matrix decomposition;Least squares approximation;Interpolation;Indexes},
-  doi={10.1109/nDS.2011.6076873}}
+  doi={10.1109/nDS.2011.6076873},
+  url={https://ieeexplore.ieee.org/document/6076873}}
 
-@article{SAVOSTYANOV2014217,
+@article{Savostyanov2014,
 title = {Quasioptimality of maximum-volume cross interpolation of tensors},
 journal = {Linear Algebra and its Applications},
 volume = {458},
@@ -207,7 +196,7 @@ keywords = {High-dimensional problems, Tensor train format, Maximum-volume princ
 abstract = {We consider a cross interpolation of high-dimensional arrays in the tensor train format. We prove that the maximum-volume choice of the interpolation sets provides the quasioptimal interpolation accuracy, that differs from the best possible accuracy by the factor which does not grow exponentially with dimension. For nested interpolation sets we prove the interpolation property and propose greedy cross interpolation algorithms. We justify the theoretical results and measure speed and accuracy of the proposed algorithm with numerical experiments.}
 }
 
-@article{DOLGOV2020106869,
+@article{Dolgov2020,
 title = {Parallel cross interpolation for high-precision calculation of high-dimensional integrals},
 journal = {Computer Physics Communications},
 volume = {246},
@@ -220,7 +209,7 @@ author = {Sergey Dolgov and Dmitry Savostyanov},
 keywords = {High-dimensional integration, High precision, Tensor train format, Cross interpolation, Ising integrals, Parallel algorithms},
 abstract = {We propose a parallel version of the cross interpolation algorithm and apply it to calculate high-dimensional integrals motivated by Ising model in quantum physics. In contrast to mainstream approaches, such as Monte Carlo and quasi Monte Carlo, the samples calculated by our algorithm are neither random nor form a regular lattice. Instead we calculate the given function along individual dimensions (modes) and use these values to reconstruct its behaviour in the whole domain. The positions of the calculated univariate fibres are chosen adaptively for the given function. The required evaluations can be executed in parallel along each mode (variable) and over all modes. To demonstrate the efficiency of the proposed method, we apply it to compute high-dimensional Ising susceptibility integrals, arising from asymptotic expansions for the spontaneous magnetisation in two-dimensional Ising model of ferromagnetism. We observe strong superlinear convergence of the proposed method, while the MC and qMC algorithms converge sublinearly. Using multiple precision arithmetic, we also observe exponential convergence of the proposed algorithm. Combining high-order convergence, almost perfect scalability up to hundreds of processes, and the same flexibility as MC and qMC, the proposed algorithm can be a new method of choice for problems involving high-dimensional integration, e.g. in statistics, probability, and quantum physics.}
 }
-@article{SCHNEIDER20101685,
+@article{Schneider2010,
 title = {Error estimates for two-dimensional cross approximation},
 journal = {Journal of Approximation Theory},
 volume = {162},
@@ -234,3 +223,124 @@ author = {Jan Schneider},
 keywords = {Cross approximation, Tensor products, Bilinear forms, Error estimates, Best approximation},
 abstract = {In this paper we deal with the approximation of a given function f on [0,1]2 by special bilinear forms ∑i=1kgi⊗hi via the so-called cross approximation. In particular we are interested in estimating the error function f−∑i=1kgi⊗hi of the corresponding algorithm in the maximum norm. There is a large amount of publications available that successfully deal with similar matrix algorithms in applied situations, for example in connection with H-matrices (see Boerm and Grasedyck (2003) [9] or Hackbusch (2007) [16] for many references). But as they do not give satisfactory error estimates, we concentrate on the theoretical issues of the problem in the language of functions. We connect it with related results from other areas of analysis in a historical survey and give a lot of references. Our main result is the connection of the error of our algorithm with the error of best approximation by arbitrary bilinear forms. This will be compared with the different approach in Bebendorf (2008) [6].}
 }
+
+@article{Sozykin2022,
+      title={{TTOpt: a maximum volume quantized Tensor Train-based optimization and its application to Reinforcement Learning}}, 
+      author={Konstantin Sozykin and Andrei Chertkov and Roman Schutski and Anh-Huy Phan and Andrzej Cichocki and Ivan Oseledets},
+      eprint={2205.00293},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2205.00293}, 
+}
+
+@article{Ritter2024,
+  title = {Quantics Tensor Cross Interpolation for High-Resolution Parsimonious Representations of Multivariate Functions},
+  author = {Ritter, Marc K. and N\'u\~nez Fern\'andez, Yuriel and Wallerberger, Markus and von Delft, Jan and Shinaoka, Hiroshi and Waintal, Xavier},
+  journal = {Phys. Rev. Lett.},
+  volume = {132},
+  issue = {5},
+  pages = {056501},
+  numpages = {6},
+  year = {2024},
+  month = {Jan},
+  publisher = {American Physical Society},
+  doi = {10.1103/PhysRevLett.132.056501},
+  url = {https://link.aps.org/doi/10.1103/PhysRevLett.132.056501}
+}
+
+@article{Jolly2024,
+      title={Tensorized orbitals for computational chemistry}, 
+      author={Nicolas Jolly and Yuriel Núñez Fernández and Xavier Waintal},
+      eprint={2308.03508},
+      archivePrefix={arXiv},
+      primaryClass={cond-mat.str-el},
+      url={https://arxiv.org/abs/2308.03508}, 
+}
+
+@article{Sakurai2025,
+      title={Learning parameter dependence for Fourier-based option pricing with tensor trains}, 
+      author={Rihito Sakurai and Haruto Takahashi and Koichi Miyamoto},
+      eprint={2405.00701},
+      archivePrefix={arXiv},
+      primaryClass={q-fin.CP},
+      url={https://arxiv.org/abs/2405.00701}, 
+}
+
+@article{Oseledets2009,
+	author = {Oseledets, I. V.},
+	date-added = {2025-04-22 22:52:36 +0200},
+	date-modified = {2025-04-22 22:56:07 +0200},
+	doi = {10.1134/S1064562409050056},
+	id = {Oseledets2009},
+	isbn = {1531-8362},
+	journal = {Doklady Mathematics},
+	number = {2},
+	pages = {653--654},
+	title = {Approximation of matrices with logarithmic number of parameters},
+	url = {https://doi.org/10.1134/S1064562409050056},
+	volume = {80},
+	year = {2009},
+	bdsk-url-1 = {https://doi.org/10.1134/S1064562409050056}}
+
+
+@article{Khoromskij2011,
+	abstract = {In the present paper, we discuss the novel concept of super-compressed tensor-structured data formats in high-dimensional applications. We describe the multifolding or quantics-based tensor approximation method of O(dlog N)-complexity (logarithmic scaling in the volume size), applied to the discrete functions over the product index set {\{}1,{\ldots},N{\}}⊗d, or briefly N-d tensors of size Nd, and to the respective discretized differential-integral operators in ℝd. As the basic approximation result, we prove that a complex exponential sampled on an equispaced grid has quantics rank 1. Moreover, a Chebyshev polynomial, sampled over a Chebyshev Gauss--Lobatto grid, has separation rank 2 in the quantics tensor format, while for the polynomial of degree m over a Chebyshev grid the respective quantics rank is at most 2m+1. For N-d tensors generated by certain analytic functions, we give a constructive proof of the O(dlog Nlog ε−1)-complexity bound for their approximation by low-rank 2-(dlog N) quantics tensors up to the accuracy ε>0. In the case ε=O(N−α), α>0, our approach leads to the quantics tensor numerical method in dimension d, with the nearly optimal asymptotic complexity O(d/αlog 2ε−1). From numerical examples presented here, we observe that the quantics tensor method has proved its value in application to various function related tensors/matrices arising in computational quantum chemistry and in the traditional finite element method/boundary element method (FEM/BEM). The tool apparently works.},
+	author = {Khoromskij, Boris N. },
+	date-added = {2025-04-22 23:11:02 +0200},
+	date-modified = {2025-04-22 23:11:10 +0200},
+	doi = {10.1007/s00365-011-9131-1},
+	id = {Khoromskij2011},
+	isbn = {1432-0940},
+	journal = {Constructive Approximation},
+	number = {2},
+	pages = {257--280},
+	title = {O(dlog N)-Quantics Approximation of N-d Tensors in High-Dimensional Numerical Modeling},
+	url = {https://doi.org/10.1007/s00365-011-9131-1},
+	volume = {34},
+	year = {2011},
+	bdsk-url-1 = {https://doi.org/10.1007/s00365-011-9131-1}}
+
+@article{Hiroshi2023,
+  title = {Multiscale Space-Time Ansatz for Correlation Functions of Quantum Systems Based on Quantics Tensor Trains},
+  author = {Shinaoka, Hiroshi and Wallerberger, Markus and Murakami, Yuta and Nogaki, Kosuke and Sakurai, Rihito and Werner, Philipp and Kauch, Anna},
+  journal = {Phys. Rev. X},
+  volume = {13},
+  issue = {2},
+  pages = {021015},
+  numpages = {27},
+  year = {2023},
+  month = {Apr},
+  publisher = {American Physical Society},
+  doi = {10.1103/PhysRevX.13.021015},
+  url = {https://link.aps.org/doi/10.1103/PhysRevX.13.021015}
+}
+
+@article{Takahashi2025,
+   title={Compactness of quantics tensor train representations of local imaginary-time propagators},
+   volume={18},
+   ISSN={2542-4653},
+   url={http://dx.doi.org/10.21468/SciPostPhys.18.1.007},
+   DOI={10.21468/scipostphys.18.1.007},
+   number={1},
+   journal={SciPost Physics},
+   publisher={Stichting SciPost},
+   author={Takahashi, Haruto and Sakurai, Rihito and Shinaoka, Hiroshi},
+   year={2025},
+   month=jan }
+
+
+@article{Murray2024,
+  title = {Nonequilibrium diagrammatic many-body simulations with quantics tensor trains},
+  author = {Murray, Matthias and Shinaoka, Hiroshi and Werner, Philipp},
+  journal = {Phys. Rev. B},
+  volume = {109},
+  issue = {16},
+  pages = {165135},
+  numpages = {12},
+  year = {2024},
+  month = {Apr},
+  publisher = {American Physical Society},
+  doi = {10.1103/PhysRevB.109.165135},
+  url = {https://link.aps.org/doi/10.1103/PhysRevB.109.165135}
+}
+

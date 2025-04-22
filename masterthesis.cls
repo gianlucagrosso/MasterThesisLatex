@@ -136,29 +136,32 @@
 \RequirePackage{algorithm}
 \RequirePackage{algpseudocode}
 
+%%% chemistry %%%
+\RequirePackage[version=4]{mhchem}
+\mhchemoptions{textfontname=sffamily, mathfontname=mathsf}
+
 % \DeclareMathOperator*{\argmin}{argmin}
 % \DeclareMathOperator*{\argmax}{argmax}
 % \DeclareMathOperator*{\tr}{tr}
 % \DeclareMathOperator*{\Tr}{Tr}
 
-% \RequirePackage[amsmath,thmmarks,hyperref]{ntheorem}
+\RequirePackage[amsmath,thmmarks,hyperref]{ntheorem}
 
-% % A style for numbered theorems, definitions, etc.
-% \theoremstyle{plain}%
-% \theoremheaderfont{\normalfont\bfseries\sffamily}% Matches e.g. \section* font
-% \theorembodyfont{\normalfont\itshape}% or \itshape if you want them italic
-% \theorempreskip{\baselineskip}
-% \theorempostskip{\baselineskip}
+% Theorems and definitions 
+\theoremstyle{plain}%
+\theoremheaderfont{\normalfont\bfseries\sffamily}% Matches e.g. \section* font
+\theorembodyfont{\normalfont\itshape}% or \itshape if you want them italic
+\theorempreskip{\baselineskip}
+\theorempostskip{\baselineskip}
 
-% % Now define your environments with that style
-% \newtheorem{definition}{Definition}[chapter]
-% \newtheorem{assumption}[definition]{Assumption}
-% \newtheorem{theorem}[definition]{Theorem}
-% \newtheorem{proposition}[definition]{Proposition}
-% \newtheorem{lemma}[definition]{Lemma}
-% \newtheorem{corollary}[definition]{Corollary}
-% \newtheorem{example}[definition]{Example}
-% \newtheorem{conjecture}[definition]{Conjecture}
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{assumption}[definition]{Assumption}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{example}[definition]{Example}
+\newtheorem{conjecture}[definition]{Conjecture}
 
 
 % \newenvironment{mydef}[1][]{%
