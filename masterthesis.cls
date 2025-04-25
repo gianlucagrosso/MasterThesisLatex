@@ -10,6 +10,18 @@
 
 % TODO: check what openbib does with the \bibindent option 
 
+%%% formatting & styling %%%
+\RequirePackage[english]{babel}
+\RequirePackage{csquotes}
+\RequirePackage[babel,stretch=10]{microtype}
+
+%%% pretty refs %%%% 
+\RequirePackage{prettyref}
+\newrefformat{def}{Def.~\ref{#1}}
+\newrefformat{chap}{Chap.~\ref{#1}}
+\newrefformat{fig}{Fig.~\ref{#1}}
+
+
 
 %%% bibliography %%%
 \RequirePackage[
@@ -80,6 +92,8 @@
         \step[fieldset=issn, null]
         \step[fieldset=arxivId, null]
         \step[fieldset=pmid, null]
+        \step[fieldset=doi, null]
+        \step[fieldset=eprint, null]
       }
     }
   }

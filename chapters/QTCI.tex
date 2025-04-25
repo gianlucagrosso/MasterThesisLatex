@@ -1,27 +1,60 @@
 \chapter{Quantics Tensor Cross Interpolation}
-\label{chap:2}
-The widespread and increasing interest in tensor network methodologies - with explicit focus on \textit{matrix product states} (MPSs) \cite{Fannes1992} - outside of the many-body community has facilitated the development of a pivotal\footnote{A rather playful wording choice given the context, as it will become clearer in the subsequent sections.} extension to the tensor network set of tools: the Tensor Cross Interpolation (TCI) algorithm.
+\label{chap:QTCI}
 
 
 \section{The algorithm}
 
 \begin{definition}[Compressible Tensor]
 	A tensor $\mathcal{T}$ is {\normalfont \textbf{compressible}} or {\normalfont \textbf{low-rank}} if it can be approximated by a Matrix Product State with small rank $\chi$.
+	\label{def:compresstensor}
 \end{definition}
 
-\note{Introduction}{Sign problem-free integration, \textit{superhigh-resolution}, exponential reductions in computational costs (\textit{curse of dimensionality}) $\to$ low-rank = calculations in polynomial time with no truncation (common approach), uncover hidden structures}\\
+\begin{definition}[Rank-revealing algorithm]
+	An algorithm 
+	
+	\[
+		\renewcommand{\arraystretch}{1.1}% (optional) a touch of extra vertical room
+		\begin{array}{r c >{{}}c<{{}} c} 
+		\mathcal{A}: &
+		\mathds{K}^{I_1 \times \dots \times I_\mathcal{L}} &
+		\longrightarrow &
+		\mathds{K}^{I_1 \times \dots \times I_\mathcal{L}} \\[2pt]
+		& \mathcal{T} &
+		\longmapsto &
+		\widetilde{\mathcal{T}}
+		\end{array}
+	\]
 
-\noindent\note{Other methods}{High dimensional integrals and exponential complexity of QMB systems, Quantum Montecarlo shortcomings: sign problem and slow convergence ($1 / \sqrt{N}$), different from TN for wave function variational ansatz (DMRG)}\vspace{\baselineskip}\\
+	is said to be {\normalfont \textbf{rank-revealing}}, if it ouputs a low-rank approximation $\widetilde{\mathcal{T}}$ for any compressible tensor $\mathcal{T}$\footnotemark given as input.
+	\label{def:rkralg}
+\end{definition}
+
+\footnotetext{In \prettyref{def:rkralg} we define a tensor $\mathcal{T}$ as an element of the vector space $\mathds{K}^{I_1 \times \dots \times I_\mathcal{L}}$, this is only true if we consider $\mathcal{T}$ an $\mathcal{L}$-dimensional numerical array, as it is for numerics. More generally $\mathcal{T} \in T^p_q(V) = \{t\ |\ t:V^{\otimes q} \otimes  (V^*)^{\otimes p} \longrightarrow \mathds{K} \} $ (where $\mathds{K} = \mathds{R} \vee \mathds{C}$ and $V = \mathcal{H}$ for most applications).}
+
 
 \subsection{Matrix Cross Interpolation and prrLU}
 \note{Matrix Cross Interpolation}{Main paper: \cite{Goreinov1997, Schneider2010}, Error is at most $O(\chi^2)$ the optimal error of SVD, CI vs prrLU, exact for the selected rows and columns (\textit{interpolation}) $A(\mathcal{I},\mathcal{J})*A(\mathcal{I},\mathcal{J})^{-1}A(\mathcal{I},\mathds{J}) = A(\mathcal{I},\mathds{J})  $ and for $\rank{A} = \chi$, heuristic \textit{maxvol principle} = maximise determinant of the pivot matrix, using continuous MCI already reduces the complexity of integration and derivation, CI is numerically unstable for large $\chi$}\vspace{\baselineskip}\\
-\note{Nice Sentences}{The RHS contains only small subparts of the original matrix. }\\
+
+\noindent\note{Nice Sentences}{The RHS contains only small subparts of the original matrix. }\\
+
+\noindent\note{prrLU}{Main book: \cite{Golub96}}
 
 \noindent\todo{Insert a numerical example of CI and prrLU $\to$ use the DFT matrix}
 
 
 \subsection{Tensor Cross Interpolation}
-\note{Tensor Cross Interpolation}{Main paper: \cite{Fernandez2024}, Main TCI ref: \cite{Oseledets2010}, polynomial dimension scaling, matrix cross interpolation \cite{Goreinov1997}, function learning, N-dimensional integrals, \textit{$\epsilon$-factorizability} of continuous functions $\to$ reduction from N to one-dimensional integrals independent of function sign ($\int \text{d}\mathbf{x} f(x_1, ... , x_N) \approx \prod\limits_{\alpha = 1 }^N\int \text{d}x_1 T_\alpha(x_\alpha)P_\alpha^{-1}$) and $|| f - f_\text{TCI} || < \epsilon $, N-dimensional integral $O(Nd\chi^2)$ (not $d^N$) (??) , tensor representation $O(N\chi^2)$ (??), \textit{active machine learning} \cite{Settles2012}: find the region with the largest approximation error, main challenge: bookkeeping and notation, \textit{maxvol} principle \cite{Dolgov2020}, exact if $\rank{TT} = \chi$ like MCI (see Naive Approach \cite{Fernandez2022}), \textit{multi-indices} and \texttt{Vector}\{\textit{multi-indices}\}, $\bigoplus$= concatenation of multi-indices, \textit{nesting condition} \cite{Oseledets2011,Dolgov2020}$\to$ $\mathcal{I}_\alpha \subset \mathcal{I}_{\alpha -1 } \bigoplus \mathds{K}_\alpha$ and $\mathcal{J}_\alpha \subset \mathds{K}_\alpha \bigoplus \mathcal{J}_{\alpha +1 }$(this guarantees exact interpolation for $f$(pivots)), function calls: $O(Nd\chi^2) \ll d^N$, $\Pi_\alpha$ and the \textit{error function} $\epsilon_\Pi = |f - f_\text{TCI}|(i, x_\alpha, x_{\alpha +1}, j)$ $\to$ find the maximum of $\epsilon_\Pi$ before adding new pivots (add the pivots that yields the largest improvement of the local accuracy), pivot search: \textit{full}, \textit{rook}, \textit{block-rook}, \textit{alternate}(alternate:single pivot $O(d\chi)$, total search $O(d\chi^2)$ \cite{Fernandez2022}), \textit{environment-aware} $\epsilon_\Pi$ $\to$ error function related to the error of the integral that takes in consideration the volume contribution to the integral, \textit{environment} vectors $L_i$ and $R_j$, \textit{rank-revealing} (only slow convergence for high rank), \textit{polynomial costs} }\\
+
+The number of function calls necessary to construct $\widetilde{\mathcal{T}}$ from $\mathcal{T}$ is $O(\mathcal{L}d\chi^2) \ll d^\mathcal{L}$, fully specifying only $O(\mathcal{L}\chi^2)$ number of \textit{pivots}.
+
+The TCI algorithm computational time scales as $O(\mathcal{L}d\chi^2)$. 
+
+\begin{definition}
+	A function $f$ is {\normalfont \textbf{almost separable}} if its tensor approximation $F$ is \underline{low-rank}.
+	\label{def:separfunc}
+\end{definition}
+
+
+\note{Tensor Cross Interpolation}{Main paper: \cite{Fernandez2024}, Main TCI ref: \cite{Oseledets2010}, polynomial dimension scaling, matrix cross interpolation \cite{Goreinov1997}, function learning, N-dimensional integrals, \textit{$\epsilon$-factorizability} of continuous functions $\to$ reduction from N to one-dimensional integrals independent of function sign ($\int \text{d}\mathbf{x} f(x_1, ... , x_N) \approx \prod\limits_{\alpha = 1 }^N\int \text{d}x_1 T_\alpha(x_\alpha)P_\alpha^{-1}$) and $|| f - f_\text{TCI} || < \epsilon $, N-dimensional integral $O(\mathcal{L}d\chi^2)$ (not $d^\mathcal{L}$) , tensor representation $O(\mathcal{L}\chi^2)$ (??), \textit{active machine learning} \cite{Settles2012}: find the region with the largest approximation error, main challenge: bookkeeping and notation, \textit{maxvol} principle \cite{Dolgov2020}, exact if $\rank{TT} = \chi$ like MCI (see Naive Approach \cite{Fernandez2022}), \textit{multi-indices} and \texttt{Vector}\{\textit{multi-indices}\}, $\bigoplus$= concatenation of multi-indices, \textit{nesting condition} \cite{Oseledets2011,Dolgov2020}$\to$ $\mathcal{I}_\alpha \subset \mathcal{I}_{\alpha -1 } \bigoplus \mathds{K}_\alpha$ and $\mathcal{J}_\alpha \subset \mathds{K}_\alpha \bigoplus \mathcal{J}_{\alpha +1 }$(this guarantees exact interpolation for $f$(pivots)), function calls: $O(\mathcal{L}d\chi^2) \ll d^\mathcal{L}$, $\Pi_\alpha$ and the \textit{error function} $\epsilon_\Pi = |f - f_\text{TCI}|(i, x_\alpha, x_{\alpha +1}, j)$ $\to$ find the maximum of $\epsilon_\Pi$ before adding new pivots (add the pivots that yields the largest improvement of the local accuracy), pivot search: \textit{full}, \textit{rook}, \textit{block-rook}, \textit{alternate}(alternate:single pivot $O(d\chi)$, total search $O(d\chi^2)$ \cite{Fernandez2022}), \textit{environment-aware} $\epsilon_\Pi$ $\to$ error function related to the error of the integral that takes in consideration the volume contribution to the integral, \textit{environment} vectors $L_i$ and $R_j$, \textit{rank-revealing} (only slow convergence for high rank), \textit{polynomial costs} }\\
 
 \noindent \todo{Insert Algorithm description (see below)}
 \begin{algorithm}
@@ -43,6 +76,8 @@ posing low-rank, high-dimensional tensors into tensor trains/matrix product stat
 
 \subsection{The Quantics Representation: QTCI}
 
+
+
 \note{QTCI}{Discards weak entanglement between different scales; works well for scale-separated, non-irregular functions; $O(\mathcal{L} \log N )$ ($N \stackrel{?}{=} 2^R $) quantics approximation scaling 4 $\to$ logarithmic scaling in the number of grid points \cite{Khoromskij2011}; exponentially high resolution; low-rank scale separated structure revealed through TCI + quantics }\\
 
 \noindent \note{Nice Sentences}{Numerical computations with multivariate functions typically involve a compromise between two contrary desiderata: accurate resolution of the functional dependence, versus parsimonious memory usage.}\\
@@ -59,21 +94,18 @@ posing low-rank, high-dimensional tensors into tensor trains/matrix product stat
 
 
 \section{Computational Fallbacks: Localised Functions}
+
+\begin{figure}[h!]
+	\caption{2D: Heatmap + error Heatmap of TCI approximation of a very localised function with different zoomings  }
+\end{figure}
+
 \subsection{Localised Function and Memory Consumption}
 
+\begin{figure}[h!]
+	\caption{1D: plot of different patch subdivision and relative bond dimension per patch for each division (like patching paper)  }
+\end{figure}
 
-Another cool list:
-\begin{itemize}
-	\item item 1
-	\item item 2\footnote{Some foot note}
-	\item item 3
-    \item item 3\item item 3\item item 3\item item 3\item item 3\item item 3
-\end{itemize}
+\begin{figure}[ht!]
+	\caption{2D: Bond dimension vs bond for each of the zoomings and for one of the more trivial parts of the function. }
+\end{figure}
 
-
-% \begin{figure}
-% 	\centering
-% 	\includegraphics[width=.75\textwidth]{example-image-duck}
-% 	\caption{Another cool duck}
-% 	\label{fig:figure2}
-% \end{figure}

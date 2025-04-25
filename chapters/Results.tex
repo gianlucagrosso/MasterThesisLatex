@@ -1,0 +1,77 @@
+\chapter{Results}
+\label{chap:results}
+\note{Plot ideas}{
+\begin{itemize}
+    \item Plot for $N \geq 2$ functions where I know analytic $f$: plot $f(x_1,..., x_N)$ vs $x_1$ where $x_2,..., x_N$ are picked randomly
+\end{itemize}
+}
+\section{Approximation of Green's functions}
+
+\begin{figure}[ht!]
+    \caption{Error Heatmap of Green's function.}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{$G_{exact}(x,y)$ \& $G_{approx}(x,y)$ vs $x$ for $y$-points picked at random.}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Memory and time vs $\delta$ (localization parameter) patched and non-patched.}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Global error $\epsilon$ vs $R$ to check convergence.}
+\end{figure}
+
+\section{BSE with Patching}
+
+\subsection{\texttt{automul} algorithm}
+
+\begin{figure}[ht!]
+    \caption{Algorithm flowchart of matrix + element-wise multiplication\\(\texttt{automul}).}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Heatmap of TCI and patched TCI approximation of the BSE vertices with patch grid (2D slices or multiple 2D sliced for 3D figure )}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Memory vs patch bond dimension comparison patched/non-patched (show sub-optimal approximation)}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{N patches vs patch bond dimension with optimal number of patches reference for matrix muliplication for each BSE vertex (highlight chosen data for contraction)}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Memory and time scaling patched/non-patched BSE contraction vs $R$ and $\epsilon$.}
+\end{figure}
+
+\section{Bubble Calculation}
+
+\begin{figure}[ht!]
+    \caption{Heatmap and scheme of the global computation (TCI+QFT+ element-wise contraction + patch sum + $\textrm{QFT}^{-1}$ )}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Memory and time scaling vs function parameter ($\beta$, $R$, $\epsilon$) comparison patch/non-patch }
+\end{figure}
+
+
+\section{Gaussian Orbital Overlap}
+
+\note{Orbitals overlap}{Yuriel's paper on atomic bases: \cite{Jolly2024}, double-zeta calculation(?)}
+
+\begin{figure}[ht!]
+    \caption{TCI and patched TCI approximation of the Boys function.}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{3D graph of Gaussian orbitals for \ce{H2} and \ce{LiH}}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Memory and time scaling of orbital overlap compared with standard approach. }
+\end{figure}
+
+

@@ -1,36 +1,52 @@
 \chapter{Patched QTCI}
-\label{chap:adaptivematmul}
+\label{chap:patching}
 
 \note{Patching}{Main reference \cite{Hiroshi2023}}\\
 
-\noindent \note{General references }{\cite{Murray2024} (first mention of the patching+QTT scheme)}
-\section{The algorithm: the Patching scheme}
-\section{Computational Costs and Scaling}
-\section{Applications}
-\subsection{Functions with Localised Features}
-A cool equation:
-\begin{equation}
-	P_{\delta}(E)=\left[\cos \left(\frac{H-E}{N}\right)\right]^{\left\lfloor N^{2} / \delta^{2}\right\rfloor_{2}}
-\end{equation}
+\noindent \note{General references }{\cite{Murray2024} (first mention of the patching+QTT scheme)}\\ 
 
- 
-\begin{table}
-	\centering
-	\caption{A cool table}
-	\begin{tabular}{ccccccc}
-	\toprule
-	\multirow{2}[0]{*}{ABC} & \multicolumn{2}{c}{X} & \multicolumn{2}{c}{Y} & \multicolumn{2}{c}{Z} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
-		& A & B & A & B & A & B \\ \midrule
-	1 & xx.yy  & xx.yy  & xx.yy  & xx.yy  & xx.yy  & xx.yy \\
-	2 & xx.yy & xx.yy & xx.yy & xx.yy & xx.yy & xx.yy \\
-	3 & xx.yy & xx.yy & xx.yy & xx.yy  & xx.yy & xx.yy \\
-	4 & xx.yy & xx.yy & xx.yy  & xx.yy  & xx.yy  & xx.yy \\
-	5 & xx.yy & xx.yy & -- & -- & xx.yy & xx.yy \\
-	6 & {\textbf xx.yy} & {\textbf xx.yy} & {\textbf xx.yy} & {\textbf xx.yy} & {\textbf xx.yy} & {\textbf xx.yy} \\
-	\bottomrule
-	\end{tabular}
-	\label{tab:table1}
-\end{table}
+\section{The algorithm: the Patching scheme}
+
+\begin{figure}[h!]
+	\caption{Tensor representation of a projected MPS and of a container of projected MPSs (patched MPS)}
+\end{figure}
+
+\begin{figure}[h!]
+	\caption{Small flowchart of the patching algorithm.}
+\end{figure}
+\section{Computational Costs and Scaling}
+
+\begin{figure}[h!]
+	\caption{Memory and time scaling vs patch bond dimension + fit (theoretical values)}
+\end{figure}
+
+\begin{figure}[h!]
+	\caption{Number of patches vs patch bond dimension + fit }
+\end{figure}
+
+\begin{figure}[h!]
+	\caption{Heatmap of patched approximation with patch grid for different patch bond dimension and tolerances.}
+\end{figure}
+
+\begin{figure}[h!]
+	\caption{Plot of optimal patching (number of patches) region for function approximation (number of patches vs bond dimension per patch)}
+\end{figure}
+
+
+
+\section{Applications}
+
+\subsection{Functions with Localised Features}
+
+\begin{figure}[h!]
+	\caption{Heatmap + error Heatmap of patched TCI approximation of a very localised function with different zoomings  }
+\end{figure}
+
+\begin{figure}[h!]
+	\caption{Bond dimension vs bond for the different patches. }
+\end{figure}
+
+
+
 
 % \lipsum
