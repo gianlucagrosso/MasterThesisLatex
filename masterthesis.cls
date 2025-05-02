@@ -124,7 +124,7 @@
 
 \RequirePackage{graphicx}
 \RequirePackage{tikz}
-\usetikzlibrary{calc}
+\usetikzlibrary{calc, matrix, fit}
 \input{frontmatter/title}
 
 
@@ -159,23 +159,30 @@
 % \DeclareMathOperator*{\tr}{tr}
 % \DeclareMathOperator*{\Tr}{Tr}
 
-\RequirePackage[amsmath,thmmarks,hyperref]{ntheorem}
-
 % Theorems and definitions 
-\theoremstyle{plain}%
-\theoremheaderfont{\normalfont\bfseries\sffamily}% Matches e.g. \section* font
-\theorembodyfont{\normalfont\itshape}% or \itshape if you want them italic
-\theorempreskip{\baselineskip}
-\theorempostskip{\baselineskip}
 
+\RequirePackage{amsthm}
+
+\newtheoremstyle{dotless}
+{\baselineskip}% ⟨Space above⟩1
+{\baselineskip}% ⟨Space below⟩1
+{\itshape} % body font
+{} % indent amount
+{\bfseries} % theorem head font 
+{} % punctuation after head
+{.5em} % space after head
+{} % head spec
+
+\theoremstyle{dotless}
 \newtheorem{definition}{Definition}[chapter]
 \newtheorem{assumption}[definition]{Assumption}
 \newtheorem{theorem}[definition]{Theorem}
 \newtheorem{proposition}[definition]{Proposition}
 \newtheorem{lemma}[definition]{Lemma}
 \newtheorem{corollary}[definition]{Corollary}
-\newtheorem{example}[definition]{Example}
 \newtheorem{conjecture}[definition]{Conjecture}
+
+\newtheorem{example}{Example}[chapter]
 
 
 % \newenvironment{mydef}[1][]{%

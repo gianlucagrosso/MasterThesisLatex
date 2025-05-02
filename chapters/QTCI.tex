@@ -4,8 +4,8 @@
 
 \section{The algorithm}
 
-\begin{definition}[Compressible Tensor]
-	A tensor $\mathcal{T}$ is {\normalfont \textbf{compressible}} or {\normalfont \textbf{low-rank}} if it can be approximated by a Matrix Product State with small rank $\chi$.
+\begin{definition}[Compressible tensor]
+	A tensor $\mathcal{T}$ is {\normalfont \textbf{compressible}} or {\normalfont \textbf{low-rank}} if it can be approximated by a Matrix Product State (MPS) with small rank $\chi$.
 	\label{def:compresstensor}
 \end{definition}
 
@@ -13,7 +13,7 @@
 	An algorithm 
 	
 	\[
-		\renewcommand{\arraystretch}{1.1}% (optional) a touch of extra vertical room
+		\renewcommand{\arraystretch}{1.1}% a touch of extra vertical room
 		\begin{array}{r c >{{}}c<{{}} c} 
 		\mathcal{A}: &
 		\mathds{K}^{I_1 \times \dots \times I_\mathcal{L}} &
@@ -25,7 +25,7 @@
 		\end{array}
 	\]
 
-	is said to be {\normalfont \textbf{rank-revealing}}, if it ouputs a low-rank approximation $\widetilde{\mathcal{T}}$ for any compressible tensor $\mathcal{T}$\footnotemark given as input.
+	is said to be {\normalfont \textbf{rank-revealing}}, if it ouputs a low-rank approximation $\widetilde{\mathcal{T}}$ for any compressible $\mathcal{L}$-dimensional tensor $\mathcal{T}$\footnotemark given as input.
 	\label{def:rkralg}
 \end{definition}
 
@@ -33,6 +33,51 @@
 
 
 \subsection{Matrix Cross Interpolation and prrLU}
+The TCI algorithm bases its implementation on the following statement: \textit{a low-rank matrix is strongly compressible. }
+
+\begin{example}[$5 \times 5$ Correlation matrix]
+For classical Harmonic Oscillator chain mode-like vectors: 
+
+\[
+\begin{alignedat}{2}      
+	\boldsymbol{v} = \frac{\boldsymbol{1}_5}{\sqrt{5}} \qquad \boldsymbol{w} = \frac{(-2,-1,\dots,2)}{2\sqrt{5}}
+\end{alignedat}
+\]
+the correspondent position-position correlation matrix can be Cross Interpolated as 
+\begin{equation}
+	\label{eq:CIcorrmat}
+	\begin{aligned}
+	  & C  \;=\; \sigma^2 \boldsymbol{v}^T \boldsymbol{v} + \tilde{\sigma}^2 \boldsymbol{w}^T\boldsymbol{w} = \\[.4em]
+	  & {}=  \underbrace{%
+	  \mbox{\footnotesize$
+	  \frac{1}{115}\left[\begin{array}{ccccc}
+		23\sigma^2 + 72\tilde{\sigma}^2  & 23\sigma^2 - 18\tilde{\sigma}^2 & 23\sigma^2 + 12 \tilde{\sigma}^2  & 23\sigma^2 - 18\tilde{\sigma}^2 & 23\sigma^2 - 48\tilde{\sigma}^2 \\[0.2em]
+		\cdots  & 23\sigma^2 + 9\tilde{\sigma}^2/2 & 23\sigma^2 - 3\tilde{\sigma}^2 & 23\sigma^2 + 9\tilde{\sigma}^2/2 & 23\sigma^2 + 12\tilde{\sigma}^2 \\[0.2em]
+		\cdots & \cdots & 23\sigma^2 + 2\tilde{\sigma}^2 & 23\sigma^2 - 3\tilde{\sigma}^2 & 23\sigma^2 - 8\tilde{\sigma}^2 \\[0.2em]
+		\cdots  & \cdots & \cdots &  23\sigma^2 + 9\tilde{\sigma}^2/2 & 23\sigma^2 + 12\tilde{\sigma}^2 \\[0.2em]
+		\cdots  & \cdots & \cdots & \cdots & 23\sigma^2 + 32\tilde{\sigma}^2
+	  \end{array}\right]$}
+	  }_{\displaystyle 5 \times 5}
+	  \\[1.2em]
+	  & {}\approx
+	\underbrace{%
+	  C[\mathds{I} , \mathcal{J}]}_{\displaystyle 5 \times 2}
+	\,
+	\underbrace{%
+	  \begin{bmatrix}
+		\frac{23\sigma^2 + 72\tilde{\sigma}^2}{115} & \frac{23\sigma^2  -48 \tilde{\sigma}^2}{115} \\[0.2em]
+		\frac{23\sigma^2 - 48\tilde{\sigma}^2}{115} & \frac{23\sigma^2 + 32\tilde{\sigma}^2}{115} 
+	  \end{bmatrix}^{-1}}_{\displaystyle 2 \times 2}
+	  \,
+	  \underbrace{%
+	  C[\mathcal{I} , \mathds{J}]}_{\displaystyle 5 \times 2}
+	\end{aligned}
+\end{equation}
+with $\sigma$ and $\tilde{\sigma}$ the variances of the two modes and $\mathcal{I} = \{ 1,5\}$ and $\mathcal{J} = \{ 1,5\}$. 
+\end{example}
+
+	
+
 \note{Matrix Cross Interpolation}{Main paper: \cite{Goreinov1997, Schneider2010}, Error is at most $O(\chi^2)$ the optimal error of SVD, CI vs prrLU, exact for the selected rows and columns (\textit{interpolation}) $A(\mathcal{I},\mathcal{J})*A(\mathcal{I},\mathcal{J})^{-1}A(\mathcal{I},\mathds{J}) = A(\mathcal{I},\mathds{J})  $ and for $\rank{A} = \chi$, heuristic \textit{maxvol principle} = maximise determinant of the pivot matrix, using continuous MCI already reduces the complexity of integration and derivation, CI is numerically unstable for large $\chi$}\vspace{\baselineskip}\\
 
 \noindent\note{Nice Sentences}{The RHS contains only small subparts of the original matrix. }\\
@@ -54,7 +99,7 @@ The TCI algorithm computational time scales as $O(\mathcal{L}d\chi^2)$.
 \end{definition}
 
 
-\note{Tensor Cross Interpolation}{Main paper: \cite{Fernandez2024}, Main TCI ref: \cite{Oseledets2010}, polynomial dimension scaling, matrix cross interpolation \cite{Goreinov1997}, function learning, N-dimensional integrals, \textit{$\epsilon$-factorizability} of continuous functions $\to$ reduction from N to one-dimensional integrals independent of function sign ($\int \text{d}\mathbf{x} f(x_1, ... , x_N) \approx \prod\limits_{\alpha = 1 }^N\int \text{d}x_1 T_\alpha(x_\alpha)P_\alpha^{-1}$) and $|| f - f_\text{TCI} || < \epsilon $, N-dimensional integral $O(\mathcal{L}d\chi^2)$ (not $d^\mathcal{L}$) , tensor representation $O(\mathcal{L}\chi^2)$ (??), \textit{active machine learning} \cite{Settles2012}: find the region with the largest approximation error, main challenge: bookkeeping and notation, \textit{maxvol} principle \cite{Dolgov2020}, exact if $\rank{TT} = \chi$ like MCI (see Naive Approach \cite{Fernandez2022}), \textit{multi-indices} and \texttt{Vector}\{\textit{multi-indices}\}, $\bigoplus$= concatenation of multi-indices, \textit{nesting condition} \cite{Oseledets2011,Dolgov2020}$\to$ $\mathcal{I}_\alpha \subset \mathcal{I}_{\alpha -1 } \bigoplus \mathds{K}_\alpha$ and $\mathcal{J}_\alpha \subset \mathds{K}_\alpha \bigoplus \mathcal{J}_{\alpha +1 }$(this guarantees exact interpolation for $f$(pivots)), function calls: $O(\mathcal{L}d\chi^2) \ll d^\mathcal{L}$, $\Pi_\alpha$ and the \textit{error function} $\epsilon_\Pi = |f - f_\text{TCI}|(i, x_\alpha, x_{\alpha +1}, j)$ $\to$ find the maximum of $\epsilon_\Pi$ before adding new pivots (add the pivots that yields the largest improvement of the local accuracy), pivot search: \textit{full}, \textit{rook}, \textit{block-rook}, \textit{alternate}(alternate:single pivot $O(d\chi)$, total search $O(d\chi^2)$ \cite{Fernandez2022}), \textit{environment-aware} $\epsilon_\Pi$ $\to$ error function related to the error of the integral that takes in consideration the volume contribution to the integral, \textit{environment} vectors $L_i$ and $R_j$, \textit{rank-revealing} (only slow convergence for high rank), \textit{polynomial costs} }\\
+\note{Tensor Cross Interpolation}{Main paper: \cite{Fernandez2024}, Main TCI ref: \cite{Oseledets2010}, polynomial dimension scaling, matrix cross interpolation \cite{Goreinov1997}, function learning, N-dimensional integrals, \textit{$\epsilon$-factorizability} of continuous functions $\to$ reduction from N to one-dimensional integrals independent of function sign ($\int \text{d}\mathbf{x} f(x_1, ... , x_N) \approx \prod\limits_{\alpha = 1 }^N\int \text{d}x_1 T_\alpha(x_\alpha)P_\alpha^{-1}$) and $|| f - f_\text{TCI} || < \epsilon $, N-dimensional integral $O(\mathcal{L}d\chi^2)$ (not $d^\mathcal{L}$) , tensor representation $O(\mathcal{L}\chi^2)$ (??), \textit{active machine learning} \cite{Settles2012}: find the region with the largest approximation error, main challenge: bookkeeping and notation, \textit{maxvol} principle \cite{Dolgov2020}, exact if $\rank{TT} = \chi$ like MCI (see Naive Approach \cite{Fernandez2022}), \textit{multi-indices} and \texttt{Vector}\{\textit{multi-indices}\}, $\bigoplus$= concatenation of multi-indices, \textit{nesting condition} \cite{Oseledets2011,Dolgov2020}$\to$ $\mathcal{I}_\alpha \subset \mathcal{I}_{\alpha -1 } \bigoplus \mathds{K}_\alpha$ and $\mathcal{J}_\alpha \subset \mathds{K}_\alpha \bigoplus \mathcal{J}_{\alpha +1 }$(this guarantees exact interpolation for $f$(pivots)), function calls: $O(\mathcal{L}d\chi^2) \ll d^\mathcal{L}$, $\Pi_\alpha$ and the \textit{error function} $\epsilon_\Pi = |f - f_\text{TCI}|(i, x_\alpha, x_{\alpha +1}, j)$ $\to$ find the maximum of $\epsilon_\Pi$ before adding new pivots (add the pivots that yields the largest improvement of the local accuracy), pivot search: \textit{full}, \textit{rook}, \textit{block-rook}, \textit{alternate}(alternate:single pivot $O(d\chi)$, total search $O(d\chi^2)$ \cite{Fernandez2022}), \textit{environment-aware} $\epsilon_\Pi$ $\to$ error function related to the error of the integral that takes in consideration the volume contribution to the integral, \textit{environment} vectors $L_i$ and $R_j$, \textit{rank-revealing} (only slow convergence for high rank), \textit{polynomial costs}, integration scales $1/N_{eval}$ compared to $1/\sqrt{N_{eval}}$ Monte Carlo (cf. Ref. \cite{Fernandez2024})}\\
 
 \noindent \todo{Insert Algorithm description (see below)}
 \begin{algorithm}
@@ -95,13 +140,13 @@ posing low-rank, high-dimensional tensors into tensor trains/matrix product stat
 
 \section{Computational Fallbacks: Localised Functions}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\caption{2D: Heatmap + error Heatmap of TCI approximation of a very localised function with different zoomings  }
 \end{figure}
 
 \subsection{Localised Function and Memory Consumption}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\caption{1D: plot of different patch subdivision and relative bond dimension per patch for each division (like patching paper)  }
 \end{figure}
 

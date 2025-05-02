@@ -62,6 +62,42 @@
 
 \note{Orbitals overlap}{Yuriel's paper on atomic bases: \cite{Jolly2024}, double-zeta calculation(?)}
 
+The electron repulsion integral of two GTOs is defined as
+
+\begin{equation}
+    \bra{\textbf{A}, \textbf{C}}\frac{1}{r_{12}}\ket{\textbf{B}, \textbf{D}} = \int_{-\infty}^\infty \text{d}^3r_1 \int_{-\infty}^\infty \text{d}^3r_2 \frac{\phi_\textbf{A}(\bm{r}_1) \phi_\textbf{B}(\bm{r}_1) \phi_\textbf{C}(\bm{r}_2) \phi_\textbf{D}(\bm{r}_2)}{|\bm{r}_1 - \bm{r}_2|}
+\end{equation}
+
+where the generic Cartedisan GTO can be written as
+
+\begin{equation}
+    \ket{\textbf{R}} = \phi_\textbf{R}(\bm{r}) = N (x - R_x)^l (y - R_y)^m (z - R_z)^n e^{-\alpha (\bm{r} - \textbf{R})^2}.
+\end{equation}
+The electron repulsion integral can be rewritten as (cf. Ref. \cite{Petersson2010}): 
+
+\begin{align}
+    \bra{\textbf{A}, \textbf{C}}\frac{1}{r_{12}}\ket{\textbf{B}, \textbf{D}} =& \frac{N_\textbf{A}N_\textbf{B}N_\textbf{C}N_\textbf{D} \pi^{5/2}}{\gamma_p\gamma_q\sqrt{\gamma_p + \gamma_q}} e^{\eta_p(\textbf{A} - \textbf{B})^2} e^{\eta_q(\textbf{C} - \textbf{D})^2} \times \\
+    \nonumber &\sum_{\bm{i},\bm{o},\bm{r},u}\mathcal{J}_x \sum_{\bm{j},\bm{p},\bm{s},v} \mathcal{J}_y \sum_{\bm{k},\bm{q},\bm{t},w} \mathcal{J}_z\ 2F_\nu (\eta (\textbf{P} - \textbf{Q})^2)
+\end{align}
+
+where
+
+\begin{equation} 
+    F_\nu(u) = \int_{0}^{1} \text{d}t\ t^{2\nu} e ^{-ut^2}
+\end{equation}
+
+is the so-called \textit{Boys function} \cite{Boys1950}.
+
+    
+\begin{equation}
+    \begin{alignedat}{5}      
+      \textbf{P} &= \frac{1}{\gamma_p}(\alpha_1 \textbf{A} + \alpha_2 \textbf{B}) &\qquad \gamma_p &= \alpha_1 + \alpha_2 \\[6pt]
+      \textbf{Q} &= \frac{1}{\gamma_q}(\alpha_3 \textbf{C} + \alpha_4 \textbf{D}) &\qquad \gamma_q &= \alpha_3 + \alpha_4 \\[6pt]
+      \eta &= \frac{\gamma_p\gamma_q}{\gamma_p + \gamma_q}
+    \end{alignedat}
+\end{equation}
+    
+
 \begin{figure}[ht!]
     \caption{TCI and patched TCI approximation of the Boys function.}
 \end{figure}
