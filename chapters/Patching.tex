@@ -1,34 +1,34 @@
 \chapter{Patched QTCI}
 \label{chap:patching}
 
-\note{Patching}{Main reference \cite{Hiroshi2023}}\\
+\note{Patching}{Main reference \cite{Hiroshi2023}; \textit{reset mode} of TCI eliminates bad pivots that occur when the algorithm first explores regions where $\mathcal{T}$ is small and only later configurations that are larger $\to$ this could be sufficient but not enough hence patching; patched TCI benefints from \textit{global pivot updates} coming from previous TCI decompositions; patching helps solving ergodicity problems; }\\
 
 \noindent \note{General references }{\cite{Murray2024} (first mention of the patching+QTT scheme)}\\ 
 
 \section{The algorithm: the Patching scheme}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\caption{Tensor representation of a projected MPS and of a container of projected MPSs (patched MPS)}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\caption{Small flowchart of the patching algorithm.}
 \end{figure}
 \section{Computational Costs and Scaling}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\caption{Memory and time scaling vs patch bond dimension + fit (theoretical values)}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\caption{Number of patches vs patch bond dimension + fit }
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\caption{Heatmap of patched approximation with patch grid for different patch bond dimension and tolerances.}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\caption{Plot of optimal patching (number of patches) region for function approximation (number of patches vs bond dimension per patch)}
 \end{figure}
 
@@ -38,11 +38,11 @@
 
 \subsection{Functions with Localised Features}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\caption{Heatmap + error Heatmap of patched TCI approximation of a very localised function with different zoomings  }
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 	\caption{Bond dimension vs bond for the different patches. }
 \end{figure}
 

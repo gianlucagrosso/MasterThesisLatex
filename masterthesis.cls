@@ -20,6 +20,10 @@
 \newrefformat{def}{Def.~\ref{#1}}
 \newrefformat{chap}{Chap.~\ref{#1}}
 \newrefformat{fig}{Fig.~\ref{#1}}
+\newrefformat{eq}{Eq.~\ref{#1}}
+\newrefformat{prop}{Prop.~\ref{#1}}
+\newrefformat{alg}{Alg.~\ref{#1}}
+
 
 
 
@@ -124,7 +128,7 @@
 
 \RequirePackage{graphicx}
 \RequirePackage{tikz}
-\usetikzlibrary{calc, matrix, fit}
+\usetikzlibrary{matrix,fit,calc,backgrounds,decorations.pathreplacing,patterns,tikzmark, calligraphy}
 \input{frontmatter/title}
 
 
@@ -147,12 +151,14 @@
 \RequirePackage{dsfont} %% \mathds
 
 %%% algorithms %%%
-\RequirePackage{algorithm}
-\RequirePackage{algpseudocode}
+\usepackage[ruled, lined, linesnumbered, algochapter,longend]{algorithm2e}
 
 %%% chemistry %%%
 \RequirePackage[version=4]{mhchem}
 \mhchemoptions{textfontname=sffamily, mathfontname=mathsf}
+
+%%% matrices %%%
+\RequirePackage{nicematrix}
 
 % \DeclareMathOperator*{\argmin}{argmin}
 % \DeclareMathOperator*{\argmax}{argmax}
@@ -177,11 +183,11 @@
 \newtheorem{definition}{Definition}[chapter]
 \newtheorem{assumption}[definition]{Assumption}
 \newtheorem{theorem}[definition]{Theorem}
-\newtheorem{proposition}[definition]{Proposition}
 \newtheorem{lemma}[definition]{Lemma}
 \newtheorem{corollary}[definition]{Corollary}
 \newtheorem{conjecture}[definition]{Conjecture}
 
+\newtheorem{proposition}{Proposition}[chapter]
 \newtheorem{example}{Example}[chapter]
 
 
@@ -204,7 +210,7 @@
 
 
 %%% code listing %%%
-\RequirePackage{xcolor}
+\RequirePackage[table]{xcolor}
 
 % %%% copyrightpage %%%
 
