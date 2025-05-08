@@ -2,6 +2,7 @@
 \ProvidesClass{masterthesis}
 
 \RequirePackage{etoolbox} % Extend Latex coding capabilities
+\RequirePackage{adjustbox}
 
 \LoadClass[fontsize=11pt,a4paper,twoside,extrafontsizes, onecolumn, openright, draft, %showtrims
 	]{memoir}
@@ -23,9 +24,7 @@
 \newrefformat{eq}{Eq.~\ref{#1}}
 \newrefformat{prop}{Prop.~\ref{#1}}
 \newrefformat{alg}{Alg.~\ref{#1}}
-
-
-
+\newrefformat{tab}{Tab.~\ref{#1}}
 
 %%% bibliography %%%
 \RequirePackage[
@@ -88,7 +87,7 @@
     {}
     {\printtext{\bibstring{in}\intitlepunct}}}
 
-% Biber sourcemap: Remove ISSNs
+% Biber sourcemap: Remove ISSNsCL
 \DeclareSourcemap{
     \maps[datatype=bibtex]{
       \map{
@@ -102,8 +101,7 @@
     }
   }
 
-\addbibresource{backmatter/library.bib}
-
+\addbibresource{/Users/di93hiq/Desktop/QTCIMasterThesis/MasterThesisLatex/backmatter/library.bib}
 
 %%% hyperref and url %%%
 \RequirePackage[unicode]{hyperref}
