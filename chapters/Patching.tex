@@ -11,10 +11,13 @@
 since all TCI algorithms involve sampling, none of them is fully immune against missing some features of the tensor of interest, as already discussed above.}
 
 \section{The algorithm: the Patching scheme}
+\label{sec:patchAlg}
 
 \begin{figure}[ht!]
 	\caption{Tensor representation of a projected MPS and of a container of projected MPSs (patched MPS)}
 \end{figure}
+
+\subsection{Direct sum of Tensor Trains}
 
 \begin{figure}[ht!]
 	\caption{Small flowchart of the patching algorithm.}
@@ -35,6 +38,11 @@ since all TCI algorithms involve sampling, none of them is fully immune against 
 
 \begin{figure}[ht!]
 	\caption{Plot of optimal patching (number of patches) region for function approximation (number of patches vs bond dimension per patch)}
+\end{figure}
+
+\subsection{``Overpatching''}
+\begin{figure}[ht!]
+	\caption{1D: plot of different patch subdivision and relative bond dimension per patch for each division (like patching paper)  }
 \end{figure}
 
 

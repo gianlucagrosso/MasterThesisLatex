@@ -2,6 +2,18 @@
 \ProvidesClass{masterthesis}
 
 \RequirePackage{etoolbox} % Extend Latex coding capabilities
+%%% spacing %%%
+\AtEndEnvironment{equation}{\vspace{.8\baselineskip}}
+\AtEndEnvironment{equation*}{\vspace{.8\baselineskip}}
+\AtEndEnvironment{lstlisting}{\vspace{.8\baselineskip}}
+
+\AtBeginEnvironment{equation}{\vspace{.5\baselineskip}}
+\AtBeginEnvironment{equation*}{\vspace{.5\baselineskip}}
+\AtBeginEnvironment{table}{\vspace{.8\baselineskip}}
+\AtBeginEnvironment{lstlisting}{\vspace{.8\baselineskip}}
+
+
+
 \RequirePackage{adjustbox}
 
 \LoadClass[fontsize=11pt,a4paper,twoside,extrafontsizes, onecolumn, openright, draft, %showtrims
@@ -25,6 +37,7 @@
 \newrefformat{prop}{Prop.~\ref{#1}}
 \newrefformat{alg}{Alg.~\ref{#1}}
 \newrefformat{tab}{Tab.~\ref{#1}}
+\newrefformat{sec}{Sec.~\ref{#1}}
 
 %%% bibliography %%%
 \RequirePackage[
@@ -205,10 +218,61 @@
 
 %%% figures %%%
 \RequirePackage{graphicx,float}
+%%% colors %%%
+\RequirePackage[table, dvipsnames]{xcolor}
+
+\definecolor{backcolour}{rgb}{0.95,0.95,0.9}
+\definecolor{mymagenta}{RGB}{255, 0, 255}
 
 
 %%% code listing %%%
-\RequirePackage[table]{xcolor}
+\RequirePackage{listings}
+
+\lstset{
+basicstyle=\ttfamily\footnotesize, 
+backgroundcolor=\color{backcolour}, 
+columns=fullflexible,
+numbers=left, 
+numberstyle=\small\ttfamily\color{Gray},
+stepnumber=1,              
+numbersep=10pt, 
+numberfirstline=true, 
+numberblanklines=true, 
+tabsize=4,
+extendedchars=true,
+breaklines=true,       
+keywordstyle=\color{Blue}\bfseries,
+identifierstyle=, % using emph or index keywords
+commentstyle=\color{OliveGreen},
+stringstyle=\color{Maroon},
+showstringspaces=false,
+showtabs=false,
+upquote=false,
+rulecolor=\color{black},
+frame=T,
+framexbottommargin=0pt,
+keepspaces=true, 
+texcl=true, % interpet comments as LaTeX
+captionpos=b,
+}
+
+\lstdefinelanguage{julia}
+{
+  keywordsprefix=\@,
+  morekeywords={
+    exit,whos,edit,load,is,isa,isequal,typeof,tuple,ntuple,uid,hash,finalizer,convert,promote,
+    subtype,typemin,typemax,realmin,realmax,sizeof,eps,promote_type,method_exists,applicable,
+    invoke,dlopen,dlsym,system,error,throw,assert,new,Inf,Nan,pi,im,begin,while,for,in,return,
+    break,continue,macro,quote,let,if,elseif,else,try,catch,end,bitstype,ccall,do,using,module,
+    import,export,importall,baremodule,immutable,local,global,const,Bool,Int,Int8,Int16,Int32,
+    Int64,Uint,Uint8,Uint16,Uint32,Uint64,Float32,Float64,Complex64,Complex128,Any,Nothing,None,
+    function,type,typealias,abstract, Type, Vector, NTuple, where
+  },
+  sensitive=true,
+  morecomment=[l]{\#},
+  morestring=[b]',
+  morestring=[b]" 
+}
 
 % %%% copyrightpage %%%
 
