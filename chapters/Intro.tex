@@ -41,6 +41,15 @@ an automatic way to map a very large variety of physics and applied mathematics 
 \noindent \note{Open questions QTCI 
 }{When does a multivariate function admit low-rank representation? }
 
+\note{Patching}{Main reference \cite{Hiroshi2023}; \textit{reset mode} of TCI eliminates bad pivots that occur when the algorithm first explores regions where $\mathcal{T}$ is small and only later configurations that are larger $\to$ this could be sufficient but not enough hence patching; patched TCI benefints from \textit{global pivot updates} coming from previous TCI decompositions; patching helps solving ergodicity problems; }\\
+
+\noindent \note{General references }{\cite{Murray2024} (first mention of the patching+QTT scheme)}\\ 
+
+\noindent \note{Plot ideas}{Plot the ratio of sampled points (function calls) vs total points of the calculation. }\\ 
+
+\noindent \note{Nice sentences}{ Nevertheless,
+since all TCI algorithms involve sampling, none of them is fully immune against missing some features of the tensor of interest, as already discussed above.}
+
 
 \textsc{Small caps text}
 {\HUGE{Huge text}}
