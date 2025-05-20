@@ -5,10 +5,14 @@
 %%% spacing %%%
 \AtEndEnvironment{equation}{\vspace{.8\baselineskip}}
 \AtEndEnvironment{equation*}{\vspace{.8\baselineskip}}
+\AtEndEnvironment{align}{\vspace{.8\baselineskip}}
+\AtEndEnvironment{align*}{\vspace{.8\baselineskip}}
 \AtEndEnvironment{lstlisting}{\vspace{.8\baselineskip}}
 
 \AtBeginEnvironment{equation}{\vspace{.5\baselineskip}}
 \AtBeginEnvironment{equation*}{\vspace{.5\baselineskip}}
+\AtBeginEnvironment{align}{\vspace{.5\baselineskip}}
+\AtBeginEnvironment{align*}{\vspace{.5\baselineskip}}
 \AtBeginEnvironment{table}{\vspace{.8\baselineskip}}
 \AtBeginEnvironment{lstlisting}{\vspace{.8\baselineskip}}
 
@@ -38,6 +42,7 @@
 \newrefformat{alg}{Alg.~\ref{#1}}
 \newrefformat{tab}{Tab.~\ref{#1}}
 \newrefformat{sec}{Sec.~\ref{#1}}
+\newrefformat{app}{Appendix~\ref{#1}}
 
 %%% bibliography %%%
 \RequirePackage[

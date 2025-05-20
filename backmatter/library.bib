@@ -589,3 +589,87 @@ abstract = {Based on the geometric analysis of Gaussian elimination (GE) found i
 }
 
 @article{Lee2018, author = {Lee, Namgil and Cichocki, Andrzej}, title = {Fundamental tensor operations for large-scale data analysis using tensor network formats}, year = {2018}, issue_date = {July 2018}, publisher = {Kluwer Academic Publishers}, address = {USA}, volume = {29}, number = {3}, issn = {0923-6082}, url = {https://doi.org/10.1007/s11045-017-0481-0}, doi = {10.1007/s11045-017-0481-0}, abstract = {We discuss extended definitions of linear and multilinear operations such as Kronecker, Hadamard, and contracted products, and establish links between them for tensor calculus. Then we introduce effective low-rank tensor approximation techniques including Candecomp/Parafac, Tucker, and tensor train (TT) decompositions with a number of mathematical and graphical representations. We also provide a brief review of mathematical properties of the TT decomposition as a low-rank approximation technique. With the aim of breaking the curse-of-dimensionality in large-scale numerical analysis, we describe basic operations on large-scale vectors, matrices, and high-order tensors represented by TT decomposition. The proposed representations can be used for describing numerical methods based on TT decomposition for solving large-scale optimization problems such as systems of linear equations and symmetric eigenvalue problems.}, journal = {Multidimensional Syst. Signal Process.}, month = jul, pages = {921–960}, numpages = {40}, keywords = {Tensor train, Tensor networks, Tensor calculus, Strong Kronecker product, Multilinear operator, Matrix product state, Matrix product operator, Generalized Tucker model, Contracted product, Big data, 65F25, 15A69, 15A63} }
+
+@article{Ehrlacher2021,
+author = {Ehrlacher, Virginie and Grigori, Laura and Lombardi, Damiano and Song, Hao},
+title = {Adaptive Hierarchical Subtensor Partitioning for Tensor Compression},
+journal = {SIAM Journal on Scientific Computing},
+volume = {43},
+number = {1},
+pages = {A139-A163},
+year = {2021},
+doi = {10.1137/19M128689X},
+
+URL = {https://doi.org/10.1137/19M128689X},
+eprint = {https://doi.org/10.1137/19M128689X},
+abstract = { In this work a numerical method is proposed to compress a tensor by constructing a piecewise tensor approximation. This is constructed by partitioning a tensor into subtensors and by constructing a low-rank tensor approximation (in a given format) in each subtensor. Neither the partition nor the ranks are fixed a priori, but, instead, they are obtained in order to fulfill a prescribed accuracy and optimize the storage. Some numerical experiments are proposed to illustrate the method. }
+}
+
+@phdthesis{FuenteRuizPhDThesis,
+  TITLE = {{Adaptive tensor methods for high dimensional problems}},
+  AUTHOR = {Fuente Ruiz, Mar{\'i}a},
+  URL = {https://theses.hal.science/tel-04082601},
+  NUMBER = {2023SORUS060},
+  SCHOOL = {{Sorbonne Universit{\'e}}},
+  YEAR = {2023},
+  MONTH = Mar,
+  KEYWORDS = {Tensor methods ; Numerical methods ; High dimension ; Canonical Polyadic ; Model Order Reduction ; Neural Networks ; PINNs ; Singulary Perturbed Problems ; M{\'e}thodes tensorielles ; M{\'e}thodes num{\'e}riques ; Haute dimension ; Polyadique canonique ; Mod{\`e}les d'ordre r{\'e}duit ; R{\'e}seaux neuronaux ; PINNs ; Probl{\`e}mes perturb{\'e}s singuliers},
+  TYPE = {Thesis},
+  PDF = {https://theses.hal.science/tel-04082601v1/file/FUENTE_RUIZ_Maria_these_2023.pdf},
+  HAL_ID = {tel-04082601},
+  HAL_VERSION = {v1},
+}
+
+@article{Ehrlacher2022,
+author = {Ehrlacher, Virginie and Ruiz, Maria Fuente and Lombardi, Damiano},
+title = {{SOTT: Greedy Approximation of a Tensor as a Sum of Tensor Trains}},
+journal = {SIAM Journal on Scientific Computing},
+volume = {44},
+number = {2},
+pages = {A664-A688},
+year = {2022},
+doi = {10.1137/20M1381472},
+
+URL = {https://doi.org/10.1137/20M1381472},
+eprint = {https://doi.org/10.1137/20M1381472},
+abstract = { In the present work, a method is proposed in order to compute an approximation of a given tensor as a sum of tensor trains (TTs), where the order of the variates and the values of the ranks can vary from one term to the other in an adaptive way. The numerical scheme is based on a greedy algorithm and an adaptation of the TT-SVD method. It achieves good performance without depending on the variable ordering: we observed that it behaves as the average of the TT-SVDs when considering all possible permutations of the variable order. The proposed approach can also be used in order to compute an approximation of a tensor in a canonical polyadic (CP) format, as an alternative to standard algorithms like alternating linear squares (ALS) or alternating singular value decomposition (ASVD) methods. Some numerical experiments are proposed, in which the proposed method is compared to ALS and ASVD methods for the construction of a CP approximation of a given tensor and performs particularly well for high-order tensors. The interest of approximating a tensor as a sum of TTs is illustrated in several numerical test cases. }
+}
+
+
+@article{Rakhuba2015,
+author = {Rakhuba, M. V. and Oseledets, I. V.},
+title = {Fast Multidimensional Convolution in Low-Rank Tensor Formats via Cross Approximation},
+journal = {SIAM Journal on Scientific Computing},
+volume = {37},
+number = {2},
+pages = {A565-A582},
+year = {2015},
+doi = {10.1137/140958529},
+URL = {https://doi.org/10.1137/140958529},
+eprint = {https://doi.org/10.1137/140958529},
+    abstract = { We propose a new cross-conv algorithm for approximate computation of convolution in different low-rank tensor formats (tensor train, Tucker, hierarchical Tucker). It has better complexity with respect to the tensor rank than previous approaches. The new algorithm has a high potential impact in different applications. The key idea is based on applying cross approximation in the “frequency domain,” where convolution becomes a simple elementwise product. We illustrate efficiency of our algorithm by computing the three-dimensional Newton potential and by presenting preliminary results for solution of the Hartree--Fock equation on tensor-product grids. }
+}
+
+
+@inbook{Deng2008,
+	address = {Boston, MA},
+	author = {Deng, Ping and Wu, Weili and Shragowitz, Eugene},
+	booktitle = {Encyclopedia of Algorithms},
+	date = {2008//},
+	date-added = {2025-05-13 22:55:58 +0200},
+	date-modified = {2025-05-13 22:57:04 +0200},
+	doi = {10.1007/978-0-387-30162-4{\_}2},
+	editor = {Kao, Ming-Yang},
+	id = {Deng2008},
+	isbn = {978-0-387-30162-4},
+	pages = {4--7},
+	publisher = {Springer US},
+	title = {Adaptive Partitions},
+	url = {https://doi.org/10.1007/978-0-387-30162-4_2},
+	year = {2008},
+	bdsk-url-1 = {https://doi.org/10.1007/978-0-387-30162-4_2},
+	bdsk-url-2 = {https://doi.org/10.1007/978-0-387-30162-4%7B%5C_%7D2}
+}
+
+
+

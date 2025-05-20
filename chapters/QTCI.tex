@@ -1,9 +1,9 @@
 \chapter{Quantics Tensor Cross Interpolation}
 \label{chap:QTCI}
 
-Cross approximation is tensor compression technique well-established in the literature \cite{Oseledets2010, Dolgov2020, Savostyanov2011, Savostyanov2014, Fernandez2022, Fernandez2024}. This technique, pioneered by Oseledets \cite{Oseledets2010} and improved by Dolgov and Savostyanov \cite{Dolgov2020}, aims to find a parsimonious interpolation for multi-index tensors with a limited amount of computational resources. Tensor Cross Interpolation (TCI) have permitted TT-representations of multivariate functions at a cheaper cost than any SVD based counterpart. Such compressed TT-representations have been used, among other applications, to compute very complex, multi-dimensional integrations, converging better (with no ``sign problem'') than standard sampling routines, such as Monte Carlo \cite{Fernandez2022, Dolgov2020}. In most recent years, Fernandez, Ritter and collaborators have improved the already powerful implementations of TCI, targeting stability and discretization issues of the standard routine \cite{Fernandez2024}. This renewed TCI, however, is not free from suboptimalities, especially when trying to target very complex, ``quasi-singular'' type of problems. 
+Cross approximation is tensor compression technique well-established in the literature \cite{Oseledets2010, Dolgov2020, Savostyanov2011, Savostyanov2014, Fernandez2022, Fernandez2024}. This technique, pioneered by Oseledets \cite{Oseledets2010} and improved by Dolgov and Savostyanov \cite{Dolgov2020}, aims to find a parsimonious interpolation for multi-index tensors with a limited amount of computational resources. Tensor Cross Interpolation (TCI) have permitted TT-representations of multivariate functions at a cheaper cost than any SVD based counterpart. Such compressed TT-representations have been used, among other applications, to compute very complex, multi-dimensional integrations, converging better (with no ``sign problem'' \cite{Loh1990}) than standard sampling routines, such as Monte Carlo \cite{Fernandez2022, Dolgov2020}. In most recent years, Fernandez, Ritter and collaborators have improved the already powerful implementations of TCI, targeting stability and discretization issues of the standard routine \cite{Fernandez2024}. This renewed TCI, however, is not free from suboptimalities, especially when trying to target very complex, ``quasi-singular'' type of problems. 
 
-In this chapter, we summarize the basic technical details of the state-of-the-art implementation of cross interpolation for tensors. A generic introduction to all the mathematical and technical details of the TCI routine is given, in order to provide the reader the tools to understand and, through further reading, reproduce the current state of the algorithm. Nonetheless, considering the goal of this work, no particular importance is given to such details, and more focus is instead directed towards the strengths (\prettyref{sec:TCIalgorithm}) and fallbacks (\prettyref{sec:TCIFallbacks}) of the ``at present'' TCI algorithm. Multiple examples are employed for this purpose.
+In this chapter, we summarize the basic technical details of the state-of-the-art implementation of cross interpolation for tensors. A generic introduction to all the mathematical and technical details of the TCI routine is given, in order to provide the reader the tools to understand and, through further reading, reproduce the current state of the algorithm. Nonetheless, considering the goal of this work, no particular importance is given to such details, and more focus is instead directed towards the strengths -- \prettyref{sec:TCIalgorithm} -- and fallbacks -- \prettyref{sec:TCIFallbacks} -- of the ``at present'' TCI algorithm. Multiple examples are employed for this purpose.
 
 \section{The algorithm}
 \label{sec:TCIalgorithm}
@@ -22,9 +22,9 @@ The Tensor Cross Interpolation (TCI) algorithm is a rank-revealing algorithm for
 		\renewcommand{\arraystretch}{1.1}% a touch of extra vertical room
 		\begin{array}{r c >{{}}c<{{}} c} 
 		\mathcal{A}: &
-		\mathds{K}^{I_1 \times \dots \times I_\mathcal{L}} &
+		\mathds{K}^{d_1 \times \dots \times d_\mathcal{L}} &
 		\longrightarrow &
-		\mathds{K}^{I_1 \times \dots \times I_\mathcal{L}} \\[2pt]
+		\mathds{K}^{d_1 \times \dots \times d_\mathcal{L}} \\[2pt]
 		& \mathcal{T} &
 		\longmapsto &
 		\widetilde{\mathcal{T}}
@@ -35,7 +35,7 @@ The Tensor Cross Interpolation (TCI) algorithm is a rank-revealing algorithm for
 	\label{def:rkralg}
 \end{definition}
 
-TCI depends on these two properties to provide a competitive numerical approximation technique. Given a tensor $\mT$ with a hidden low-rank structure as input, TCI always provides an optimal and compressed representation of it at a \textit{polynomial-scaling} cost in CPU time and memory. Even when the tensor $\mT$ is high rank, TCI is able to output a TT unfolding $\widetilde{\mT}$ (at a slower convergence rate). Before explaining how TCI works, let us first dive into the mathematical tools that supply TCI of this \textit{rank-revealing} property.
+TCI depends on these two properties to provide a competitive numerical approximation technique. Given a tensor $\mT$ with a hidden low-rank structure as input, TCI always provides an optimal and compressed representation of it at a \textit{polynomial-scaling} cost in CPU time and memory. Even when the tensor $\mT$ is high rank, TCI is able to output a TT unfolding $\widetilde{\mT}$ (at a slower convergence rate). Before explaining how TCI works, let us first dive into the mathematical tools that supply TCI of this \textit{rank-revealing} and \textit{compression} properties.
 
 \footnotetext{In \prettyref{def:rkralg} we define a tensor $\mathcal{T}$ as an element of the vector space $\mathds{K}^{I_1 \times \dots \times I_\mathcal{L}}$, this is only true if we consider $\mathcal{T}$ an $\mathcal{L}$-dimensional numerical array, as it is for numerics. More generally $\mathcal{T} \in T^p_q(V) = \{t\ |\ t:V^{\otimes q} \otimes  (V^*)^{\otimes p} \longrightarrow \mathds{K} \} $ (where $\mathds{K} = \mathds{R} \vee \mathds{C}$ and $V = \mathcal{H}$ for most applications).}
 
@@ -309,14 +309,14 @@ Some remarks about \prettyref{alg:prrLU} are in order:
 Tensor Cross Interpolation is a generalization of matrix Cross Interpolation -- and therefore prrLU (see \prettyref{eq:prrLUCI}) -- to $\mathcal{L}$-dimensional tensors $\mathcal{T}$. Similarly to prrLU, TCI progressively uncovers the \textit{low rank} structure of a given tensor, rendering a very functional approximation of the input. The main struggle of TCI routines revolves around bookkeeping of tensor indices -- the \textit{pivots} -- necessary for a correct approximation. 
 Hence, let us introduce some useful notation: 
 \begin{itemize}
-	\item $\mathcal{T}_{\boldsymbol{\sigma}} \in \mathds{K}^{I_1\times I_2\times \dots \times I_\mathcal{L}}$ is the TCI input tensor, with indices $\boldsymbol{\sigma} \in I_1\times I_2\times \dots \times I_\mathcal{L}$ ($\dim I_i = d_i \footnotemark $); $\mathcal{\widetilde{T}}_{\boldsymbol{\sigma}} \in \mathds{K}^{I_1\times I_2\times \dots \times I_\mathcal{L}}$ is the resulting interpolated tensor:
+	\item $\mathcal{T}_{\boldsymbol{\sigma}} \in \mathds{K}^{d_1\times d_2\times \dots \times d_\mathcal{L}}$ is the TCI input tensor, with indices $\bsigma \in I_1\times I_2\times \dots \times I_\mathcal{L} := \text{Ind}\left(\mT\right)$ ($|I_i| = d_i\, \footnotemark$); $\mathcal{\widetilde{T}}_{\boldsymbol{\sigma}} \in \mathds{K}^{d_1\times d_2\times \dots \times d_\mathcal{L}}$ is the resulting interpolated tensor:
+	\footnotetext{For most application $d_i=d\; \forall i$, with fixed $d$. }
 	\begin{align}
 		\label{eq:globTTensor}   
-	 \mathcal{T}_{\boldsymbol{\sigma}} 
+	 \mathcal{T}_{\bsigma}
 	 = \raisebox{-5mm}{\includegraphics{figures/fnatural_short.pdf}} \approx  \mathcal{\widetilde{T}}_{\boldsymbol{\sigma}} \, ; 
 	 \end{align}
-	\footnotetext{For most application $d_i=d\; \forall i$, with fixed $d$. }
-	\item $\mathds{I}_\ell = I_1\times I_2\times \dots \times I_\ell$ and $\mathds{J}_\ell = I_\ell\times I_2\times \dots \times I_\mathcal{L}$\footnotemark denotes, respectively, the set of all \textit{row multi-indices} and \textit{column multi-indices} up to and from site $\ell$ (e.g. $i \in \mathds{I}_\ell$, $j \in \mathds{J}_\ell$ implies $i = (\sigma_1, \dots, \sigma_\ell)$, $j = (\sigma_\ell, \dots, \sigma_\mathcal{L})$);
+	\item $\mathds{I}_\ell = I_1\times I_2\times \dots \times I_\ell$ and $\mathds{J}_\ell = I_\ell\times I_2\times \dots \times I_\mathcal{L}$\footnotemark\; denotes, respectively, the set of all \textit{row multi-indices} and \textit{column multi-indices} up to and from site $\ell$ (e.g. $i_\ell \in \mathds{I}_\ell$, $j_\ell \in \mathds{J}_\ell$ implies $i_\ell = (\sigma_1, \dots, \sigma_\ell)$, $j_\ell = (\sigma_\ell, \dots, \sigma_\mathcal{L})$);
 	\item $\mathcal{I}_\ell \subseteq \mathds{I}_\ell$ and $\mathcal{J}_\ell \subseteq \mathds{J}_\ell$ are, respectively, lists of \textit{pivot rows} and \textit{pivot columns} and contain only a subset of the total row and column multi-indices, the \textit{pivots};
 	\item the following objects represent \textit{slices} of the original tensor:
 	\vspace{.5\baselineskip}
@@ -340,7 +340,7 @@ of the TCI routine.
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=\textwidth]{figures/TCI.pdf}
-	\caption{Main steps of the TCI algorithm. $a)$ A set of indices such that $\mathcal{T}_{\hat \sigma} \neq 0$ is chosen randomly from the configuration space. Pivot lists are constructed from the initial multi-indices set. $b)$ A first sweep is performed for an initial Matrix Product State representation of our tensor $\mathcal{T}$. At sites $\ell$ and $\ell+1$, $\Pi_\ell$ tensor slices of the form in \prettyref{eq:Tslices} are constructed from the initial pivot lists $\mathcal{I}_{\ell-1}$ and $\mathcal{J}_{\ell+2}$. prrLU is then perfomed on the ``matricized'' version of $\Pi_\ell$ -- $\bigl[\Pi_\ell\bigr]_{(i_{\ell -1}, \sigma_\ell) (\sigma_{\ell+1}, j_{\ell +2})}$ -- and new pivots $\mathcal{I}'_\ell$ and $\mathcal{J}'_{\ell+1}$ are added to the initial lists $\mathcal{I}_\ell$ and $\mathcal{J}_{\ell+1}$. This first sweep resembles the naive approach introduced in Ref. \cite{Fernandez2022} for pedagogical purposes, as well as the well-established SVD-based MPS tensor unfolding (cf. Ref. \cite{vonDelftTNNotes}). $c)$ Sweeping back and forth through index pairs -- $\sigma_\ell, \sigma_{\ell +1}$ -- the 2-dimensional slices $\Pi_\ell$ are reconstructed from the current local pivot lists and prrLU-compressed again. The purpose is to improve the choice of the initial \textit{pivots} and the approximation $\widetilde{\mathcal{T}}$. This last step is performed until convergence.}
+	\caption{Main steps of the TCI algorithm. $a)$ A set of indices such that $\mathcal{T}_{\hat \sigma} \neq 0$ is chosen randomly from the configuration space $\text{Ind}\left(\mT\right)$. Pivot lists are constructed from the initial multi-indices set. $b)$ A first sweep is performed for an initial Matrix Product State representation of our tensor $\mathcal{T}$. At sites $\ell$ and $\ell+1$, $\Pi_\ell$ tensor slices of the form in \prettyref{eq:Tslices} are constructed from the initial pivot lists $\mathcal{I}_{\ell-1}$ and $\mathcal{J}_{\ell+2}$. prrLU is then perfomed on the ``matricized'' version of $\Pi_\ell$ -- $\bigl[\Pi_\ell\bigr]_{(i_{\ell -1}, \sigma_\ell) (\sigma_{\ell+1}, j_{\ell +2})}$ -- and new pivots $\mathcal{I}'_\ell$ and $\mathcal{J}'_{\ell+1}$ are added to the initial lists $\mathcal{I}_\ell$ and $\mathcal{J}_{\ell+1}$. This first sweep resembles the naive approach introduced in Ref. \cite{Fernandez2022} for pedagogical purposes, as well as the well-established SVD-based MPS tensor unfolding (cf. Ref. \cite{vonDelftTNNotes}). $c)$ Sweeping back and forth through index pairs -- $\sigma_\ell, \sigma_{\ell +1}$ -- the 2-dimensional slices $\Pi_\ell$ are reconstructed from the current local pivot lists and prrLU-compressed again. The purpose is to improve the choice of the initial \textit{pivots} and the approximation $\widetilde{\mathcal{T}}$. This last step is performed until convergence.}
 	\label{fig:TCIalg}
 \end{figure}
 
@@ -418,7 +418,7 @@ The above procedures all try to target TCI \textit{ergodicity} issues that arise
 
 Tensor Cross Interpolation, as the $\mL$-dimensional extension of CI, conserves its compression properties. The number of elements of $\mT$ necessary for its TT decomposition is limited to the $\bsigma$ configurations obtained out of concatenation of the pivots in the \textit{pivot lists} -- $\mI_\ell$,$\mJ_{\ell +1}$ $\forall \ell$. Hence, the approximation is systematically controlled by $\chi$, where $\chi = \max_{\ell} \chi_\ell$ is the \textit{rank} of the tensor $\mT$ with $\chi_\ell = \dim \mI_\ell = \dim \mJ_{\ell +1}$ rank of the local pivot matrix $P_\ell$. As a consequence TCI computational resources' scaling strongly depends on $\chi$.
 
-The number of function calls necessary for the MPS unfolding $\widetilde{\mathcal{T}}$ of $\mathcal{T}$ is $\order (\chi^2d\mathcal{L})$ compared to the $d^\mathcal{L}$ ($= |\mathds{I}_\mL| = |\mathds{J}_1|$) of its SVD counterpart, where $d$ is the local configuration space dimensionality. Such an exponential advantage is obtained by fully specifying only $\order (\chi^2\mathcal{L})$ number of \textit{pivots} from the original tensor. The algebra cost ($\sim$ computational time) of the algorithm scales then as $\order (\chi^3d\mathcal{L})$. Scaling of the main TCI routines provided by the \texttt{TensorCrossInterpolation.jl} $\julia$ library \cite{TensorCrossInterpolation.jl} is detailed in \prettyref{tab:cost}. From this analysis, as well as from Example \ref{ex:Ldimfunc}, we can understand that TCI possess incredible memory saving power, compared to other MPS building routines.
+The number of function calls necessary for the MPS unfolding $\widetilde{\mathcal{T}}$ of $\mathcal{T}$ is $\order (\chi^2d^2\mathcal{L})$ compared to the $d^\mathcal{L}$ ($= |\text{Ind}\left(\mT\right)|$) of its SVD counterpart, where $d$ is the local configuration space dimensionality. Such an exponential advantage is obtained by fully specifying only $\order (\chi^2\mathcal{L})$ number of \textit{pivots} from the original tensor. The algebra cost ($\sim$ computational time) of the algorithm scales then as $\order (\chi^3d^2\mathcal{L})$. Scaling of the main TCI routines provided by the \texttt{TensorCrossInterpolation.jl} $\julia$ library \cite{TensorCrossInterpolation.jl} is detailed in \prettyref{tab:cost}. From this analysis, as well as from Example \ref{ex:Ldimfunc}, we can understand that TCI possess incredible memory saving power, compared to other MPS building routines.
 \begin{example}[$\mL$-dimensional function]
 Inspiring ourselves from \cite{Fernandez2024}, we construct an example to exhibit TCI compression capabilities. Let us consider the following $\mL$-dimensional function: 
 
@@ -428,13 +428,15 @@ Inspiring ourselves from \cite{Fernandez2024}, we construct an example to exhibi
    \label{eq:Ldimfunc}
 \end{equation}
 
-As one can easily understand, such a continuous function can be numerically represented by a tensor $\mathcal{F}_{\bsigma}$ through grid discretization over a preferred domain. For this exercise, we take a 61 point Gauss-Kronod type of grid, over the $[0,1]^\mL$ hypercube. What this means in practice is that $\mathcal{F}_{\bsigma} \in \mathds{R}^{I_1\times\dots\times I_\mL}$ and $\dim I_i = d = 61$. TCI approximation of $\mathcal{F}_{\bsigma}$ renders a tensor $\widetilde{\mathcal{F}}_{\bsigma}$ with only a limited number of calls to the original function $f(\boldsymbol{x})$, as depicted in \prettyref{fig:TCIscaling} below. 
+As one can easily understand, such a continuous function can be numerically represented by a tensor $\mathcal{F}_{\bsigma}$ through grid discretization over a preferred domain. For this exercise, we take a 61 point Gauss-Kronod type of grid, over the $[0,1]^\mL$ hypercube. What this means in practice is that $\mathcal{F}_{\bsigma} \in \mathds{R}^{I_1\times\dots\times I_\mL}$ \footnotemark and $\dim I_i = d = 61$. TCI approximation of $\mathcal{F}_{\bsigma}$ renders a tensor $\widetilde{\mathcal{F}}_{\bsigma}$ with only a limited number of calls to the original function $f(\boldsymbol{x})$, as depicted in \prettyref{fig:TCIscaling} below. 
+
+\footnotetext{From this point onward, $\mF$ will refer to the tensor discretization of a continuous function, while $\mT$ will be the notation for a generic $\mL$-dimensional tensor.}
 
 \prettyref{fig:TCIscaling} perfectly documents the reduced memory footprint required from the TCI representation of functions up to 20 dimensions. Exponential scaling of memory requirements, necessary to store the total $61^\mL$ number of tensor elements of $\mathcal{F}_{\bsigma}$, is replaced by an $\chi$-dependent polynomial scaling. Moreover, as one can understand from the bottom right plot in \prettyref{fig:TCIscaling}, out of the total $61^2$ ($\mL=2$) Gauss-Kronod grid points, only $49$ are actually required for a nearly optimal approximation of $f$, therefore limiting the bond dimension $\chi$ of our tensor train to $\chi = 7$ and with that the number of total stored parameters. 
 \begin{figure}[ht!]
 		\centering
 		\includegraphics[width=0.9\textwidth]{figures/TCI_memory_scaling+heatmap.pdf}
-		\caption{TCI approximation of $f(\boldsymbol{x})$ in \prettyref{eq:Ldimfunc} after discretization on a $\mL$-dimensional 61 point Gauss-Kronod grid. \textit{On the left}: number of total floating point elements stored in the compressed tensor $\widetilde{\mathcal{F}}_{\bsigma}$ as a function of $\mL$ (blue line). The ``worst-case-scenario'' scaling $d^\mL$ and the theoretical scaling $\order (\chi^2d\mathcal{L})$ are also represented (green and red dashed line, respectively). \textit{Top right:} heatmap of the $\mL = 2$ approximation $\widetilde{\mathcal{F}}_{\bsigma}$ over the $61\times61$ Gauss-Kronod grid, subset of $[0,1]\times[0,1]$, with absolute tolerance $\epsilon = 10^{-8}$. \textit{Bottom right:} heatmap of the $\mL = 2$ original function  $f(\boldsymbol{x})$ over the domain $[0,1]\times[0,1]$. The red dots represent the location of the \textit{pivot} values exploited for the TCI approximation above.
+		\caption{TCI approximation of $f(\boldsymbol{x})$ in \prettyref{eq:Ldimfunc} after discretization on a $\mL$-dimensional 61 point Gauss-Kronod grid. \textit{On the left}: number of total floating point elements stored in the compressed tensor $\widetilde{\mathcal{F}}_{\bsigma}$ as a function of $\mL$ (blue line). The ``worst-case-scenario'' scaling $d^\mL$ and the theoretical scaling $\order (\chi^2d^2\mathcal{L})$ are also represented (green and red dashed line, respectively). \textit{Top right:} heatmap of the $\mL = 2$ approximation $\widetilde{\mathcal{F}}_{\bsigma}$ over the $61\times61$ Gauss-Kronod grid, subset of $[0,1]\times[0,1]$, with absolute tolerance $\epsilon = 10^{-8}$. \textit{Bottom right:} heatmap of the $\mL = 2$ original function  $f(\boldsymbol{x})$ over the domain $[0,1]\times[0,1]$. The red dots represent the location of the \textit{pivot} values exploited for the TCI approximation above.
 		}
 		\label{fig:TCIscaling}
 	\end{figure}
@@ -450,7 +452,7 @@ Condider, for example, the following integral
 \end{equation}
 through numerical discretization it can be reduced to 
 \begin{equation}
-	I \approx \sum_{\bsigma} \mathcal{F}_{\bsigma} ,\quad \; \mathcal{F}_{\bsigma} = f(\boldsymbol{x}(\bsigma))
+	I \approx \sum_{\bsigma} \mathcal{F}_{\bsigma}  ,\quad \; \mathcal{F}_{\bsigma} = f(\boldsymbol{x}(\bsigma))\;
 	\label{eq:LdimapproxIntegral}
 \end{equation}
 where $\boldsymbol{x}(\bsigma)$ is our discretization grid (cf. Example \ref{ex:Ldimfunc}). If we decide to perform TCI unfolding of our numerical tensor $\mathcal{F}_{\bsigma}$ before the integration, \prettyref{eq:LdimapproxIntegral} then reads
@@ -468,7 +470,7 @@ The above achievement of TCI relies on the following property of continuous func
 	\label{def:separfunc}
 \end{definition}
 
-For this class of functions the numerical advantage of TCI integration over more standard approaches -- like Monte Carlo sampling -- is incomparable (cf. $1/N_{\text{eval}}^4$ vs. $1/\sqrt{N_{\text{eval}}}$ convergence for $N_{\text{eval}}$ function evaluations in Fig. 2 of Ref. \cite{Fernandez2024}). On top of that, for computations revolving around quantum mechanical systems, TCI does not suffer from the \textit{``sign problem''} that always goes along with sampling methods, such as Quantum Monte Carlo, when they try to deal with integration of highly-oscillating functions. TCI performs extremely well even when dealing with functions oscillating simultaneously on very different scales. Consequently, we can understand that the limiting factor of TCI (rank of the $\varepsilon$-factorization) is entirely orthogonal
+For this class of functions the numerical advantage of TCI integration over more standard approaches -- like Monte Carlo sampling -- is incomparable (cf. $1/N_{\text{eval}}^4$ vs. $1/\sqrt{N_{\text{eval}}}$ convergence for $N_{\text{eval}}$ function evaluations in Fig. 2 of Ref. \cite{Fernandez2024}). On top of that, for computations revolving around quantum mechanical systems, TCI does not suffer from the \textit{``sign problem''} \cite{Loh1990} that always goes along with sampling methods, such as Quantum Monte Carlo, when they try to deal with integration of highly-oscillating functions. TCI performs extremely well even when dealing with functions oscillating simultaneously on very different scales. Consequently, we can understand that the limiting factor of TCI (rank of the $\varepsilon$-factorization) is entirely orthogonal
 to that of sampling methods.
 
 If the user intends to employ TCI purely to perform complex integrations, the definition of an \textit{environment-aware error} (from \prettyref{eq:ErrorPiIsErrorT} and \prettyref{eq:LdimTCIIntegral}) might turn out to be very useful
@@ -489,7 +491,7 @@ Discretization errors are often a consequence of poor scaling of our numerical a
 
 Given a function of $\mathcal{N}$ variables $f(\boldsymbol{x})$ we discretize each variable through a dyadic grid with \(M=2^{\mR}\) points per variable, 
 \begin{equation}
-	x_n(m_n) =\frac{m_n}{2^{\mR}}
+	x_n(m_n) = (x_{n,\text{max}} - x_{n,\text{min}})\frac{m_n}{2^{\mR}} + x_{n,\text{min}}
 	\label{eq:quanticsGrid}
 \end{equation}
 where each index \(m_n\in\{0,\dots,M-1\}\) is written in binary form with $\mR$ bits as 
@@ -594,15 +596,15 @@ Let us consider the following function
 \begin{gather}
 	\begin{aligned}
 		f(\boldsymbol{r}) &={\color{mymagenta}f_1(\boldsymbol{r})} + {\color{green} f_2(\boldsymbol{r})} =\\ 
-		&={\color{mymagenta} A_1 * e^{-\frac{(\boldsymbol{r} - \boldsymbol{r}_1)^2}{2\sigma^2_1}} \sin(k_1\boldsymbol{r})} + {\color{green} A_2 * e^{-\frac{(\boldsymbol{r} - \boldsymbol{r}_2)^2}{2\sigma^2_2}} \sin(k_2\boldsymbol{r})},
+		&={\color{mymagenta} A_1\, e^{-\frac{(\boldsymbol{r} - \boldsymbol{r}_1)^2}{2\sigma^2_1}} \sin(k_1\boldsymbol{r})} + {\color{green} A_2\, e^{-\frac{(\boldsymbol{r} - \boldsymbol{r}_2)^2}{2\sigma^2_2}} \sin(k_2\boldsymbol{r})},
+		\label{eq:localFunc}
 	\end{aligned}
 \end{gather}
 	where
 \[
 \begin{gathered}
 	\boldsymbol{r} = (x,y), \quad \boldsymbol{r}_{1/2} = \pm( 0.5, 0.5),\\[6pt]
-	A_1 = 10^{3}\; A_2 = 10^6, \quad \sigma_1 = 10^{2}\; \sigma_2 = 10^{-3}, \quad k_1 = 10\; k_2 = 10^3. 
-	\label{eq:localFunc}
+	A_1 = 10^{3}\, A_2 = 10^6, \quad \sigma_1 = 10^{2}\, \sigma_2 = 10^{-3}, \quad k_1 = 10\, k_2 = 10^3. 
 \end{gathered}
 \]
 \begin{figure}[ht!]
@@ -622,16 +624,6 @@ The absolute quality of the local approximation can be measured through
 where a smaller value indicates a better precision. 
 We show this error measure in the \textit{top central} plot in \prettyref{fig:errorLocalFunc}, for a QTCI of $f$ with $R=20$, desired absolute tolerance $\varepsilon = 10^{-7}$ and fused quantics index ordering. The image suggests that -- as expected from \prettyref{fig:localFunc} -- most of the function domain is easy to represent, while the computational effort is focused around the centers of our local features $\boldsymbol{r}_1$ and $\boldsymbol{r}_2$. From this, we get the impression that dividing the domain into computationally simple and complex subdomains -- or \textit{patches} -- could benefit the overall cost and, to some degree, accuracy of the QTCI representation. Other arguments support this strategy, as follows. 
 
-Given two indipendent tensors $A_{\bsigma}$ and 
-$B_{\bsigma}$, defined on the same configuration space $\bsigma$, the sum tensor $S_{\bsigma} = A_{\bsigma} \oplus B_{\bsigma}$, can be obtained through direct sum -- or partial direct sum -- of the two tensors. The same operation can be performed for Tensor Trains, by direct summing each site tensor (cf. \prettyref{sec:patchAlg} and Ref. \cite{Lee2018}). 
-In our particular example, if we decide to approximate each summand $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$ in \prettyref{eq:localFunc} with TTs -- $\widetilde{\mF}_1$ and $\widetilde{\mF}_2$ -- then 
-\begin{equation}
-	f(\boldsymbol{r}(\bsigma)) = \mF_{\bsigma} \approx \widetilde{\mF}_{1\bsigma} \oplus \widetilde{\mF}_{2\bsigma} = \widetilde{\mF}^\oplus_{\bsigma}
-	\label{eq:localTermsSum}
-\end{equation}
-with negligible error, due to the independency of the two terms. The bottom matrix of canvas, in \prettyref{fig:errorLocalFunc}, supports this argument. The first pair of plots \textit{a.1)} and \textit{b.1)} portray the error function of the QTCI approximation \textit{focused} on the support region of $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$. The second pair \textit{a.2)} and \textit{b.2)}, on the other hand, measures the error for the QTCI approximations -- $\widetilde{\mF}_{2\bsigma}$ and $\widetilde{\mF}_{1\bsigma}$ -- \textit{limited} \footnotemark to the support of $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$.
-
-\footnotetext{When limiting the QTCI approximation, in order to produce results with similar resolution to the standard application, we reduce the number of bits to $\mR_1 = 17$ and $\mR_2 = 16$, while keeping the other parameters unchanged.}
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.7\textwidth]{figures/Error_heatmap_localFunc.pdf}
@@ -639,16 +631,22 @@ with negligible error, due to the independency of the two terms. The bottom matr
 	\label{fig:errorLocalFunc}
 \end{figure}
 
+Given two indipendent tensors $A_{\bsigma}$ and 
+$B_{\bsigma}$, defined on the same configuration space $\bsigma$, the element-wise sum tensor $S_{\bsigma} = A_{\bsigma} + B_{\bsigma}$, can be obtained through direct sum -- or partial direct sum -- of the two tensors. The same operation can be performed for Tensor Trains, by direct summing each site tensor (cf. \prettyref{sec:patchAlg} and Ref. \cite{Lee2018}). 
+In our particular example, if we decide to approximate each summand $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$ in \prettyref{eq:localFunc} with TTs -- $\widetilde{\mF}_1$ and $\widetilde{\mF}_2$ -- then 
+\begin{equation}
+	f(\boldsymbol{r}(\bsigma)) = \mF_{\bsigma} \approx \widetilde{\mF}_{1\bsigma} + \widetilde{\mF}_{2\bsigma} = \widetilde{\mF}^+_{\bsigma}
+	\label{eq:localTermsSum}
+\end{equation}
+with negligible error, due to the independency of the two terms. The bottom matrix of canvas, in \prettyref{fig:errorLocalFunc}, supports this argument. The first pair of plots \textit{a.1)} and \textit{b.1)} portray the error function of the QTCI approximation \textit{focused} on the support region of $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$. The second pair \textit{a.2)} and \textit{b.2)}, on the other hand, measures the error for the QTCI approximations -- $\widetilde{\mF}_{2\bsigma}$ and $\widetilde{\mF}_{1\bsigma}$ -- \textit{limited} \footnotemark to the support of $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$.
+
+\footnotetext{When limiting the QTCI approximation, in order to produce results with similar resolution to the standard application, we reduce the number of bits to $\mR_1 = 17$ and $\mR_2 = 16$, while keeping the other parameters unchanged.}
+
+
 
 We can observe a slight improve in the local approximation error in the last row of plots compared to the first one. It seems easy to understand that when when QTCI is constricted to each local feature of $f$ it is able to resolute the target with better precision, due to a more specified pivot selection. Nevertheless, the main advantage of this naive solution is not this small accuracy improvement \textit{per se}. 
 
 The computational effort of this \textit{``divide and conquer''} variant of QTCI -- apart from being very well suited for parallelization -- frees the algorithm from the constraint of representing a single object, made of different independent components, with a single tensor train. The improvement in numerical resources requirement is non-negligible. The bond dimension development along the chains of the MPS unfoldings $\widetilde{\mF}_{\bsigma}$, $\widetilde{\mF}_{2\bsigma}$ and $\widetilde{\mF}_{1\bsigma}$ is a witness of that, as shown in \prettyref{fig:bondDimLocalFunc}. 
-
-The rank $\chi^\oplus$ of the direct sum of MPSs -- $\widetilde{\mF}^\oplus_{\bsigma}$ -- in \prettyref{eq:localTermsSum}, depends only linearly on the bond dimension of its addends, i.e. $\chi^\oplus = \chi_1 + \chi_2$, where $\chi_1$, $\chi_2$ are the ranks of $\widetilde{\mF}_{1\bsigma}$ and $\widetilde{\mF}_{2\bsigma}$, respectively. Due to the different scale at which our two term $f_1$ and $f_2$ are correctly resoluted, the decrease in total bond dimension is quite significant, despite the rank summing operation required to get our final object; as evidence of this, the total number of floating point parameters necessary for the two different implementations is 
-
-\begin{equation}
-	N_{param}(\widetilde{\mF}_{\bsigma}) \simeq 1.4 \times 10^6 > N_{param}(\widetilde{\mF}_{2\bsigma} \oplus \widetilde{\mF}_{1\bsigma}) \simeq 5.6 \times 10^5.
-\end{equation}
 
 \begin{figure}[ht!]
 	\centering
@@ -657,14 +655,21 @@ The rank $\chi^\oplus$ of the direct sum of MPSs -- $\widetilde{\mF}^\oplus_{\bs
 	\label{fig:bondDimLocalFunc}
 \end{figure}
 
-% \note{Tensor Cross Interpolation}{Main paper: \cite{Fernandez2024}, Main TCI ref: \cite{Oseledets2010}, function learning, \textit{maxvol} principle \cite{Dolgov2020}, exact if $\rank{TT} = \chi$ like MCI (see Naive Approach \cite{Fernandez2022}), \textit{rank-revealing} (only slow convergence for high rank); separation of pivot exploration and tensor update could be beneficial (see Monte Carlo \textit{space configuration enlargment}); SVD stability issues compared to prrLU}\\
+The rank $\chi^+$ of the direct sum of MPSs -- $\widetilde{\mF}^+_{\bsigma}$ -- in \prettyref{eq:localTermsSum}, depends only linearly on the bond dimension of its addends, \textit{i.e.}
 
-% \noindent\note{Nice sentences}{ Tensor network methods offer a new appraoch to high-dimensional integration.TCI has a very peculiar position among other tensor network algorithms: it provides
-% an automatic way to map a very large variety of physics and applied mathematics problems onto the MPS toolbox. }\\
+\begin{equation}
+	\chi^+ = \chi_1 + \chi_2,
+\end{equation}
 
-% \noindent\note{General references}{\cite{Oseledets2010, Oseledets2011, Savostyanov2014, Savostyanov2011, Dolgov2020}}\\
-% \note{Open questions}{Generality of $\epsilon$-factorizability property}
+where $\chi_1$, $\chi_2$ are the ranks of $\widetilde{\mF}_{1\bsigma}$ and $\widetilde{\mF}_{2\bsigma}$, respectively. 
 
-% \noindent \note{Open questions QTCI 
-% }{When does a multivariate function admit low-rank representation? }
+Due to the different scale at which our two term $f_1$ and $f_2$ are correctly resoluted, the decrease in total bond dimension is quite significant, despite the rank summing operation required to get our final object; as evidence of this, the total number of floating point parameters necessary for the two different implementations is 
+
+\begin{equation}
+	N_{\text{par}}(\widetilde{\mF}_{\bsigma}) \simeq 1.4 \times 10^6 > N_{\text{par}}(\widetilde{\mF}_{2\bsigma} + \widetilde{\mF}_{1\bsigma}) \simeq 5.6 \times 10^5.
+	\label{eq:naiveLocalFuncMemorySave}
+\end{equation}
+
+
+
 
