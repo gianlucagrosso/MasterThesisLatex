@@ -312,7 +312,7 @@ captionpos=b,
 	\vspace*{9pt}
 	\begin{Spacing}{1}
     \noindent
-		{\LARGE{\textbf{Adaptive distribution of quantics tensor trains into subdomains with controlled bond dimension}}}
+		{\LARGE{\textbf{Efficient Tensor Compression through Adaptive Patched Quantics Tensor Cross Interpolation}}}
 	\end{Spacing}
 	\bigskip
 	\centerline{\Large {{ABSTRACT}}}

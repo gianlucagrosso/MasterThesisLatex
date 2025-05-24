@@ -149,7 +149,7 @@ where the first equality reflects the error associated with an arbitrary MPS app
 	\Psi_{\bsigma} \simeq \widetilde{\Psi}^{+}_{\bsigma} = \sum_{p_{\ell_1}= 1}^{d_{\ell_1}} \cdots \sum_{p_{\ell_N}= 1}^{d_{\ell_N}} \widetilde{\Psi}^{p_{\ell_1},\dots,p_{\ell_N}}
 	\label{eq:NslicesSum}
 \end{equation}
-taking $(\ell_1, \dots, \ell_N) \in [1,\dots, \mL]^{N(\leq \mL)}$ ($\ell_i \neq \ell_j$ for every $i\neq j$) without any specific order constraint. $\widetilde{\Psi}^{+}_{\bsigma}$ is good approximation of the original tensor $\Psi_{\bsigma}$.
+taking $(\ell_1, \dots, \ell_N) \in \{1,\dots, \mL\}^{N(\leq \mL)}$ ($\ell_i \neq \ell_j$ for every $i\neq j$) without any specific order constraint. $\widetilde{\Psi}^{+}_{\bsigma}$ is good approximation of the original tensor $\Psi_{\bsigma}$.
 
 \subsection{The patching scheme}
 Having laid out all the necessary ingredients, we now return to detailing our patched (Q)TCI algorithm. 
@@ -200,9 +200,9 @@ where both the \textit{prefix} indices $(p_1,\dots,p_{\bar{\ell}}) \in \mathds{I
 	 Consequently, the patched-TCI procedure produces TT approximations $\widetilde{\mT}^{p_1,\dots,p_{\bar \ell}}$ that are strictly \textit{non-overlapping} (\textit{disjointed}) in configuration space; 
 	\item the collection of TTs of the form in \prettyref{eq:patchedTT}, in order to constitute a good approximation for the full tensor $\mT_{\bsigma}$, satisfies the condition  
 	\begin{equation}
-		\mT_{\bsigma} \approx \sum_{p_1 = 1}^{d_1} \cdots \sum_{p_{\bar{\ell}} = 1}^{d_{\bar{\ell}}} \widetilde{\mT}^{p_1,\dots,p_{\bar \ell}}.
+		\mT_{\bsigma} \approx \sum_{\widetilde{T}^{(\cdot)} \in \texttt{results}} \widetilde{\mT}^{(\cdot)}.
 	\end{equation}
-	and we can therefore resum them to a single tensor train $\widetilde{\mT}^{+}_{\bsigma}$, as we did in \prettyref{eq:NslicesSum}.
+	and we can therefore resum them to a single tensor train $\widetilde{\mT}^{+}_{\bsigma}$, similar to what we did in \prettyref{eq:NslicesSum}. $\widetilde{\mT}^{+}_{\bsigma}$ is a good TT representation of $\mT$. However due to the adaptivity of pQTCI, differently from \prettyref{eq:NslicesSum}, here we might be presented with a series of \textit{patches} $\widetilde{\mT}^{p_1,\dots,p_{\bar \ell}}$ with prefixes $(p_1,\dots,p_{\bar \ell})$ of different lengths ${\bar \ell}$; nonetheless, this intricacy does not affect the TT sum operation.
 \end{itemize}
 
 In \prettyref{fig:patchingAlg} we displayed a version of the patched TCI where the tensor is sliced sequentially starting from the first index $\sigma_1$ of the tensor $\mT$. As pointed out already, this constraint is not required to obtain a meaningful outcome from the algorithm (we refer the reader to \prettyref{app:patchordering} for details about the impact of the \textit{prefix ordering} -- or \textit{patch ordering} -- on the approximation) The \textit{prefix} of each subtensor $\mT^{p_1,\dots,p_{\bar \ell}}$ -- that indicates to which slice of $\mT$ it corresponds to -- can be taken randomly, in an exclusive manner, from the set of tensor indices $\{\sigma_1,\dots,\sigma_\mL\}$ (considered labels in this context).
