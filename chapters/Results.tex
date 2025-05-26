@@ -24,6 +24,47 @@
     \caption{Global error $\epsilon$ vs $R$ to check convergence.}
 \end{figure}
 
+\section{Benchmarking of Patched MPO-MPO Contractions}
+\subsection{Element-wise multiplication}
+\begin{figure}[ht!]
+    \caption{Heatmap + patch grid of element-wise multiplication of 2D MPOs (qHO calculation of $\Psi^2(x)$ ) }
+\end{figure}
+
+\todo{Benchmark with Quantum Harmonic Oscillator in localised potential ($\omega \gg 1$) $\to$ evaluate $|\Psi(x)|^2$. Also something related to heat equation could work}
+
+\begin{figure}[ht!]
+    \caption{Number of patches vs patch bond dimension with optimal region for element-wise multiplication ( theoretical value) }
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Memory and time scaling element-wise multiplication + fit  }
+\end{figure}
+
+\subsection{Matrix multiplication}
+\begin{figure}[ht!]
+    \caption{Heatmap + patch grid of matrix multiplication of 2D MPOs with worst, average and best case scenario for patch subdivision (linear combination of gaussians). }
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Number of patches vs patch bond dimension with optimal region for matrix multiplication (theoretical value) }
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Memory and time scaling matrix multiplication + fit  }
+\end{figure}
+
+\subsection{Adaptive matrix multiplication}
+
+
+\begin{figure}[ht!]
+    \caption{Heatmap + patch grid of adaptive matrix multiplication (linear combination of gaussians). }
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Memory scaling matrix multiplication compared with normal patch contraction }
+\end{figure}
+
+
 \section{BSE with Patching}
 
 \subsection{\texttt{automul} algorithm}

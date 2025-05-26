@@ -1,14 +1,14 @@
 \chapter{Quantics Tensor Cross Interpolation}
 \label{chap:QTCI}
 
-Cross approximation is tensor compression technique well-established in the literature \cite{Oseledets2010, Dolgov2020, Savostyanov2011, Savostyanov2014, Fernandez2022, Fernandez2024}. This technique, pioneered by Oseledets \cite{Oseledets2010} and improved by Dolgov and Savostyanov \cite{Dolgov2020}, aims to find a parsimonious interpolation for multi-index tensors with a limited amount of computational resources. Tensor Cross Interpolation (TCI) have permitted TT-representations of multivariate functions at a cheaper cost than any SVD based counterpart. Such compressed TT-representations have been used, among other applications, to compute very complex, multi-dimensional integrations, converging better (with no ``sign problem'' \cite{Loh1990}) than standard sampling routines, such as Monte Carlo \cite{Fernandez2022, Dolgov2020}. In most recent years, Fernandez, Ritter and collaborators have improved the already powerful implementations of TCI, targeting stability and discretization issues of the standard routine \cite{Fernandez2024}. This renewed TCI, however, is not free from suboptimalities, especially when trying to target very complex, ``quasi-singular'' type of problems. 
+Cross approximation is a tensor compression technique well-established in the literature \cite{Oseledets2010, Dolgov2020, Savostyanov2011, Savostyanov2014, Fernandez2022, Fernandez2024}. This technique, pioneered by Oseledets \cite{Oseledets2010} and improved by Dolgov and Savostyanov \cite{Dolgov2020}, aims to find a parsimonious interpolation for multi-index tensors with a limited amount of computational resources. Tensor Cross Interpolation (TCI) permitted TT-representations of multivariate functions at a cheaper cost than any SVD based counterpart. Such compressed TT-representations have been used, among other applications, to compute very complex, multi-dimensional integrations, converging better (with no ``sign problem'' \cite{Loh1990}) than standard sampling routines, such as Monte Carlo \cite{Fernandez2022, Dolgov2020}. Ritter and collaborators have improved the already powerful implementations of TCI, targeting stability and discretization issues of the standard routine \cite{Fernandez2024}. This renewed TCI, however, is not free from suboptimalities, especially when trying to target very complex, ``quasi-singular'' type of problems. 
 
-In this chapter, we summarize the basic technical details of the state-of-the-art implementation of cross interpolation for tensors. A generic introduction to all the mathematical and technical details of the TCI routine is given, in order to provide the reader the tools to understand and, through further reading, reproduce the current state of the algorithm. Nonetheless, considering the goal of this work, no particular importance is given to such details, and more focus is instead directed towards the strengths -- \prettyref{sec:TCIalgorithm} -- and fallbacks -- \prettyref{sec:TCIFallbacks} -- of the ``at present'' TCI algorithm. Multiple examples are employed for this purpose.
+In this chapter, we summarize the basic technical details of the state-of-the-art implementation of cross interpolation for tensors. \prettyref{sec:TCIalgorithm} gives a generic introduction to all the mathematical and technical details of the TCI routine, in order to provide the reader the tools to understand and, through further reading, reproduce the current state of the algorithm. Nonetheless, considering the goal of this work, no particular importance is given to such details, and more focus is instead directed towards the strengths of the TCI algorithm. Section \ref{sec:TCIFallbacks} then shows how a naively modified version of TCI can be tailored to functions with sharply localised structure. Multiple examples are employed for this purpose.
 
 \section{The algorithm}
 \label{sec:TCIalgorithm}
 
-The Tensor Cross Interpolation (TCI) algorithm is a rank-revealing algorithm for decomposing low-rank, high-dimensional tensors into tensor trains/matrix product states (MPS). Its implementation, as we just understood, relies on two prerequites, stating as follows
+The algorithm is a rank-revealing algorithm for decomposing low-rank, high-dimensional tensors into tensor trains/matrix product states (MPS). Hence, its implementation requires two prerequisites: the tensor should be \textbf{compressible}, and the algorithm used for compressing it should be \textbf{rank-revealing}. The properties are defined as follows:
 
 \begin{definition}[Compressible tensor]
 	A tensor $\mathcal{T}$ is {\normalfont \textbf{compressible}} or {\normalfont \textbf{low-rank}} if it can be approximated by a Matrix Product State (MPS) with small rank $\chi$.
@@ -35,7 +35,7 @@ The Tensor Cross Interpolation (TCI) algorithm is a rank-revealing algorithm for
 	\label{def:rkralg}
 \end{definition}
 
-TCI depends on these two properties to provide a competitive numerical approximation technique. Given a tensor $\mT$ with a hidden low-rank structure as input, TCI always provides an optimal and compressed representation of it at a \textit{polynomial-scaling} cost in CPU time and memory. Even when the tensor $\mT$ is high rank, TCI is able to output a TT unfolding $\widetilde{\mT}$ (at a slower convergence rate). Before explaining how TCI works, let us first dive into the mathematical tools that supply TCI of this \textit{rank-revealing} and \textit{compression} properties.
+TCI depends on these two properties to provide a competitive numerical approximation technique. Given a tensor $\mT$ with a hidden low-rank structure as input, TCI always provides a compressed representation of it at a \textit{polynomial-scaling} cost in CPU time and memory. Even when the tensor $\mT$ is high rank, TCI is able to output a TT unfolding $\widetilde{\mT}$ (at a slower convergence rate). Before explaining how TCI works, let us first dive into the mathematical tools that supply TCI of this \textit{rank-revealing} and \textit{compression} properties.
 
 \footnotetext{In \prettyref{def:rkralg} we define a tensor $\mathcal{T}$ as an element of the vector space $\mathds{K}^{I_1 \times \dots \times I_\mathcal{L}}$, this is only true if we consider $\mathcal{T}$ an $\mathcal{L}$-dimensional numerical array, as it is for numerics. More generally $\mathcal{T} \in T^p_q(V) = \{t\ |\ t:V^{\otimes q} \otimes  (V^*)^{\otimes p} \longrightarrow \mathds{K} \} $ (where $\mathds{K} = \mathds{R} \vee \mathds{C}$ and $V = \mathcal{H}$ for most applications).}
 
@@ -48,9 +48,9 @@ Let A be a $M \times N$ matrix, we introduce the following notations:
 	\item $\mathds{J} = \{1, \dots, N\}$ is the ordered set of all column indices of $A$;
 	\item $\mathcal{I} = \{i_1, \dots, i_{\tchi} \} \subseteq \mathds{I}$ and $\mathcal{J} = \{j_1, \dots, j_{\tchi} \} \subseteq \mathds{J}$ are, respectively, subsets of rows and columns indices of $A$.
 \end{itemize}
-Therefore, in a $\julia$-like fashion\footnotemark  we define 
+Therefore, in a $\julia$-like fashion\footnotemark   we define 
 
-\footnotetext{From this point onward, we shall consistently use this notation. Slicing notation of the form $A[r_{start}:r_{end}, :]$ ($\equiv A_{r,c}$ with $(r,c) \in \{ r_{start},r_{start}+1,\dots, r_{end}\} \times \{1,2, \dots N\}$) will also be employed.}
+\footnotetext{From this point onward, we shall consistently use this notation. Slicing notation of the form $A[r_{\text{start}}:r_{\text{start}}, :]$ ($\equiv A_{r,c}$ with $(r,c) \in \{ r_{start},r_{start}+1,\dots, r_{end}\} \times \{1,2, \dots N\}$) will also be employed.}
 
 \begin{equation}
 	\begin{alignedat}{3}
@@ -70,10 +70,8 @@ The CI formula then reads \cite{Kumar2016}
 	\end{tikzpicture}
 	\nonumber
 \end{gather}
-
 \footnotetext{We introduce here a tensor network diagrammatic representation of the matrix multiplication. The internal connecting solid lines represent summation over the respective matrix indices, according to the \textit{Einstein summation convention}. The external lines represent fixed indices.}
-
-\prettyref{eq:MCI} gives a rank-$\tchi$ approximation of $A$, where $\tchi = \text{dim}\left( \mathcal{I} \right) = \text{dim}\left( \mathcal{J} \right)$. CI is ``only'' a quasioptimal decomposion of $A$ and its accuracy strongly depends on the choice of the pivots; however, contrarily to its optimal counterparts (e.g. SVD), it doesn't require knowing (and saving in memory) the full $M \times N$ matrix to be computed. Let's consider the following example: 
+\prettyref{eq:MCI} gives a rank-$\tchi$ approximation of $A$, where $\tchi = \text{dim}\left( \mathcal{I} \right) = \text{dim}\left( \mathcal{J} \right)$. CI is ``only'' a quasioptimal decomposion of $A$ and its accuracy strongly depends on the choice of the pivots; however, contrarily to its optimal counterparts (e.g. SVD), it doesn't require knowing (and saving in memory) the full $M \times N$ matrix to be computed. Moreover, CI correctly represents the rows and column employed to construct of the approximation on the \textit{r.h.s.} of \prettyref{eq:MCI} while also being exact if $\tchi = \chi$. Let's consider the following example: 
 \begin{example}[$5 \times 5$ Correlation matrix]
 \label{ex:CIcorrmat}
 For classical Harmonic Oscillator 1D chain mode-like vectors: 
@@ -141,11 +139,11 @@ the corresponding position-position correlation matrix can be ``cross interpolat
 	  C[\mathcal{I} , \mathds{J}]}_{\displaystyle 5 \times 2}
 \end{gather}
 
-with $\sigma$ and $\tilde{\sigma}$ the variances of the two modes and $\mathcal{I} = \{ 1,5\}$ and $\mathcal{J} = \{ 1,5\}$. From the definition of $C$ we can recognize that $\rank{C} = 2$. This property is correctly highlighted by its CI decomposition ($\dim \mathcal{I} = \dim \mathcal{J} = 2$), since, in this particular case, the approximation is exact (cf. \prettyref{prop:CI}.\hyperlink{cond:rankexact}{3}). The total number of floating point numbers necessary to store the whole matrix in memory is $5 \times 5 = 25$, while for the CI decomposition $5\times 2 \times 2 + 2\times 2 = 24$ are sufficient. It is easy to deduce that the reduction in memory costs becomes less derisory for modes of generic dimension $N$ ($N\times N \gg N \times 2 \times 2 + 2\times 2$ when $N \gg 1$).
+with $\sigma$ and $\tilde{\sigma}$ the variances of the two modes and $\mathcal{I} = \{ 1,5\}$ and $\mathcal{J} = \{ 1,5\}$. From the definition of $C$ we can recognize that $\rank{C} = 2$. This property is correctly highlighted by its CI decomposition ($\dim \mathcal{I} = \dim \mathcal{J} = 2$), since, in this particular case, the approximation is exact (cf. \prettyref{prop:CI}.\hyperlink{cond:rankexact}{3}). The total number of floating point numbers necessary to store the whole matrix in memory is $5 \times 5 = 25$, while for the CI decomposition $5\times 2 \times 2 + 2\times 2 = 24$ are sufficient. It is easy to deduce that the reduction in memory costs becomes more important for modes of generic dimension $N$ ($N\times N \gg N \times 2 \times 2 + 2\times 2$ when $N \gg 1$).
 \end{example}
 
-From the example above we can evince the computational advantage of CI, however -- in order to make such approximation computationally feasable -- some sort error control is necessary. 
-In particular, the error of the CI approximation is related to the \textit{Schur complement} of the matrix to interpolate \cite{Golub96}. 
+From the example above we can evince the computational advantage of CI, however -- in order to make such approximation computationally feasable -- some sort of error control is necessary. 
+In particular, the error of the CI approximation is related to the \textit{Schur complement} of the matrix \cite{Golub96}. 
 
 \begin{definition}[Schur Complement]
 	Let us block partition a matrix $A\in\mathds{K}^{M\times N}$ ($\mathds{K} = \mathds{R}, \mathds{C}$) as follows: 
@@ -213,7 +211,7 @@ is singular, which gives $ A[i,j] = A[i, \mathcal{J}] \left( A[\mathcal{I}, \mat
 \subsubsection{Partial rank-revealing LU decomposition (prrLU)}
 Matrix Cross Interpolation presents itself as a very useful tool when it comes to numerical compression of matrices. Generalization of CI to continuous domains \cite{Schneider2010, Fernandez2022} even allows for reduction of numerical complexity of two-dimensional integration and derivation. Nonetheless, for practical, very complex, calculations, CI starts to fail. Numerical instability issues like rounding errors, ill-conditioning or overflowing \cite{Golub96} naturally emerge when CI requires large values of $\tchi$ to be accurate, therefore making the pivot matrix \textit{almost singular}. 
 
-Partial rank-revealing LU (prrLU) \cite{Golub96, Pan2000} matrix decomposition proposes itself as a possible solution for the numerical fragilities of CI. The prrLU provides a more stable, but equivalent approximation of our matrix to decompose. prrLU -- opposite to CI -- avoids any inversion of the pivot matrix $A[\mathcal{I}, \mathcal{J}]$, whereas -- similar to CI -- still requires a small subset of matrix's elements to be known. 
+Partial rank-revealing LU (prrLU) \cite{Golub96, Pan2000} matrix decomposition solves many of the numerical fragilities of CI. The prrLU provides a more stable, but equivalent approximation of our matrix to decompose. prrLU avoids any inversion of the pivot matrix $A[\mathcal{I}, \mathcal{J}]$, whereas still requires a small subset of matrix's elements to be known. 
 
 We may summarize the main features of prrLU as follows:
 
@@ -247,7 +245,7 @@ The prrLU implementation relies on the following LU decomposition (easily inferr
 	\end{bmatrix}\\[6pt]
 	\nonumber L_{11} = U_{11} = \identity_{11}, \qquad L_{21} = A_{21}A^{-1}_{11}, \qquad U_{12} = A^{-1}_{11}A_{12}
 \end{gather} 
-From \prettyref{eq:SchurLU} we can already understand where the improved stability of prrLU comes from: no matrix inversion is computed directly! The general prrLU algorithmic routine proceeds as outlined below:  
+Although matrices $L_{21}$ and $U_{12}$ in \prettyref{eq:SchurLU} contain the inverse of the matrix block $A_{11}$, the state-of-the-art implementation of prrLU limits $A_{11}$ to a $1\times1$ slice; hence, no actual matrix inversion is computed directly! The general prrLU algorithmic routine proceeds as outlined below \cite{Fernandez2024}:  
 
 \vspace{1.5\baselineskip}
 \begin{algorithm}[H]
@@ -282,7 +280,6 @@ From \prettyref{eq:SchurLU} we can already understand where the improved stabili
 	\Return{$(\Pi_r,\,\Pi_c,\,L,\,U,\,n)$}\;
 \end{algorithm}
 \vspace{2\baselineskip}
-
 By iteratively applying \prettyref{eq:SchurLU} on the lower-right block of the internal matrix \(\scriptstyle \begin{bmatrix} A_{11} & 0 \\
 	0 & [A / A_{11}] \end{bmatrix}\), while limiting $A_{11}$ to a $1\times 1$ submatrix at each step, \prettyref{alg:prrLU} allows us to obtain an approximation of the form 
 
@@ -293,14 +290,13 @@ By iteratively applying \prettyref{eq:SchurLU} on the lower-right block of the i
 	\end{bmatrix} = \tilde{A} + \textrm{err.},
 	\label{eq:prrLUCI}
 \end{equation}
-
 perfectly equivalent to \prettyref{eq:MCI} (cf. Ref. \cite{Fernandez2024}). In \prettyref{eq:prrLUCI}  $D$ is a diagonal matrix containing -- after iterative permutations -- the first $\tchi$ optimal pivots of $A$.
-Some remarks about \prettyref{alg:prrLU} are in order: 
+Some remarks about \prettyref{alg:prrLU} are in order
 \begin{itemize}
-	\item the implementation of prrLU is based upon the search of a good \textit{pivot} (\texttt{findBestPivot}). Through the \textit{maxvol principle}, a good pivot is defined as one that maximises the volume of the submatrix $A[\mathcal{I}, \mathcal{J}]$ ($\equiv A_{11}$ after permutations). The iterative application of \prettyref{eq:SchurLU} reduces the optimal pivot to the largest element of the submatrix $A[n\!:\!N,n\!:\!M]$ at iteration $n$;
-	\item different strategies can be implemented for pivot searching; a naive approach consists in a \textit{full search} scheme scanning the entire submatrix $A[n\!:\!N,n\!:\!M]$. $\order(MN)$ poor scaling of the naive implementation renders prrLU computationally inefficient. \textit{Rook search} \cite{Poole2000} and \textit{block rook search} \cite{Fernandez2024} are cleverer and cheaper approaches, with comparable robutstness and convergence features, but reduced computational cost $\order(\max\left(M,N\right))$;  
-	\item the matrix elements explored during \textit{rook search} are sufficient to perform prrLU of $A$. Therefore, prrLU yields compressibility traits similar to those of CI (see Example \ref{ex:CIcorrmat}). For this reason, prrLU can also be applied to 2-dimensional continuous functions discretized on a grid, whose full structure is uknown a priori; 	
-	\item the absolute error of the prrLU approximation is reduced to the modulus of the last inserted pivot, as one can understand from \prettyref{alg:prrLU}. The reason behind this is that we intend to minimize $\parallel\! A - \tilde{A}\!\parallel_{\infty} = \parallel\![A/A[\mathcal{I}, \mathcal{J}]] \!\parallel_{\infty}$ which is bounded by $\parallel\! A[n\!:\!N, n\!:\!M]\!\parallel_{\infty}$ at iteration step $n$.  
+	\item The implementation of prrLU is based upon the search of a good \textit{pivot} (\texttt{findBestPivot}). Through the \textit{maxvol principle}, a good pivot is defined as one that maximises the volume of the submatrix $A[\mathcal{I}, \mathcal{J}]$ ($\equiv A_{11}$ after permutations). The iterative application of \prettyref{eq:SchurLU} reduces the optimal pivot to the largest element of the submatrix $A[n\!:\!N,n\!:\!M]$ at iteration $n$;
+	\item Different strategies can be implemented for pivot searching; a naive approach consists in a \textit{full search} scheme scanning the entire submatrix $A[n\!:\!N,n\!:\!M]$. $\order(MN)$ poor scaling of the naive implementation renders prrLU computationally inefficient. \textit{Rook search} \cite{Poole2000} and \textit{block rook search} \cite{Fernandez2024} are cleverer and cheaper approaches, with comparable robutstness and convergence features, but reduced computational cost $\order(\max\left(M,N\right))$.  
+	\item The matrix elements explored during \textit{rook search} are sufficient to perform prrLU of $A$. Therefore, prrLU yields compressibility traits similar to those of CI (see Example \ref{ex:CIcorrmat}). For this reason, prrLU can also be applied to 2-dimensional continuous functions discretized on a grid, whose full structure is uknown a priori. 	
+	\item The absolute error of the prrLU approximation is reduced to the modulus of the last inserted pivot, as one can understand from \prettyref{alg:prrLU}. The reason behind this is that we intend to minimize $\parallel\! A - \tilde{A}\!\parallel_{\infty} = \parallel\![A/A[\mathcal{I}, \mathcal{J}]] \!\parallel_{\infty}$ which is bounded by $\parallel\! A[n\!:\!N, n\!:\!M]\!\parallel_{\infty}$ at iteration step $n$.  
 \end{itemize}
 
 

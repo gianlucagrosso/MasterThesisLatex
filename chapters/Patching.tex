@@ -135,10 +135,10 @@ wherein we generalized \raisebox{-1.5mm}{\includegraphics[scale=0.95]{figures/Pr
 \begin{equation}
 \raisebox{-4.5mm}{\includegraphics[scale=0.95]{figures/ProjectionTensor_lLabel.pdf}} = \begin{cases}
 		[\mathds{1}]_{m_{\ell-1},m_\ell} & \text{if } \sigma_\ell = p_\ell \\
-		0 & \text{otherwise},
+		[0]_{m_{\ell-1},m_\ell} & \text{otherwise},
 	\end{cases}
 \end{equation}
-with bonds $m_{\ell-1}$ and $m_{\ell}$ of same dimension. 
+with bonds $m_{\ell-1}$ and $m_{\ell}$ of same dimension and where $0_{m,n}$ denotes the element $(m,n)$ of the zero matrix.
 From \prettyref{eq:subTensorSum} we can recognize that 
 
 \begin{equation}
@@ -151,7 +151,7 @@ where the first equality reflects the error associated with an arbitrary MPS app
 \end{equation}
 taking $(\ell_1, \dots, \ell_N) \in \{1,\dots, \mL\}^{N(\leq \mL)}$ ($\ell_i \neq \ell_j$ for every $i\neq j$) without any specific order constraint. $\widetilde{\Psi}^{+}_{\bsigma}$ is good approximation of the original tensor $\Psi_{\bsigma}$.
 
-\subsection{The patching scheme}
+\subsection{The Patching scheme}
 Having laid out all the necessary ingredients, we now return to detailing our patched (Q)TCI algorithm. 
 Consider a generic tensor $\mT_{\bsigma}$ and its TCI approximation $\widetilde{\mT}_{\bsigma}$. As noted in \prettyref{sec:TCIFallbacks}, when the tensor $\mT$ exhibits sharply localised structures, its compression $\widetilde{\mT}$ can be made more memory-efficient by adopting a \textit{divide-et-impera} approach. Nevertheless, although the naive domain-splitting approach outlined in \prettyref{sec:TCIFallbacks} proved functional, it provided no means of numerical control and presumed that both the location and spatial extent of the tensor’s relevant features were known a priori. Such ideal conditions are rarely encountered in real-world applications, particularly when the tensor $\mT$ stems from complex computations that estimate unknown variables. However, the preceding example shows that memory usage for a (local) TT approximation is effectively characterised by its bond dimensions $\chi_\ell$—specifically, by the maximum bond dimension $\chi$. Recognizing this allows us to devise a more intelligent, adaptive, and general solution to the compression of tensors presenting sharp localized features.
 
@@ -182,7 +182,7 @@ The algorithm proceeds as follows:
 
 \begin{figure}[ht!]
 	\includegraphics{figures/PatchingAlgorithm.pdf}
-	\caption{Flowchart of the patched TCI algorithm. $a)$ Convergence criterion for the subtensors $\widetilde{\mT}^{p_1,\dots,p_{\bar \ell}}$ -- or \textit{patches} -- defined by the parameters $\chi_{\text{patch}}$ and $\varepsilon$, and the two sets of subtensors that have already converged -- \texttt{results} -- and those yet to converge  -- \texttt{tasks}. $b)$ Flowchart of the \textit{patching scheme}. The TCI approximation is adaptively decomposed into smaller computations through \textit{slicing} (cf. \prettyref{eq:tensorSlice}). Each subtensor is TCI compressed within the smaller domain. The converged \textit{patches} are added to \texttt{results}, the yet-to-converge ones to \texttt{tasks}. The algorithm terminates -- \includegraphics[scale=0.95]{figures/TerminalSquare.pdf} -- when \texttt{tasks} is empty. We refer the reader to the main manuscript for additional details.}
+	\caption{Flowchart of the patched TCI algorithm. $(a)$ Convergence criterion for the subtensors $\widetilde{\mT}^{p_1,\dots,p_{\bar \ell}}$ -- or \textit{patches} -- defined by the parameters $\chi_{\text{patch}}$ and $\varepsilon$, and the two sets of subtensors that have already converged -- \texttt{results} -- and those yet to converge  -- \texttt{tasks}. $(b)$ Flowchart of the \textit{patching scheme}. The TCI approximation is adaptively decomposed into smaller computations through \textit{slicing} (cf. \prettyref{eq:tensorSlice}). Each subtensor is TCI compressed within the smaller domain. The converged \textit{patches} are added to \texttt{results}, the yet-to-converge ones to \texttt{tasks}. The algorithm terminates -- \includegraphics[scale=0.95]{figures/TerminalSquare.pdf} -- when \texttt{tasks} is empty. We refer the reader to the main manuscript for additional details.}
 	\label{fig:patchingAlg}
 \end{figure}
 
@@ -285,11 +285,11 @@ As in standard TCI (see \prettyref{tab:cost}), the memory footprint of patched Q
 
 A comparable reasoning yields an estimate for the runtime  of the patched QTCI routine. If a single, full-domain TCI run takes  $\order\bigl( \chi^3 d^2 \mL \bigr)$ CPU time, then the cumulative runtime of patched QTCI becomes
 \begin{equation}
-	t_{\text{patch}} \lesssim \chip^3 d^2 \sum_{\ell = 0}^{{\bar \ell}} d^\ell (\mL - \ell) \lesssim  \Np \chip^3 d^2 \mL,
+	t_{\text{patch}} \lesssim \chip^3 d^2 \sum_{\ell = 0}^{{\bar \ell}} d^\ell (\mL - \ell) \lesssim  \Np \chip^3 d^3 \mL,
 \end{equation}
 where we assumed $\mL \gg \ellb$ in the last inequality. This yields a runtime scaling for pQTCI of 
 \begin{equation}
-	\order\bigl(\Np \chip^3 d^2 \mL\bigr).
+	\order\bigl(\Np \chip^3 d^3 \mL\bigr).
 	\label{eq:PatchTimeScaling}
 \end{equation}
 
@@ -301,7 +301,7 @@ Beyond the raw cost estimates, the analysis yields some useful thresholds: the p
       & \textbf{memory cost} & \textbf{CPU runtime} \\ \cline{2-3} \\[-6pt]
     $\Np\;<$ &
       $\displaystyle \frac{\chi^{2}}{\chi_{\text{patch}}^{2}}$ &
-      $\displaystyle \frac{\chi^{3}}{\chi_{\text{patch}}^{3}}$ \\[15pt]\cline{2-3}
+      $\displaystyle \frac{\chi^{3}}{d\chi_{\text{patch}}^{3}}$ \\[15pt]\cline{2-3}
   \end{tabular}
   \label{eq:chiPatchBound}
 \end{equation}

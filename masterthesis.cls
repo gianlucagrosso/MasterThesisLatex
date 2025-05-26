@@ -37,7 +37,7 @@
 \newrefformat{def}{Def.~\ref{#1}}
 \newrefformat{chap}{Chap.~\ref{#1}}
 \newrefformat{fig}{Fig.~\ref{#1}}
-\newrefformat{eq}{Eq.~\ref{#1}}
+\newrefformat{eq}{Eq.~(\ref{#1})}
 \newrefformat{prop}{Prop.~\ref{#1}}
 \newrefformat{alg}{Alg.~\ref{#1}}
 \newrefformat{tab}{Tab.~\ref{#1}}
@@ -188,7 +188,7 @@
 \newtheoremstyle{dotless}
 {\baselineskip}% ⟨Space above⟩1
 {\baselineskip}% ⟨Space below⟩1
-{\itshape} % body font
+{\normalfont} % body font
 {} % indent amount
 {\bfseries} % theorem head font 
 {} % punctuation after head
