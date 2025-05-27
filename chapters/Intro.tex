@@ -3,108 +3,63 @@
 ``Dispelling'' the \textit{curse of dimensionality} that ``hexes'' numerics' computations, has been a challenge of prime interest in different fields of science for many years. 
 Tensor network techniques -- and in particular \textit{matrix product states} (MPSs) methodologies -- are a well-established \cite{Fannes1992,White1992,Schollwock2011,Vidal2003,VerstraeteCirac2004,vonDelftTNNotes,tensornetwork.org} and standard approach widely employed by the quantum many-body (QMB) physics community to mitigate such exponential increase of computational resources. Numerical simulations of high-dimensional QMB wavefunctions represent, in fact, an exceptionally challenging computational task if not properly addressed.
 
-Meanwhile mathematicians have dedicated, as well, significant effort to target the same problem -- arising from multidimensional tensor approximation of continuous functions and numerical linear algebra computations \cite{Oseledets2009Intro, Kolda2009} -- ultimately converging towards a similar approach: \textit{tensor trains} (TTs)\footnote{From now on \textit{tensor train} and \textit{matrix product state} will be used interchangeably.} \cite{Oseledets2011}. 
+Mathematicians have dedicated, as well, significant effort to target the same problem -- arising from multidimensional tensor approximation of continuous functions or complex numerical linear algebra computations \cite{Oseledets2009Intro, Kolda2009} -- ultimately converging towards a similar approach: \textit{tensor trains} (TTs)\footnote{From now on \textit{tensor train} and \textit{matrix product state} will be used interchangeably.} \cite{Oseledets2011}. 
 
-The rising interest in tensor-network (TN) methods -- particularly those based on MPSs — has therefore led to the emergence of a standard ``MPS toolbox'' \cite{ttpylib, ITensors.jl, QSpace} and a well-defined catalogue of canonical TN applications \cite{Verstraete2008} (variational ansatz of QMB wavefunctions -- or DMRG -- among the most popular). For a long time, however, techniques for function approximation and manipulation have been laying beyond the traditional TN portfolio.
+The rising interest in tensor-network (TN) methods -- particularly those based on MPSs — has therefore led to the emergence of a standard ``MPS toolbox'' \cite{ttpylib, ITensors.jl, QSpace} and a well-defined catalogue of canonical TN applications \cite{Verstraete2008} (variational ansatz of QMB wavefunctions -- or DMRG -- among the most popular in physics). For a long time, however, techniques for function approximation and manipulation have been laying beyond the traditional TN portfolio.
 
 
-Classical numerical techniques for representing and manipulating functions--whether for integration, convolution, differentiation, or related tasks--have advanced considerably over the years \cite{Isaacson1994}, yet they remain hindered by significant constraints. Grid‐based or naive SVD–style tensor decompositions, for instance, confront the \emph{curse of dimensionality}: the memory and CPU time required to store and update a high‐resolution representation of a $\mN$-dimensional function grow exponentially with 
-$\mN$. Stochastic approaches such as Monte Carlo and Quantum Monte Carlo fare no better in the high‐dimensional regime; their error decreases only algebraically with sample size and they are plagued by additional obstacles—most notably the “sign problem’’—that can render simulations impractical for large, strongly correlated systems \cite{Loh1990}. Together, these limitations leave many modern, high-dimensional applications beyond the reach of standard numerical methods\cite{Fernandez2022}.
+Classical numerical techniques for representing and manipulating functions--whether for integration, convolution, differentiation, or related tasks--have advanced considerably over the years \cite{Isaacson1994}, yet they remain hindered by significant constraints. Grid‐based or naive SVD–style tensor discretizations of multivariate functions, for instance, confront the \emph{curse of dimensionality}: the memory and CPU time required to store and update a high‐resolution representation of a $\mN$-dimensional function grow exponentially with 
+$\mN$. When it comes to integration, standard stochastic approaches such as Monte Carlo and Quantum Monte Carlo fare no better in the high‐dimensional regime; their error decreases only algebraically with sample size and they are plagued by additional obstacles—most notably the “sign problem’’ \cite{Loh1990}—that can render simulations impractical for large, strongly correlated systems \cite{Fernandez2022}. Together, these limitations leave many modern, high-dimensional applications beyond the reach of standard numerical methods.
 
-The widespread and increasing interest in TN and MPSs methodologies among different fields has therefore facilitated the development of a pivotal\footnote{A rather playful wording choice given the context.} extension to the ``MPS toolbox'' in order to integrate the missing function representation capabilities: the Tensor Cross Interpolation (TCI) algorithm.
+The widespread and increasing interest in TN and MPSs methodologies among different fields has facilitated the development of a pivotal\footnote{A rather playful wording choice given the context.} extension to the ``MPS toolbox'' in order to integrate the missing function representation capabilities: the Tensor Cross Interpolation (TCI) algorithm.
 
 TCI attempts to address many of the above-mentioned limitations of standard function approximation and operation algorithms, by revealing low-rank structures and leveraging weakly entangled, scale-separated MPS-based function representations. As a result, cross approximation algorithms offer significantly improved computational scaling and flexibility, making the (Q)TCI library suite \cite{Fernandez2024} highly attractive for a wide range of advanced applications. Among them the following are definitely worth mentioning (with their respective achievements): high-order real-time nonequilibrium Schwinger-Keldysh perturbation expansions \cite{Fernandez2022} (integral convergence improved from $1/\sqrt{N_{\text{func\_eval}}}$ to $1/N_{\text{func\_eval}}^2$), multi-dimensional function minimization and quantized reinforcement learning \cite{Sozykin2022} (outperfoming standard gradient-free methods in number of function evaluations and execution time), computation of Brilloin zone integrals for topological invariants evaluation \cite{Ritter2024} (exponential to polynomial-order scaling of integration costs with respect to the simulation parameters), compact tensorization of atomic orbitals bases with high accuracy \cite{Jolly2024} (error on g.s. energy of \ce{H2} improved by 85\% w.r.t. double zeta calculation), (speed-up of) multi-assets Fourier transform-based European option pricing \cite{Sakurai2025}.
 
-More generally the novel approach of Ref. \cite{Fernandez2022, Fernandez2024} to integrate \textit{quantics} tensor rebasing with \textit{tensor cross approximation} procedures -- i.e. Quantics Tensor Cross Interpolation (QTCI) -- opened up the possibility to features like \textit{super-high resolution} and \textit{sign problem-free integration} for multi-dimensional functions, while maintaining computational costs bounded to a polynomial increase. Although the traditional ``TT-toolset'' already allowed for a similar scaling in resources with truncation-based procedures to reduce tensor's rank, (Q)TCI progressively reveals the rank structure of the input tensor by adaptively increasing the number of tensor evaluations (more on this in \prettyref{chap:QTCI}) without any loss of information caused by truncation. For this reason \todo{Machine learning part}
+More generally the novel approach of Ref. \cite{Fernandez2022, Fernandez2024} to integrate \textit{quantics} tensor rebasing with \textit{tensor cross approximation} procedures -- i.e. Quantics Tensor Cross Interpolation (QTCI) -- opened up the possibility to features like \textit{super-high resolution} and \textit{sign problem-free integration} for multi-dimensional functions, while maintaining computational costs bounded to a polynomial increase. Although the traditional ``TT-toolset'' already allowed for a similar scaling in resources with truncation-based procedures to reduce tensor's rank, (Q)TCI progressively reveals the rank structure of the input tensor by adaptively increasing the number of tensor evaluations (more on this in \prettyref{chap:QTCI}) without any loss of information caused by truncation. For this reason QTCI can be viewed as an \emph{active–learning} algorithm
+\cite{Settles2012}:  it probes the input tensor only at those configurations that most efficiently expose its low–rank structure, thereby minimising the number of function evaluations needed to reach a prescribed accuracy.
 
-However... \todo{ Here you talk about TCI limitations and patching}
+The class of multivariate continuous functions that admit a low–rank tensor representation within a tolerance~$\varepsilon$—the so-called \emph{$\varepsilon$-factorisable} functions \cite{Fernandez2022}—appears to be
+very large, although a rigorous characterisation is still lacking.  In practice this broadness translates into a wide domain of applicability for QTCI.
 
+Despite its versatility, the original TCI routine can suffer from \emph{ergodicity} problems: it may stall on very sparse tensors, tensors with
+discrete symmetries, or tensorised functions featuring sharp local peaks. Global pivoting and related heuristics \cite{Fernandez2024} mitigate these issues but do not always succeed, particularly when the tensor originates from \textit{ab initio} calculations for which no \emph{a priori} information is available. More in general, since all TCI algorithms involve sampling, none of them is fully immune against missing some features of the tensor of interest.
 
-\todo{Here you talk about  content of each chapter }
+To address these issues we propose in this work a \emph{divide-et-impera} extension of TCI. Inspired from similar distributed TT frameworks \cite{Hiroshi2023,Ehrlacher2021}, the algorithm adaptively partitions the target tensor into smaller subtensors (“patches”), TCI compressing each with a fixed bond-dimension cap, and thus concentrates resources on the most challenging regions of configuration space while keeping the overall memory footprint under control. 
 
-\note{Tensor Networks}{\textit{MPS or TT toolset} for reducing the rank of tensor object}
+The same patch philosophy also alleviates other tensor-network bottlenecks. In particular, we demonstrate how a similar domain decomposition limits intermediate bond growth in MPO–MPO contractions, substantially reducing their computational cost.
 
-\note{Introduction}{Sign problem-free integration, \textit{superhigh-resolution}, exponential reductions in computational costs (\textit{curse of dimensionality}) $\to$ low-rank = calculations in polynomial time with no truncation (common approach), uncover hidden structures}\\
-
-\noindent\note{Other methods}{High dimensional integrals and exponential complexity of QMB systems, Quantum Montecarlo shortcomings: sign problem and slow convergence ($1 / \sqrt{N}$), different from TN for wave function variational ansatz (DMRG)}\vspace{\baselineskip}\\
-
-
-
-For next chapter:
-
-\note{Tensor Cross Interpolation}{Main paper: \cite{Fernandez2024}, Main TCI ref: \cite{Oseledets2010}, function learning, \textit{maxvol} principle \cite{Dolgov2020}, exact if $\rank{TT} = \chi$ like MCI (see Naive Approach \cite{Fernandez2022}), \textit{rank-revealing} (only slow convergence for high rank); separation of pivot exploration and tensor update could be beneficial (see Monte Carlo \textit{space configuration enlargment}); SVD stability issues compared to prrLU}\\
-
-\noindent\note{Nice sentences}{ Tensor network methods offer a new appraoch to high-dimensional integration.TCI has a very peculiar position among other tensor network algorithms: it provides
-an automatic way to map a very large variety of physics and applied mathematics problems onto the MPS toolbox. }\\
-
-\noindent\note{General references}{\cite{Oseledets2010, Oseledets2011, Savostyanov2014, Savostyanov2011, Dolgov2020}}\\
-\note{Open questions}{Generality of $\epsilon$-factorizability property}
-
-\noindent \note{Open questions QTCI 
-}{When does a multivariate function admit low-rank representation? }
-
-\note{Patching}{Main reference \cite{Hiroshi2023}; \textit{reset mode} of TCI eliminates bad pivots that occur when the algorithm first explores regions where $\mathcal{T}$ is small and only later configurations that are larger $\to$ this could be sufficient but not enough hence patching; patched TCI benefints from \textit{global pivot updates} coming from previous TCI decompositions; patching helps solving ergodicity problems; }\\
-
-\noindent \note{General references }{\cite{Murray2024} (first mention of the patching+QTT scheme)}\\ 
-
-\noindent \note{Plot ideas}{Plot the ratio of sampled points (function calls) vs total points of the calculation. }\\ 
-
-\noindent \note{Nice sentences}{ Nevertheless,
-since all TCI algorithms involve sampling, none of them is fully immune against missing some features of the tensor of interest, as already discussed above.}
+The manuscript structured as follows: Chapter~\ref{chap:QTCI} reviews the standard (Q)TCI algorithm, its canonical implementation, and representative applications. Chapter~\ref{chap:patching} introduces the patched(divide-et-impera) variant—\emph{patched (Q)TCI}—and analyses its theoretical cost and limitations. Chapter~\ref{chap:MPOcontr} extends the patch strategy to MPO–MPO contractions, presenting both greedy and adaptive distributed schemes with cost estimates. Chapter~\ref{chap:results} presents numerical benchmarks and showcases the new algorithms on selected problems centred on the single-impurity Anderson model.
 
 
-\textsc{Small caps text}
-{\HUGE{Huge text}}
+% \note{Tensor Networks}{\textit{MPS or TT toolset} for reducing the rank of tensor object}
 
+% \note{Introduction}{Sign problem-free integration, \textit{superhigh-resolution}, exponential reductions in computational costs (\textit{curse of dimensionality}) $\to$ low-rank = calculations in polynomial time with no truncation (common approach), uncover hidden structures}\\
 
-Some different type of text:\hfill
-
-Mixing \textbf{different series, \textsf{families}} and
-\textsl{\texttt{shapes,}} \textsc{especially in one sentence,}
-is usually \emph{highly inadvisable!}\textit{ it = emph}
-
-Some modification 
-
-\MakeTextUppercase{⟨text⟩}
-
-
-% \begin{figure}
-% 	\centering
-% 	\includegraphics[width=.5\textwidth]{example-image-duck}
-% 	\caption{A cool duck}
-% 	\label{fig:figure1}
-% \end{figure}
+% \noindent\note{Other methods}{High dimensional integrals and exponential complexity of QMB systems, Quantum Montecarlo shortcomings: sign problem and slow convergence ($1 / \sqrt{N}$), different from TN for wave function variational ansatz (DMRG)}\vspace{\baselineskip}\\
 
 
 
-% \label{sec:outline}
+% For next chapter:
 
-% A cool list:
-% \begin{enumerate}
-% 	\item item 1
-% 	\item item 2
-% 	\item item 3
-% \end{enumerate}
+% \note{Tensor Cross Interpolation}{Main paper: \cite{Fernandez2024}, Main TCI ref: \cite{Oseledets2010}, function learning, \textit{maxvol} principle \cite{Dolgov2020}, exact if $\rank{TT} = \chi$ like MCI (see Naive Approach \cite{Fernandez2022}), \textit{rank-revealing} (only slow convergence for high rank); separation of pivot exploration and tensor update could be beneficial (see Monte Carlo \textit{space configuration enlargment}); SVD stability issues compared to prrLU}\\
 
-% \rem{Something}
-%  \todo{I have to fix this}
-%  \note{Note }{just a note}
+% \noindent\note{Nice sentences}{ Tensor network methods offer a new appraoch to high-dimensional integration.TCI has a very peculiar position among other tensor network algorithms: it provides
+% an automatic way to map a very large variety of physics and applied mathematics problems onto the MPS toolbox. }\\
 
-% \subsubsection{Some section}
-% Some text
-% \begin{definition}[Some law]
-%     Some details
-% \end{definition}
-% Thank you for the space
-% \change{\note{Gianluca}{I have to do this}}
+% \noindent\note{General references}{\cite{Oseledets2010, Oseledets2011, Savostyanov2014, Savostyanov2011, Dolgov2020}}\\
+% \note{Open questions}{Generality of $\epsilon$-factorizability property}
 
-% \begin{mydef}[Title]
-%     Some text
-% \end{mydef}
-    
+% \noindent \note{Open questions QTCI 
+% }{When does a multivariate function admit low-rank representation? }
 
-% $\Tr (\Gamma)$
+% \note{Patching}{Main reference \cite{Hiroshi2023}; \textit{reset mode} of TCI eliminates bad pivots that occur when the algorithm first explores regions where $\mathcal{T}$ is small and only later configurations that are larger $\to$ this could be sufficient but not enough hence patching; patched TCI benefints from \textit{global pivot updates} coming from previous TCI decompositions; patching helps solving ergodicity problems; }\\
 
+% \noindent \note{General references }{\cite{Murray2024} (first mention of the patching+QTT scheme)}\\ 
+
+% \noindent \note{Plot ideas}{Plot the ratio of sampled points (function calls) vs total points of the calculation. }\\ 
+
+% \noindent \note{Nice sentences}{ Nevertheless,
+% since all TCI algorithms involve sampling, none of them is fully immune against missing some features of the tensor of interest, as already discussed above.}
 
 
 
