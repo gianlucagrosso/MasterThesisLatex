@@ -19,7 +19,7 @@ More generally the novel approach of Ref. \cite{Fernandez2022, Fernandez2024} to
 \cite{Settles2012}:  it probes the input tensor only at those configurations that most efficiently expose its low–rank structure, thereby minimising the number of function evaluations needed to reach a prescribed accuracy.
 
 The class of multivariate continuous functions that admit a low–rank tensor representation within a tolerance~$\varepsilon$—the so-called \emph{$\varepsilon$-factorisable} functions \cite{Fernandez2022}—appears to be
-very large, although a rigorous characterisation is still lacking.  In practice this broadness translates into a wide domain of applicability for QTCI.
+very large, although a rigorous characterisation is still lacking.  In practice this broadness translates into a wide domain of applicability for QTCI. 
 
 Despite its versatility, the original TCI routine can suffer from \emph{ergodicity} problems: it may stall on very sparse tensors, tensors with
 discrete symmetries, or tensorised functions featuring sharp local peaks. Global pivoting and related heuristics \cite{Fernandez2024} mitigate these issues but do not always succeed, particularly when the tensor originates from \textit{ab initio} calculations for which no \emph{a priori} information is available. More in general, since all TCI algorithms involve sampling, none of them is fully immune against missing some features of the tensor of interest.
@@ -27,6 +27,8 @@ discrete symmetries, or tensorised functions featuring sharp local peaks. Global
 To address these issues we propose in this work a \emph{divide-et-impera} extension of TCI. Inspired from similar distributed TT frameworks \cite{Hiroshi2023,Ehrlacher2021}, the algorithm adaptively partitions the target tensor into smaller subtensors (“patches”), TCI compressing each with a fixed bond-dimension cap, and thus concentrates resources on the most challenging regions of configuration space while keeping the overall memory footprint under control. 
 
 The same patch philosophy also alleviates other tensor-network bottlenecks. In particular, we demonstrate how a similar domain decomposition limits intermediate bond growth in MPO–MPO contractions, substantially reducing their computational cost.
+
+\note{Cite website and implementation}{A very well structured implementation of the main TCI routine can be found in the $\julia$ library \texttt{TensorCrossInterpolation.jl} \cite{TensorCrossInterpolation.jl}.  for the rest of the work. Other smart functionalities including the quantics tensor dicretizetion + TCI are also provided by analogous libraries as documented in the \textit{tensor4all.org} website \cite{tensor4all.org}. This implementation will be used as base for construction of our newly implemented patched TCI routine.}
 
 The manuscript structured as follows: Chapter~\ref{chap:QTCI} reviews the standard (Q)TCI algorithm, its canonical implementation, and representative applications. Chapter~\ref{chap:patching} introduces the patched(divide-et-impera) variant—\emph{patched (Q)TCI}—and analyses its theoretical cost and limitations. Chapter~\ref{chap:MPOcontr} extends the patch strategy to MPO–MPO contractions, presenting both greedy and adaptive distributed schemes with cost estimates. Chapter~\ref{chap:results} presents numerical benchmarks and showcases the new algorithms on selected problems centred on the single-impurity Anderson model.
 

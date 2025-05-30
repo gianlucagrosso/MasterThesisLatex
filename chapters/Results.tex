@@ -1,36 +1,199 @@
-\chapter{Results}
+\chapter{Numerical results}
 \label{chap:results}
-\note{Plot ideas}{
+
+
+\prettyref{chap:patching} and \prettyref{chap:MPOcontr} introduced our \emph{patched QTCI} and \emph{patched MPO–MPO contraction} algorithms in detail. By extending the state-of-the-art implementation of the QTCI algorithm, we have implemented a \textit{divide‐and‐conquer} version of TCI that targets scenarios in which the standard routine may struggle.
+
+In this chapter we first present representative benchmarks (\prettyref{sec:2DGreen} and \prettyref{sec:benchmarkMPOMPOContr}) that highlight the performance of the new routines. We then apply them to two physics problems that have previously posed computational bottlenecks: the two–dimensional Hubbard model (\prettyref{sec:bubbleCalc}) and the single‐impurity Anderson model (Sec.~\ref{sec:patchBSE}). Both cases were recently addressed with QTCI or patched quantics SVD–based tensor trains approaches \cite{Hiroshi2023,Rohshap2025}. Our patched QTCI method complements and extends those efforts, demonstrating improved efficiency on the same benchmark tasks.
+
+Our calculations are constructed on the alreadymature $\julia$ packages \texttt{TensorCrossInterpolation.jl} \cite{TensorCrossInterpolation.jl} and \texttt{QuanticsTCI.jl} \cite{tensor4all.org}, which we have extended with the additional features required for the present applications.
+
+\section{Approximation of 2D Green's functions}
+\label{sec:2DGreen}
+
+We begin with the toy Green’s function  
+
+\begin{equation}
+  G(\mathbf{k})
+  \;=\;
+  \frac{1}
+       {\;\omega+\mu-\varepsilon_{\mathbf{k}}+i\delta\,},
+  \label{eq:2DGreen}
+\end{equation}
+
+where the non-interacting dispersion is taken as
+\(\varepsilon_{\mathbf{k}}=-2\cos k_{x}-2\cos k_{y}\)  
+and we set the chemical potential to \(\mu=0\).
+\prettyref{eq:2DGreen} is patterned after the Matsubara Green’s function of the two-dimensional Hubbard model at finite temperature
+\cite{Mahan2000},
+
+\begin{equation}
+  G(i\nu,\mathbf{k})
+  \;=\;
+  \frac{1}
+       {\,i\nu+\mu-\varepsilon_{\mathbf{k}}-\Sigma(i\nu,\mathbf{k})},
+\end{equation}
+
+with two deliberate simplifications:
+\(\omega\) plays the rôle of the (real) self-energy
+\(\Sigma\), while \(\delta\) mimics the Matsubara frequency
+\(\nu=(2n+\xi)\pi/\beta\) ($\xi=0,1$ for bosons and fermions) and thus encodes the temperature.
+Accordingly we treat \(\omega\) as a fixed input—one may think of it as the self-energy obtained from the previous Dyson iteration—whereas \(\delta\) is varied to emulate different temperatures.
+
+The figure below shows a density plot of
+\(\operatorname{Re}G(\mathbf{k})\) for the representative choice
+\(\omega=10^{-1}\):
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics{figures/realGreenHeatmap.pdf}
+    \caption{Heatmap of the real part of the Green's function in \prettyref{eq:2DGreen}, $\text{Re}\left(G(\bk)\right)$ for different values of $\delta$ and fixed $\omega=10^{-1}$. }
+    \label{fig:realGreenHeatmap}
+\end{figure}
+
+\prettyref{fig:realGreenHeatmap} shows that the parameter \(\delta\) controls how sharply the Green’s function is localised: as \(\delta\to 0\) the poles narrow and \(G(\mathbf{k})\) becomes increasingly singular.  This makes the function an ideal testbed for patched QTCI.
+
+We discretise \(G(\mathbf{k})\) by quantics rebasing,  
+\begin{equation}
+  G(\bk)
+  \;\longrightarrow\;
+  G_{\bsigma} = G\!\bigl(\bk(\bsigma)\bigr),
+\end{equation}
+with bit string
+\(\boldsymbol{\sigma}=(\sigma_{1},\dots,\sigma_{\mathcal R})\) in the fused
+ordering, or \(\boldsymbol{\sigma}=(\sigma_{x1},\dots,\sigma_{y\mathcal R})\) in the interleaved ordering.  
+Throughout we use \(\mathcal R=15\) bits per \(\bk\)-component.
+
+After setting a patch bond–dimension cap \(\chi_{\text{patch}}\) and a global tolerance \(\tau=10^{-7}\), we monitor convergence of pQTCI via the pointwise error
+\begin{equation}
+  \varepsilon(\mathbf{k})
+  = \log_{10}\!
+      \frac{\bigl|\operatorname{Re}\widetilde G(\mathbf{k})
+                -\operatorname{Re}G(\mathbf{k})\bigr|}
+           {\;\|\operatorname{Re}\widetilde G\|_{\infty}},
+  \label{eq:localError2DGreen}
+\end{equation}
+where \(\|\operatorname{Re}\widetilde G\|_{\infty}\) is the maximum of \(|\operatorname{Re}\widetilde G|\) over all sampling points \(\bk(\bsigma)\) used in every patch \(\operatorname{Re} \widetilde{G}^{p_1,\dots,p_{\bar\ell}}\) produced by the patched QTCI routine.
+
+\prettyref{fig:2DGreenErrorHeatmap} compares the patched QTCI approximation with the exact real part of the Green’s function for three values of the
+broadening parameter \(\delta\).  The top row shows
+\(\operatorname{Re}G(\bk)\) reconstructed from the patched tensor train, while the bottom row plots the local error \(\varepsilon(\bk)\) defined in \prettyref{eq:localError2DGreen} over the entire Brillouin zone \([-\pi,\pi]^{2}\). To evaluate the approximate tensor
+\(\operatorname{Re}\widetilde{G}_{\bsigma}\) on a uniform \(\bk\)-grid we first invert the mapping \(\bsigma\mapsto\bk(\bsigma)\) and then, after resumming the whole patches set $\text{Re}\bigl(\widetilde{G}^{p_1,\dots,p_{\ellb}}\bigr)$ to a single TT approximation $\text{Re}\bigl(\widetilde{G}_{\bsigma}^{+}\bigr)$, we evaluate the correspondent $\bsigma(\bk)$ tensor value for each $\bk$ point of the domain. 
+
+\begin{figure}[ht!]
+    \centering 
+    \includegraphics{figures/2DGreenErrorHeatmap.pdf}
+    \caption{Patched QTCI approximation of
+           \(\operatorname{Re}G(\bk)\).
+           $(a)$ Heatmaps of the patched tensor train evaluated on \([-\pi,\pi]^{2}\) for bond–dimension caps \(\chi_{\text{patch}}=48,118,277\) (corresponding to
+           \(\delta=10^{-1},10^{-2},10^{-3}\), respectively).
+           (b) Log–error \(\varepsilon(\bk)\) [\prettyref{eq:localError2DGreen}]
+           for the same patched approximations. }
+    \label{fig:2DGreenErrorHeatmap}
+\end{figure}
+
+Despite the fact that \(\varepsilon(\bk)\) does not drop everywhere below the target tolerance \(\tau=10^{-7}\), its \emph{spatial average} error is of that
+order. For the same parameters the conventional (Q)TCI routine attains comparable accuracy, as illustrated in \prettyref{fig:TCI2DGreenerror} for
+\(\delta=10^{-1}\).
+\begin{figure}[ht!]
+    \centering
+    \includegraphics{figures/heatmap_TCI_error_2DGreen_ω_0.1_δ_0.1_R_15_abstol_1.0e-7_unfol_fused.pdf}
+    \caption{Local error \(\varepsilon(\bk)\) for a standard QTCI approximation of \(\operatorname{Re}G(\bk)\) at \(\delta=10^{-1}\).}
+    \label{fig:TCI2DGreenerror}
+\end{figure}
+
+A one–dimensional cut at \(k_{y}=\pi/2\) (\prettyref{fig:lineError2DGreen}) confirms that the patched approximation faithfully reproduces the sharp features of \(\operatorname{Re}G(\bk)\) for all three
+\(\delta\) values.
+\begin{figure}[ht!]
+    \centering
+    \includegraphics{figures/lineError2DGreen.pdf}
+    \caption{One–dimensional slice,
+           \(\operatorname{Re}G(k_{x},k_{y}=\pi/2)\),
+           comparing the patched approximation (solid red) with the exact
+           function (dotted blue) for
+           \(\delta=10^{-1}\) (a),
+           \(\delta=10^{-2}\) (b),
+           and \(\delta=10^{-3}\) (c).}
+    \label{fig:lineError2DGreen}
+\end{figure}
+
+We now benchmark patched QTCI (pQTCI) against the standard QTCI routine for
+the Green’s function introduced above.  For each broadening
+\(\delta\in\{10^{-1},10^{-2},10^{-3}\}\) we measure
+
 \begin{itemize}
-    \item Plot for $N \geq 2$ functions where I know analytic $f$: plot $f(x_1,..., x_N)$ vs $x_1$ where $x_2,..., x_N$ are picked randomly
-    \item plot bond dimension at varying $R$ on the same plot (see Fig. 4 \cite{Fernandez2024})
+  \item the \emph{run time} on an Intel\textsuperscript{\textregistered}
+        Xeon\textsuperscript{\textregistered} W-2245 CPU @ 3.90 GHz, and
+  \item the \emph{memory footprint}, here defined as the total number of
+        floating-point parameters in all patches
+        \(\operatorname{Re}\widetilde{G}^{p_{1},\dots,p_{\bar\ell}}\).
 \end{itemize}
-}
-\section{Approximation of Green's functions}
+
+The tensor \(\operatorname{Re}G_{\bsigma}\) is discretised with
+\(\mathcal R=15\) bits per momentum component and approximated to a tolerance
+\(\tau=10^{-7}\).  We scan the bond–dimension cap
+\(\chi_{\text{patch}}\) and compare fused and interleaved bit orderings.
 
 \begin{figure}[ht!]
-    \caption{Error Heatmap of Green's function.}
+    \centering
+    \includegraphics{figures/2DGreenMemoryTimeFused.pdf}
+    \caption{ \textbf{Fused ordering.} Total parameter count (left) and CPU run time (right) versus bond-cap \(\chi_{\text{patch}}\) for \(\delta=10^{-1},10^{-2},10^{-3}\). Dotted lines show the corresponding standard-QTCI values. }
+    \label{fig:memoryTime2DGreenFused}
 \end{figure}
 
 \begin{figure}[ht!]
-    \caption{$G_{exact}(x,y)$ \& $G_{approx}(x,y)$ vs $x$ for $y$-points picked at random.}
+    \centering
+    \includegraphics{figures/2DGreenMemoryTimeInterleaved.pdf}
+    \caption{\textbf{Interleaved ordering.}
+    Same data as \prettyref{fig:memoryTime2DGreenFused}, but with
+    interleaved bit strings.}
+    \label{fig:memoryTime2DGreenInterleaved}
 \end{figure}
 
-\begin{figure}[ht!]
-    \caption{Memory and time vs $\delta$ (localization parameter) patched and non-patched.}
-\end{figure}
+Figures~\ref{fig:memoryTime2DGreenFused}–
+\ref{fig:memoryTime2DGreenInterleaved} reveal three main trends:
+
+\begin{enumerate}
+\item For \(\delta=10^{-2}\) and \(10^{-3}\) the patched routine beats standard QTCI in memory requirements. CPU rutime is smaller only with fused intex ordering. The advantage grows as the poles sharpen (smaller~\(\delta\)).
+
+\item Each curve exhibits an optimal
+      \(\chi_{\text{patch}}^{\mathrm{best}}\): setting the cap too low triggers the ``overpatching'' effect discussed in
+      \prettyref{sec:patchingCost}, inflating the patch count without reducing ranks further.
+
+\item Surprisingly, the fused ordering runtimes performs better than the interleaved one, although,in most cases, both respect the theoretical patch bounds of \prettyref{eq:chiPatchBound} for the total number of patches $\Np$. (cf. \prettyref{app:bounds} for more details).
+\end{enumerate}
+
+For the broadest line, \(\delta=10^{-1}\), pQTCI offers no gain—the function is already smooth enough that a single TT suffices, and the extra slicing merely adds overhead.
+
+A global view of the “return on investment’’ is given in \prettyref{fig:deltavsMemoryTime}, which plots the ratio of plain QTCI result to the best patched result (in parameters and run time) as a function of \(\delta\).  The larger is the ratio, the greater the benefit of using pQTCI.
 
 \begin{figure}[ht!]
-    \caption{Global error $\epsilon$ vs $R$ to check convergence.}
+    \centering
+    \includegraphics{figures/localisationParam2DGreen.pdf}
+    \caption{Parameter and run-time ratios between the best patched approximation (at \(\chi_{\text{patch}}^{\mathrm{best}}\)) and a single-TT QTCI
+    approximation, as a function of the broadening \(\delta\).} 
+    \label{fig:deltavsMemoryTime}
 \end{figure}
+
+In summary, adaptively partitioning the domain allows one to focus bond dimension where it is truly needed, yielding significant savings for sharply localised Green’s functions, while incurring in overhead (``overpatching'') when the function is already smooth.
 
 \section{Benchmarking of Patched MPO-MPO Contractions}
+\label{sec:benchmarkMPOMPOContr}
+Consider now the following two-dimensional functions
+
+\begin{align}
+f(\bx) = \sum_{j=1}^4 e^{-(\bx - \bx_j)^2/\sigma^2_j}, \quad  
+g(\bx) = \sum_{j=1}^4 e^{-|\bx - \bx'_j|/\sigma_j}, 
+\label{eq:linearGauss}
+\end{align}
+with $\bx_j = (\cos \phi_j, \sin \phi_j )$, $\phi_j = (j-\frac{1}{2}) \frac{\pi}{2}$, $\sigma_j =  2^{-(j+1)}$, and $\bx'_j =\bx_j + (2\sigma_j,
+\sigma_j)$.
+
+
 \subsection{Element-wise multiplication}
 \begin{figure}[ht!]
     \caption{Heatmap + patch grid of element-wise multiplication of 2D MPOs (qHO calculation of $\Psi^2(x)$ ) }
 \end{figure}
-
-\todo{Benchmark with Quantum Harmonic Oscillator in localised potential ($\omega \gg 1$) $\to$ evaluate $|\Psi(x)|^2$. Also something related to heat equation could work}
 
 \begin{figure}[ht!]
     \caption{Number of patches vs patch bond dimension with optimal region for element-wise multiplication ( theoretical value) }
@@ -65,7 +228,23 @@
 \end{figure}
 
 
-\section{BSE with Patching}
+\section{Bare Susceptibility Calculation}
+\label{sec:bubbleCalc}
+
+\note{Papers}{Convolution in frequency domain \cite{Rakhuba2015}}
+
+\begin{figure}[ht!]
+    \caption{Heatmap and scheme of the global computation (TCI+QFT+ element-wise contraction + patch sum + $\textrm{QFT}^{-1}$ )}
+\end{figure}
+
+\begin{figure}[ht!]
+    \caption{Memory and time scaling vs function parameter ($\beta$, $R$, $\epsilon$) comparison patch/non-patch }
+\end{figure}
+
+
+
+\section{Bethe-Salpeter equations}
+\label{sec:patchBSE}
 
 \subsection{\texttt{automul} algorithm}
 
@@ -89,69 +268,59 @@
     \caption{Memory and time scaling patched/non-patched BSE contraction vs $R$ and $\epsilon$.}
 \end{figure}
 
-\section{Bubble Calculation}
-
-\note{Papers}{Convolution in frequency domain \cite{Rakhuba2015}}
-
-\begin{figure}[ht!]
-    \caption{Heatmap and scheme of the global computation (TCI+QFT+ element-wise contraction + patch sum + $\textrm{QFT}^{-1}$ )}
-\end{figure}
-
-\begin{figure}[ht!]
-    \caption{Memory and time scaling vs function parameter ($\beta$, $R$, $\epsilon$) comparison patch/non-patch }
-\end{figure}
 
 
-\section{Gaussian Orbital Overlap}
 
-\note{Orbitals overlap}{Yuriel's paper on atomic bases: \cite{Jolly2024}, double-zeta calculation(?)}
+% \section{Gaussian Orbital Overlap}
 
-The electron repulsion integral of two GTOs is defined as
+% \note{Orbitals overlap}{Yuriel's paper on atomic bases: \cite{Jolly2024}, double-zeta calculation(?)}
 
-\begin{equation}
-    \bra{\textbf{A}, \textbf{C}}\frac{1}{r_{12}}\ket{\textbf{B}, \textbf{D}} = \int_{-\infty}^\infty \text{d}^3r_1 \int_{-\infty}^\infty \text{d}^3r_2 \frac{\phi_\textbf{A}(\bm{r}_1) \phi_\textbf{B}(\bm{r}_1) \phi_\textbf{C}(\bm{r}_2) \phi_\textbf{D}(\bm{r}_2)}{|\bm{r}_1 - \bm{r}_2|}
-\end{equation}
+% The electron repulsion integral of two GTOs is defined as
 
-where the generic Cartedisan GTO can be written as
+% \begin{equation}
+%     \bra{\textbf{A}, \textbf{C}}\frac{1}{r_{12}}\ket{\textbf{B}, \textbf{D}} = \int_{-\infty}^\infty \text{d}^3r_1 \int_{-\infty}^\infty \text{d}^3r_2 \frac{\phi_\textbf{A}(\bm{r}_1) \phi_\textbf{B}(\bm{r}_1) \phi_\textbf{C}(\bm{r}_2) \phi_\textbf{D}(\bm{r}_2)}{|\bm{r}_1 - \bm{r}_2|}
+% \end{equation}
 
-\begin{equation}
-    \ket{\textbf{R}} = \phi_\textbf{R}(\bm{r}) = N (x - R_x)^l (y - R_y)^m (z - R_z)^n e^{-\alpha (\bm{r} - \textbf{R})^2}.
-\end{equation}
-The electron repulsion integral can be rewritten as (cf. Ref. \cite{Petersson2010}): 
+% where the generic Cartedisan GTO can be written as
 
-\begin{align}
-    \bra{\textbf{A}, \textbf{C}}\frac{1}{r_{12}}\ket{\textbf{B}, \textbf{D}} =& \frac{N_\textbf{A}N_\textbf{B}N_\textbf{C}N_\textbf{D} \pi^{5/2}}{\gamma_p\gamma_q\sqrt{\gamma_p + \gamma_q}} e^{\eta_p(\textbf{A} - \textbf{B})^2} e^{\eta_q(\textbf{C} - \textbf{D})^2} \times \\
-    \nonumber &\sum_{\bm{i},\bm{o},\bm{r},u}\mathcal{J}_x \sum_{\bm{j},\bm{p},\bm{s},v} \mathcal{J}_y \sum_{\bm{k},\bm{q},\bm{t},w} \mathcal{J}_z\ 2F_\nu (\eta (\textbf{P} - \textbf{Q})^2)
-\end{align}
+% \begin{equation}
+%     \ket{\textbf{R}} = \phi_\textbf{R}(\bm{r}) = N (x - R_x)^l (y - R_y)^m (z - R_z)^n e^{-\alpha (\bm{r} - \textbf{R})^2}.
+% \end{equation}
+% The electron repulsion integral can be rewritten as (cf. Ref. \cite{Petersson2010}): 
 
-where
+% \begin{align}
+%     \bra{\textbf{A}, \textbf{C}}\frac{1}{r_{12}}\ket{\textbf{B}, \textbf{D}} =& \frac{N_\textbf{A}N_\textbf{B}N_\textbf{C}N_\textbf{D} \pi^{5/2}}{\gamma_p\gamma_q\sqrt{\gamma_p + \gamma_q}} e^{\eta_p(\textbf{A} - \textbf{B})^2} e^{\eta_q(\textbf{C} - \textbf{D})^2} \times \\
+%     \nonumber &\sum_{\bm{i},\bm{o},\bm{r},u}\mathcal{J}_x \sum_{\bm{j},\bm{p},\bm{s},v} \mathcal{J}_y \sum_{\bm{k},\bm{q},\bm{t},w} \mathcal{J}_z\ 2F_\nu (\eta (\textbf{P} - \textbf{Q})^2)
+% \end{align}
 
-\begin{equation} 
-    F_\nu(u) = \int_{0}^{1} \text{d}t\ t^{2\nu} e ^{-ut^2}
-\end{equation}
+% where
 
-is the so-called \textit{Boys function} \cite{Boys1950}.
+% \begin{equation} 
+%     F_\nu(u) = \int_{0}^{1} \text{d}t\ t^{2\nu} e ^{-ut^2}
+% \end{equation}
+
+% is the so-called \textit{Boys function} \cite{Boys1950}.
 
     
-\begin{equation}
-    \begin{alignedat}{5}      
-      \textbf{P} &= \frac{1}{\gamma_p}(\alpha_1 \textbf{A} + \alpha_2 \textbf{B}) &\qquad \gamma_p &= \alpha_1 + \alpha_2 \\[6pt]
-      \textbf{Q} &= \frac{1}{\gamma_q}(\alpha_3 \textbf{C} + \alpha_4 \textbf{D}) &\qquad \gamma_q &= \alpha_3 + \alpha_4 \\[6pt]
-      \eta &= \frac{\gamma_p\gamma_q}{\gamma_p + \gamma_q}
-    \end{alignedat}
-\end{equation}
+% \begin{equation}
+%     \begin{alignedat}{5}      
+%       \textbf{P} &= \frac{1}{\gamma_p}(\alpha_1 \textbf{A} + \alpha_2 \textbf{B}) &\qquad \gamma_p &= \alpha_1 + \alpha_2 \\[6pt]
+%       \textbf{Q} &= \frac{1}{\gamma_q}(\alpha_3 \textbf{C} + \alpha_4 \textbf{D}) &\qquad \gamma_q &= \alpha_3 + \alpha_4 \\[6pt]
+%       \eta &= \frac{\gamma_p\gamma_q}{\gamma_p + \gamma_q}
+%     \end{alignedat}
+% \end{equation}
     
 
-\begin{figure}[ht!]
-    \caption{TCI and patched TCI approximation of the Boys function.}
-\end{figure}
+% \begin{figure}[ht!]
+%     \caption{TCI and patched TCI approximation of the Boys function.}
+% \end{figure}
 
-\begin{figure}[ht!]
-    \caption{3D graph of Gaussian orbitals for \ce{H2} and \ce{LiH}}
-\end{figure}
+% \begin{figure}[ht!]
+%     \caption{3D graph of Gaussian orbitals for \ce{H2} and \ce{LiH}}
+% \end{figure}
 
-\begin{figure}[ht!]
-    \caption{Memory and time scaling of orbital overlap compared with standard approach. }
-\end{figure}
+% \begin{figure}[ht!]
+%     \caption{Memory and time scaling of orbital overlap compared with standard approach. }
+% \end{figure}
 
 

@@ -552,7 +552,7 @@ method of choice whenever scale‑separation permits a bounded TT rank, which wi
 
 \subsection{\texttt{TensorCrossInterpolation.jl} library}
 
-In the previous sections we introduced technical details and different applications of the TCI and QTCI algorithms. As briefly mentioned, all of the examples we presented rely on a $\julia$ implementation of the algorithm, namely \texttt{TensorCrossInterpolation.jl} -- or \texttt{TCI.jl} \cite{TensorCrossInterpolation.jl}. We will not dive into this details of the library however, as reference for the rest of the work, we will mention its main functionality: the \texttt{crossinterpolate2} function.
+In the previous sections we introduced technical details and different applications of the TCI and QTCI algorithms. As briefly mentioned, all of the examples we presented rely on a $\julia$ implementation of the algorithm, namely \texttt{TensorCrossInterpolation.jl} \cite{TensorCrossInterpolation.jl, tensor4all.org}.  We will not dive into this details of the library however, as reference for the rest of the work, we will mention its main functionality: the \texttt{crossinterpolate2} function.
 
 \texttt{crossinterpolate2}, described in the Listing \ref{code:crossinterpolate2} below, performs TCI of a given numerical function \texttt{f}; in our context, \texttt{f} is either represented by the discretized version of a multi-variate continuous function -- $f(\boldsymbol{x}(\bsigma))$ -- or by any tensor-like numerical function -- $\mF_{\bsigma}$. Given the definition of our tensor $\mF_{\bsigma}$ as a \texttt{function} type, we can understand that its elements don't need to be known and stored beforehand, suitably for TCI. 
 The output of the computation is an object containing the site tensors of the TT-unfolding, together with the lists of pivots necessary to realize the cross approximation.
@@ -614,7 +614,7 @@ We can infer that the use of QTCI to approximate $f(\boldsymbol{r})$ at high acc
 
 The absolute quality of the local approximation can be measured through 
 \begin{equation}
-	\varepsilon(\boldsymbol{r}(\bsigma)) = \log_{10}(\mF_{\bsigma} - \widetilde{\mF}_{\bsigma}), \quad \boldsymbol{r}(\bsigma) \in [0,1]^2
+	\varepsilon(\boldsymbol{r}(\bsigma)) = \log_{10}\left|\mF_{\bsigma} - \widetilde{\mF}_{\bsigma}\right|, \quad \boldsymbol{r}(\bsigma) \in [0,1]^2
 	\label{eq:logTCIerror}
 \end{equation}
 where a smaller value indicates a better precision. 
@@ -622,7 +622,7 @@ We show this error measure in the \textit{top central} plot in \prettyref{fig:er
 
 \begin{figure}[ht!]
 	\centering
-	\includegraphics[width=0.7\textwidth]{figures/Error_heatmap_localFunc.pdf}
+	\includegraphics{figures/Error_heatmap_localFunc.pdf}
 	\caption{Logarithmic error $\varepsilon(\boldsymbol{r}(\bsigma))$ for the QTCI representation $\widetilde{\mF}_{\bsigma}$ of $f(\boldsymbol{r})$ in \prettyref{eq:localFunc} (\textit{top}) with different zoomings (\textit{a-b.1}). Error measure of QTCI of $f$ \textit{limited} to the surrounding of $\boldsymbol{r}_1$ and $\boldsymbol{r}_2$ is also shown (\textit{a-b.2}). We refer to the main manuscript for further details. }
 	\label{fig:errorLocalFunc}
 \end{figure}
@@ -646,7 +646,7 @@ The computational effort of this \textit{``divide and conquer''} variant of QTCI
 
 \begin{figure}[ht!]
 	\centering
-	\includegraphics[width=0.5\textwidth]{figures/bonddim_localised_func+bonddim_patches.pdf}
+	\includegraphics[width=0.7\textwidth]{figures/bonddim_localised_func+bonddim_patches.pdf}
 	\caption{Bond dimension per-site of the TT unfolding of $f(\boldsymbol{r})$ (blue line) and of the TT unfoldings of ${\color{mymagenta}f_1(\boldsymbol{r})}$ and ${\color{green} f_2(\boldsymbol{r})}$ in \prettyref{eq:localFunc}, limited to their respective support. The respective Tensor Trains  $\widetilde{\mF}_{\bsigma}$, $\widetilde{\mF}_{1\bsigma}$ and $\widetilde{\mF}_{2\bsigma}$ are obtained through QTCI. }
 	\label{fig:bondDimLocalFunc}
 \end{figure}
