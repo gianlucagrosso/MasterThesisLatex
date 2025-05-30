@@ -193,7 +193,7 @@ This insight suggests a convenient two-dimensional diagrammatic view of patched 
 \end{equation}
 With this notation, the patch ensembles introduced in \prettyref{eq:patchCollectionsContr}—and the tensor that results from their pairwise contractions—can be depicted with a two-dimensional schematic (\prettyref{fig:2DPatchContrRepr}).
 
-\begin{figure}[ht!]
+\begin{figure}[htbp]
     \centering
     \includegraphics{figures/2DPatchContrRepr.pdf}
     \caption{2D representation of patched MPO-MPO contraction.}
@@ -323,6 +323,7 @@ To outperform a single, non-patched contraction of the full-rank MPOs (\(\chi\) 
 
 \begin{equation}
     \Np < \frac{\chip^4}{\chi^{\,4}}.
+    \label{eq:elemMulBound}
 \end{equation}
 
 Within this window patch-wise element-wise multiplication delivers a net computational saving by trading rank for patch count.
@@ -365,7 +366,7 @@ respectively, so that their contraction realises the convolution
     M(\boldsymbol{x},\boldsymbol{y}) =\int d\boldsymbol{s} L(\boldsymbol{x}, \boldsymbol{s})R(\boldsymbol{s}, \boldsymbol{y}).
     \label{eq:convTypeInt}
 \end{equation}
-\prettyref{fig:2DPatchMatMul} visualises three patching patterns for this “MPO–matrix multiplication,” assuming each factor is decomposed into \(\Np \) patches of equal bond dimension \(\chip\).
+
 
 \begin{figure}[ht!]
 \centering
@@ -374,26 +375,7 @@ respectively, so that their contraction realises the convolution
 \label{fig:2DPatchMatMul}
 \end{figure}
 
-Assume that \(L_{\boldsymbol{\sigma}^{R}\boldsymbol{\sigma}^{S}}\) and
-\(R_{\boldsymbol{\sigma}^{S}\boldsymbol{\sigma}^{C}}\) are pQTCI
-approximations of two multivariate functions,
-\[
-  L\bigl(\boldsymbol{x}(\boldsymbol{\sigma}^{R}),
-          \boldsymbol{s}(\boldsymbol{\sigma}^{S})\bigr)
-  \quad\text{and}\quad
-  R\bigl(\boldsymbol{s}(\boldsymbol{\sigma}^{S}),
-          \boldsymbol{y}(\boldsymbol{\sigma}^{C})\bigr),
-\]
-respectively, so that their contraction realises the convolution
-\begin{equation}
-  M(\boldsymbol{x},\boldsymbol{y})
-  = \int\!d\boldsymbol{s}\;
-      L(\boldsymbol{x},\boldsymbol{s})\,
-      R(\boldsymbol{s},\boldsymbol{y}).
-  \label{eq:convTypeInt}
-\end{equation}
-
-\prettyref{fig:2DPatchMatMul} visualises three patching patterns for this “MPO–matrix multiplication,” assuming each factor is decomposed into \(\Np\) patches of equal bond dimension \(\chip\). In \prettyref{fig:2DPatchMatMul} the first column corresponds to the $L$ patched tensor, the second column to the $R$ and the last column to the patched contraction result $M$. The possible scenarios are the following:
+\prettyref{fig:2DPatchMatMul} visualises three patching patterns for this “MPO–matrix multiplication,” assuming each factor is decomposed into \(\Np \) patches of equal bond dimension \(\chip\). There the first column corresponds to the $L$ patched tensor, the second column to the $R$ and the last column to the patched contraction result $M$. The possible scenarios are the following:
 
 \begingroup
 \renewcommand{\labelenumi}{(\alph{enumi})}

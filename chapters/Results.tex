@@ -134,14 +134,14 @@ The tensor \(\operatorname{Re}G_{\bsigma}\) is discretised with
 \(\tau=10^{-7}\).  We scan the bond–dimension cap
 \(\chi_{\text{patch}}\) and compare fused and interleaved bit orderings.
 
-\begin{figure}[ht!]
+\begin{figure}[htbp]
     \centering
     \includegraphics{figures/2DGreenMemoryTimeFused.pdf}
     \caption{ \textbf{Fused ordering.} Total parameter count (left) and CPU run time (right) versus bond-cap \(\chi_{\text{patch}}\) for \(\delta=10^{-1},10^{-2},10^{-3}\). Dotted lines show the corresponding standard-QTCI values. }
     \label{fig:memoryTime2DGreenFused}
 \end{figure}
 
-\begin{figure}[ht!]
+\begin{figure}[htbp]
     \centering
     \includegraphics{figures/2DGreenMemoryTimeInterleaved.pdf}
     \caption{\textbf{Interleaved ordering.}
@@ -160,7 +160,7 @@ Figures~\ref{fig:memoryTime2DGreenFused}–
       \(\chi_{\text{patch}}^{\mathrm{best}}\): setting the cap too low triggers the ``overpatching'' effect discussed in
       \prettyref{sec:patchingCost}, inflating the patch count without reducing ranks further.
 
-\item Surprisingly, the fused ordering runtimes performs better than the interleaved one, although,in most cases, both respect the theoretical patch bounds of \prettyref{eq:chiPatchBound} for the total number of patches $\Np$. (cf. \prettyref{app:bounds} for more details).
+\item Surprisingly, the fused ordering runtimes performs better than the interleaved one, although,in most cases, both respect the theoretical patch bounds of \prettyref{eq:chiPatchBound} for the total number of patches $\Np$. (cf. Sec.~\ref{app:2DGreenbounds} of \prettyref{app:bounds} for more details).
 \end{enumerate}
 
 For the broadest line, \(\delta=10^{-1}\), pQTCI offers no gain—the function is already smooth enough that a single TT suffices, and the extra slicing merely adds overhead.
@@ -179,7 +179,7 @@ In summary, adaptively partitioning the domain allows one to focus bond dimensio
 
 \section{Benchmarking of Patched MPO-MPO Contractions}
 \label{sec:benchmarkMPOMPOContr}
-Consider now the following two-dimensional functions
+Consider the two model functions 
 
 \begin{align}
 f(\bx) = \sum_{j=1}^4 e^{-(\bx - \bx_j)^2/\sigma^2_j}, \quad  
@@ -187,45 +187,170 @@ g(\bx) = \sum_{j=1}^4 e^{-|\bx - \bx'_j|/\sigma_j},
 \label{eq:linearGauss}
 \end{align}
 with $\bx_j = (\cos \phi_j, \sin \phi_j )$, $\phi_j = (j-\frac{1}{2}) \frac{\pi}{2}$, $\sigma_j =  2^{-(j+1)}$, and $\bx'_j =\bx_j + (2\sigma_j,
-\sigma_j)$.
+\sigma_j)$. \prettyref{fig:factorsHeatmaps} shows heatmaps of \(f\) and \(g\).
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics{figures/linearCombGauss.pdf}
+    \caption{Heatmap of $f(\bx)$ and $g(\bx)$ defined in \prettyref{eq:linearGauss}.}
+    \label{fig:factorsHeatmaps}
+\end{figure}
+
+We convert each function to a tensor via quantics rebasing (fused or interleaved),
+\begin{equation}
+    f(\bx) \mapsto \mF_{\bsigma}, \quad g(\bx) \mapsto \mG_{\bsigma}.
+    \label{eq:tensorFactors}
+\end{equation}
+Applied to \(\mF_{\bsigma}\) and \(\mG_{\bsigma}\), the patched QTCI routine yields collections of tensor–train patches \(\{\mF^{p_{1},\dots,p_{\bar\ell}}_{\bsigma}\}\) and \(\{\mG^{p_{1},\dots,p_{\bar\ell}}_{\bsigma}\}\). We use these patch representations, after MPS-to-MPO folding (cf. \prettyref{eq:MPStoMPO}), as input for our \textit{patched MPO-MPO contraction} routines.
+
+\subsection{Matrix multiplication}
+
+Let the tensors \(\mF_{\bsigma}\) and \(\mG_{\bsigma}\) be stored in the \emph{interleaved} quantics format  
+
+\[
+  \bsigma
+  =( \sigma_{x,1},\sigma_{y,1},\sigma_{x,2},\sigma_{y,2},\dots,
+     \sigma_{x,\mathcal R},\sigma_{y,\mathcal R}),
+  \qquad
+  \mathcal R=17.
+\]
+
+When pQTCI is applied, the slicing (projection) order determines the resulting
+patch tiling:
+\begin{itemize}
+  \item \textbf{Row patching:}\;
+        \(p_{x,1}\!\to p_{x,2}\!\to\cdots\to p_{x,\mathcal R}\)
+        (top–left panel of \prettyref{fig:patchingPatternsMatMul});
+  \item \textbf{Column patching:}\;
+        \(p_{y,1}\!\to p_{y,2}\!\to\cdots\to p_{y,\mathcal R}\)
+        (centre–left panel);
+  \item \textbf{Interleaved patching:}\;
+        \(p_{x,1}\!\to p_{y,1}\!\to p_{x,2}\!\to\cdots\to p_{x,\mathcal R}\)
+        (bottom–left panel).
+\end{itemize}
+
+Because pQTCI is adaptive, the actual patch pattern follows the feature structure of the functions; from left to right, each column in \prettyref{fig:patchingPatternsMatMul} correspond to the factors in \prettyref{eq:linearGauss} and their patched MPO contraction, respectively.
+
+Each tensor‐train patch can be folded into an MPO (\prettyref{eq:MPStoMPO}) and fed to the patched MPO–MPO contraction routines.  
+For instance, the two–dimensional convolution  
+\begin{equation}
+    h(x,y) = \int ds f(x,s)s(x,s)
+\end{equation}
+maps to the patched ``matrix multiplication'' 
+
+\begin{equation}
+    \mathcal{H} = \sum_{\bsigma'} \mF_{\bsigma\bsigma'}\mG_{\bsigma'\bsigma''},
+\end{equation}
+
+where only mutually compatible patch pairs need be multiplied. Although the labels “row”  and “column” may seem inverted when viewed against the two-dimensional tilings in \prettyref{fig:patchingPatternsMatMul}, they are perfectly natural in the \emph{matrix} interpretation of each tensor—where the 
+$x$-bit string forms the row index and the 
+$y$-bit string the row index.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics{figures/PatchContrResults.pdf}
+    \caption{Patch tilings for the two factors \(\widetilde{\mF}\) (panels
+    $a–c.1$) and \(\widetilde{\mG}\) $(a–c.2)$, together with the corresponding
+    patched product \(\widetilde{\mathcal H}\) $(a–c.3)$. Rows illustrate three representative patching contraction strategies as in \prettyref{fig:2DPatchMatMul}: $(a)$ rows patching against column patching, i.e. \emph{worst‐case} in terms of contraction count;
+    $(b)$ column patching against row patching — the \emph{best‐case};
+   $(c)$ interleaved patching (alternating \(x\) and \(y\)) — the
+    \emph{average} scenario. Each patch is rendered in a distinct colour for more clarity.}
+    \label{fig:patchingPatternsMatMul}
+\end{figure}
+
+\prettyref{fig:patchingPatternsMatMul} compares the patch layouts that pQTCI produces for \(f\) and \(g\) under combinations of the three slicing orders introduced above.  
+Column~$(1)$ shows the set \(\{\widetilde{\mF}^{p_{1},\dots,p_{\bar\ell}}\}\) that enters as the left factor of the convolution; column~$(2)$ shows the right–factor patches
+\(\{\widetilde{\mG}^{p_{1},\dots,p_{\bar\ell}}\}\); column~$(3)$ displays the patches \(\{\widetilde{\mathcal H}^{p_{1},\dots,p_{\bar\ell}}\}\) produced by the patched MPO–MPO contraction. Colours encode individual patches, allowing one to see at a glance how the
+domain is split and how the resulting product inherits the finer of the two tilings. From the two-dimensional tilings one sees that the product tensor adopts the row patching of the left factor along the $x$-direction, while its $y$-direction patching follows the column pattern of the right factor.
+
+We now compare the patched–contraction schemes of \prettyref{fig:patchingPatternsMatMul} with a single, non-patched MPO–MPO contraction.  
+\prettyref{fig:patchedMulResults} reports the wall-clock time versus the product of the  patch bond caps \(\chi_{\text{patch}, \mF}\) and  \(\chi_{\text{patch}, \mG}\)--fixed in the preliminary pQTCI runs-- for the three patch layouts, measured on an Intel\textsuperscript{\textregistered}  Xeon\textsuperscript{\textregistered} W-2245 CPU @ 3.90 GHz.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics{figures/patchedMulResults.pdf}
+    \caption{ Run-time scaling of the patched MPO–MPO contraction for the $(a)$ worst,
+    $(b)$ best, and $(c)$ mixed (average) patch arrangements as in \prettyref{fig:patchingPatternsMatMul}. Dotted lines mark the reference time of a monolithic contraction with the same tolerance. }
+    \label{fig:patchedMulResults}
+\end{figure}
+
+Key observations:
+
+\begin{itemize}
+    \item \emph{Worst-case layout}—column patches on both factors—exhibits the slowest scaling, consistent with the \(\mathcal N_{\text{patch}}^{2}\) contraction count predicted in \prettyref{eq:worsScaling}.
+    \item For very small \(\chi_{\text{patch}}\) all three patch configurations rise again, signalling \emph{over-patching}: the initial pQTCI step subdivides \(\mF\) and \(\mG\) so aggressively that the overhead of launching thousands of tiny contractions outweighs the benefit of lower ranks.
+    \item Around an intermediate, problem-dependent \(\chi_{\text{patch}}^{\mathrm{opt}}\) the patched approach becomes advantageous.  In the best-case arrangement [panel~(b)] the speed-up reaches an order of magnitude relative to the single-core baseline.
+\end{itemize}
+
+The speed-up is consistent with the limits on $\Np$ derived in Eqs~\eqref{eq:worstBound}-\eqref{eq:averageBound}; a detailed analysis is provided in Sec.\ref{sec:PatchContrbounds} of Appendix~\ref{app:bounds}.
 
 
 \subsection{Element-wise multiplication}
-\begin{figure}[ht!]
-    \caption{Heatmap + patch grid of element-wise multiplication of 2D MPOs (qHO calculation of $\Psi^2(x)$ ) }
+
+Let \(\mF_{\bsigma}\) and \(\mG_{\bsigma}\) be represented in either the
+\emph{interleaved} or \emph{fused} quantics format.  
+After pQTCI compression and MPO diagonalisation
+(\prettyref{eq:diagSiteTensors}), the two MPOs can be fed to the \emph{patched
+element-wise contraction} routine, which produces
+\begin{equation}
+ \bigl(\mF\mG\bigr)_{\bsigma} = \mF_{\bsigma}\mG_{\bsigma}
+\end{equation} 
+i.e.\ the tensorised counterpart of the pointwise product 
+\begin{equation}
+    (fg)(x,y) = f(x,y)g(x,y).
+\end{equation}
+Knowing the analytic forms of \(f\) and \(g\), we monitor the patchwise error with the metric of \prettyref{eq:localError2DGreen} (where $\bk \to \bx$).  
+\prettyref{fig:localErrorElemmul} shows the local error across the domain for a set tolerance \(\tau=10^{-7}\)—applied both in pQTCI and as the square root of thetruncation threshold in each \emph{zip-up} contraction.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics{figures/elemMulError.pdf}
+    \caption{Pointwise error \(\varepsilon(\bx)\) of the patched element-wise product for \(\tau=10^{-7}\), $\chi_{\text{patch},\mF} = \chi_{\text{patch},\mG} = 68$ with interleaved ordering.}
+    \label{fig:localErrorElemmul}
 \end{figure}
 
-\begin{figure}[ht!]
-    \caption{Number of patches vs patch bond dimension with optimal region for element-wise multiplication ( theoretical value) }
+
+
+Because a diagonal MPO is non-zero only on matching input/output indices, two patches contribute to the product only if they cover the \emph{same} \((x,y)\) tile.  
+\prettyref{fig:patchingPatternsElemMul} illustrates this: panels $(a)$ and $(b)$ show the patch layouts of the patched tensors \(\widetilde{\mF}\) and
+\(\widetilde{\mG}\); panel (c) displays the resulting patches of the product, which appear only where the patched in $(a)$ and $(b)$ overlap (cf.\
+\prettyref{fig:patchElemContr}). The result is a patched tensor \(\widetilde{\mF\mG}\) that inherits -- in each region of the domain -- the smallest subdivision possible between the two factors.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics{figures/ElemmulResults.pdf}
+    \caption{Patch tilings of $(a)$ \(\widetilde{\mF}\), $(b)$ \(\widetilde{\mG}\) and $(c)$ their patched element-wise product \(\widetilde{\mF\mG}\). Only overlapping tiles produce a non-zero result.}
+    \label{fig:patchingPatternsElemMul}
 \end{figure}
 
-\begin{figure}[ht!]
-    \caption{Memory and time scaling element-wise multiplication + fit  }
-\end{figure}
+Element-wise multiplication enjoys the most relaxed patch-count bound (\prettyref{eq:elemMulBound}; see also
+Sec.~\ref{sec:PatchContrbounds} in Appendix~\ref{app:bounds}), and the timing
+data in \prettyref{fig:elemMulResults} confirm the advantage. With fused ordering the patched routine achieves up to a five-fold speed-up
+over a monolithic contraction; interleaved ordering is still faster than the baseline in for some choices of $\chi_{\text{patch},\mF}$ and $\chi_{\text{patch},\mG}$, though by a smaller margin.
 
-\subsection{Matrix multiplication}
-\begin{figure}[ht!]
-    \caption{Heatmap + patch grid of matrix multiplication of 2D MPOs with worst, average and best case scenario for patch subdivision (linear combination of gaussians). }
-\end{figure}
+
 
 \begin{figure}[ht!]
-    \caption{Number of patches vs patch bond dimension with optimal region for matrix multiplication (theoretical value) }
-\end{figure}
-
-\begin{figure}[ht!]
-    \caption{Memory and time scaling matrix multiplication + fit  }
+    \centering
+    \includegraphics{figures/elemmulTimeResults.pdf}
+    \caption{Runtims for patched element-wise multiplication versus the product of the bond caps \(\chi_{\text{patch},\mF}\chi_{\text{patch},\mG}\). Solid lines: patched contraction with fused or interleaved index ordering; dotted lines: reference time for a single, non-patched contraction at the same tolerance. }
+    \label{fig:elemMulResults}
 \end{figure}
 
 \subsection{Adaptive matrix multiplication}
 
 
 \begin{figure}[ht!]
+    \centering
+    \includegraphics{figures/AdaptiveMulHeatmap.pdf}
     \caption{Heatmap + patch grid of adaptive matrix multiplication (linear combination of gaussians). }
 \end{figure}
 
 \begin{figure}[ht!]
-    \caption{Memory scaling matrix multiplication compared with normal patch contraction }
+    \centering
+    \includegraphics{figures/adaptiveMulMemory.pdf}
+    \caption{Memory scaling adaptive mul}
 \end{figure}
+
+
 
 
 \section{Bare Susceptibility Calculation}

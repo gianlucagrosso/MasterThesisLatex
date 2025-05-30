@@ -205,7 +205,9 @@ where both the \textit{prefix} indices $(p_1,\dots,p_{\bar{\ell}}) \in \mathds{I
 	and we can therefore resum them to a single tensor train $\widetilde{\mT}^{+}_{\bsigma}$, similar to what we did in \prettyref{eq:NslicesSum}. $\widetilde{\mT}^{+}_{\bsigma}$ is a good TT representation of $\mT$. However due to the adaptivity of pQTCI, differently from \prettyref{eq:NslicesSum}, here we might be presented with a series of \textit{patches} $\widetilde{\mT}^{p_1,\dots,p_{\bar \ell}}$ with prefixes $(p_1,\dots,p_{\bar \ell})$ of different lengths ${\bar \ell}$; nonetheless, this intricacy does not affect the TT sum operation.
 \end{itemize}
 
-In \prettyref{fig:patchingAlg} we displayed a version of the patched TCI where the tensor is sliced sequentially starting from the first index $\sigma_1$ of the tensor $\mT$. As pointed out already, this constraint is not required to obtain a meaningful outcome from the algorithm (we refer the reader to \prettyref{app:patchordering} for details about the impact of the \textit{prefix ordering} -- or \textit{patch ordering} -- on the approximation). The \textit{prefix} of each subtensor $\mT^{p_1,\dots,p_{\bar \ell}}$ -- that indicates to which slice of $\mT$ it corresponds to -- can be taken randomly, in an exclusive manner, from the set of tensor indices $\{\sigma_1,\dots,\sigma_\mL\}$ (considered labels in this context).
+In \prettyref{fig:patchingAlg} we displayed a version of the patched TCI where the tensor is sliced sequentially starting from the first index $\sigma_1$ of the tensor $\mT$. As pointed out already, this constraint is not required to obtain a meaningful outcome from the algorithm.
+% (we refer the reader to \prettyref{app:patchordering} for details about the impact of the \textit{prefix ordering} -- or \textit{patch ordering} -- on the approximation)
+The \textit{prefix} of each subtensor $\mT^{p_1,\dots,p_{\bar \ell}}$ -- that indicates to which slice of $\mT$ it corresponds to -- can be taken randomly, in an exclusive manner, from the set of tensor indices $\{\sigma_1,\dots,\sigma_\mL\}$ (considered labels in this context).
 
 Let us consider now the specific case when we intend to TT approximate a multi-variate function, call it $f(\boldsymbol{x})$. \prettyref{sec:TCIalgorithm} taught us that, when we intend to properly resolute all the relevant features of $f$, it is a clever choice to numerically represent it as a tensor utilizing the quantics discretization (with $\mR$ bits per spatial dimention $x_i$): in fact, the discretization error of the approximation decreases exponentially by increasing $\mR$ only linearly. 
 
@@ -326,7 +328,7 @@ We restate the formula here for simplicity
 We discretize $f$ on the square domain $[0,1]^2$ into the tensor $\mF_{\bsigma} = f(\boldsymbol{r}(\bsigma))$, using interleaved or fused quantics representation. Applying the patched QTCI compression to $\mF$, while varying the bond-dimension cap $\chip$, let us track how the domain is adaptively partitioned and how the overall patch count $\Np$ changes with $\chip$. 
 Lowering the bond-dimension cap $\chip$ in the patched QTCI algorithm forces each patch to converge on a progressively smaller portion of the configuration space. This behaviour is illustrated in \prettyref{fig:patchEvolution}. 
 
-\begin{figure}[ht!]
+\begin{figure}[htbp]
 	\includegraphics{figures/PatchEvolutionwithChi.pdf}
 	\caption{Evolution of the adaptive partitioning of the bivariate function $f(\boldsymbol{r})$ domain (cf. \prettyref{eq:localFunc} and \prettyref{eq:localFuncNewParams}), due to pQTCI. Interleaved or fused orderin is utilized for the indices of the tensor $\mF_{\bsigma} = f(\boldsymbol{r}(\bsigma))$. Smaller maximum bond dimensions per patch $\chip$ render finer partitionings of the domain.}
 	\label{fig:patchEvolution}
@@ -345,7 +347,7 @@ We can then understand that there exists a strond dependence of $\Np$ by $\chip$
 In other words, halving the allowable bond dimension per patch would quadruple the number of patches required to achieve the same accuracy.
 \prettyref{fig:NpatchvsChipatch} corroborates this scaling: it plots the patch count against the actual maximum bond dimension, $\chip^*$\footnotemark, attained by the most demanding patch in the pQTCI compression of $\mF_{\bsigma}$.
 \footnotetext{The value of the bond dimension bound $\chip$ fixed by the user doesn't always correspond to the maximum bond dimension at which TCI converges within each patch. The largest of these maximum bond dimensions among all the patches is here referred to as $\chip^*$. }
-\begin{figure}[ht!]
+\begin{figure}[htbp]
 	\centering
 	\includegraphics{figures/localFunc_Npatch_vs_Chipatch.pdf}
 	\caption{Number of total patches vs largest patch maximum bond dimension $\chip^*$ for the approximation of $f(\boldsymbol{r})$ as in \prettyref{eq:localFunc}. The numerical data is compared with the estimated scaling $1/\chi^2$ (cf. \prettyref{eq:scalingNpatchBonddim}).}
@@ -393,7 +395,7 @@ Consequently, the aggregate number of TT parameters (solid curve in panel~$(b)$)
 In effect, the algorithm redundantly stores the same information in multiple MPS blocks, negating any potential savings and exemplifying the drawback of \emph{over-patching}.
 
 
-\begin{figure}[ht!]
+\begin{figure}[htbp]
 	\centering
 	\includegraphics{figures/OverPatching.pdf}
 	\caption{Performance of patched QTCI on the two–dimensional oscillatory function of \prettyref{eq:2Dfunction}.  $(a)$ Example of the domain subdivision produced with $\mR = 15$, $\chip = 10$, and $\varepsilon = 10^{-4}$.  The partition is highly redundant and fails to align with the true feature layout of the function. $(b)$ Total number of TT parameters returned by pQTCI (solid curves) at three target tolerances, plotted against the bond-dimension cap $\chip$.  For comparison, the parameter count of a full-domain TCI compression is shown as a dotted line.  Once $\chi_{\text{patch}}\gtrsim 80$, every run collapses to a single patch and matches the TCI cost; for smaller caps, over-patching inflates the parameter count sharply.}
