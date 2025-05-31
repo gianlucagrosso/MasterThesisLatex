@@ -263,11 +263,11 @@ where each local tensor is defined by
     \label{eq:diagSiteTensors}
     \begin{aligned}
         \raisebox{-6mm}{\includegraphics{figures/ADiag_SiteTensor.pdf}} = \begin{cases}
-            [A^{\sigma'_\ell}_\ell]_{a_{\ell-1},a_\ell} \quad &\text{if}\ \sigma'_\ell = \sigma''_\ell \\
+            [A^{\sigma'_\ell}_\ell]_{a_{\ell-1},a_\ell} \quad &\text{if}\ \sigma_\ell = \sigma'_\ell \\
             [0]_{a_{\ell-1},a_\ell} \quad &\text{otherwise}
         \end{cases}\\
         \raisebox{-6mm}{\includegraphics{figures/BDiag_SiteTensor.pdf}} = \begin{cases}
-            [B^{\sigma_\ell}_\ell]_{b_{\ell-1},b_\ell} \quad &\text{if}\ \sigma_\ell = \sigma'_\ell \\
+            [B^{\sigma_\ell}_\ell]_{b_{\ell-1},b_\ell} \quad &\text{if}\ \sigma'_\ell = \sigma''_\ell \\
             [0]_{b_{\ell-1},b_\ell} \quad &\text{otherwise}.
         \end{cases}
     \end{aligned}
@@ -322,7 +322,7 @@ Employing the zip-up algorithm (or an equivalent
 To outperform a single, non-patched contraction of the full-rank MPOs (\(\chi\) being their common bond dimension), the number of patches must obey 
 
 \begin{equation}
-    \Np < \frac{\chip^4}{\chi^{\,4}}.
+    \Np < \frac{\chi^4}{\chip^{\,4}}.
     \label{eq:elemMulBound}
 \end{equation}
 
@@ -393,7 +393,7 @@ respectively, so that their contraction realises the convolution
       \end{equation}
       improving on a full-rank contraction iff
       \begin{equation}
-       \Np<\frac{\chip^{2}}{\chi^{2}}.
+       \Np<\frac{\chi^{2}}{\chip^{2}}.
        \label{eq:worstBound}
       \end{equation}
       
@@ -410,7 +410,7 @@ respectively, so that their contraction realises the convolution
       \end{equation}
       yielding a gain whenever
       \begin{equation}
-       \Np<\frac{\chip^{4}}{\chi^{4}}.
+       \Np<\frac{\chi^{4}}{\chip^{4}}.
        \label{eq:bestBound}
       \end{equation}
 
@@ -436,7 +436,7 @@ respectively, so that their contraction realises the convolution
 \endgroup
 
 Patch-wise matrix multiplication trades global bond dimension for patch count.  When any of the bounds in \prettyref{eq:bestBound}, \prettyref{eq:worstBound} and \prettyref{eq:averageBound} are respected, patched MPO–MPO contractions has the possibility\footnotemark\, to outperform their monolithic counterparts, making them a compelling tool for high-dimensional convolutions.
-\footnotetext{The typical result out of a pQTCI run is a combination of the patterns shown in \prettyref{fig:2DPatchMatMul}, due to the adaptivity of the algorithm. Hence, \prettyref{eq:bestBound}, \prettyref{eq:worstBound} and \prettyref{eq:averageBound} only give us an intuition of the optimal bounds for $\Np$. }
+\footnotetext{The typical result out of a pQTCI run is a combination of the patterns shown in \prettyref{fig:2DPatchMatMul}, due to the adaptivity of the algorithm. Hence, \prettyref{eq:bestBound}, \prettyref{eq:worstBound} and \prettyref{eq:averageBound} only give us an intuition of the optimal bounds for $\Np$.}
 \section{Adaptive Patched MPO-MPO Contraction}
 \label{sec:AdaptivePatchMPOMPOContr}
 

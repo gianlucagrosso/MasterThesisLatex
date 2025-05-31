@@ -14,7 +14,7 @@ N_{\!p}\) with the theoretical bounds (cf. \prettyref{eq:chiPatchBound})
     \;<\;
     \begin{cases}
       \displaystyle\chi^{2}/\chip^{2}, & \text{(memory)},\\[6pt]
-      \displaystyle\chi^{3}/(d\,\chip^{3}), & \text{(time)},
+      \displaystyle\chi^{3}/(d\,\chip^{3}), & \text{(CPU runtime)},
     \end{cases}
   \label{eq:chiPatchBoundApp}
 \end{equation}
@@ -68,7 +68,7 @@ indicator of when pQTCI will outperform a monolithic QTCI run: the algorithm is 
 \subsection{Matrix muliplication}
 The limits derived in \prettyref{eq:worstBound}, \prettyref{eq:bestBound}, and \prettyref{eq:averageBound} assume that the
 two MPO factors share the same patching depth~\(\bar\ell\).  If the left MPO \(\widetilde{\mF}_{\bsigma,\bsigma'}\) and the right MPO
-\(\widetilde{\mG}_{\bsigma',\bsigma''}\) are patched to \emph{different} levels, the bounds depend onf both of their patch numbers. With \(\chi_{\widetilde{\mF}}\) and \(\chi_{\widetilde{\mG}}\) denoting the bond dimensions of the corresponding non-patched tensors, and \(\chi_{\text{patch},\widetilde{\mF}}\), \(\chi_{\text{patch},\widetilde{\mG}}\) the caps imposed on each factor, the generalised conditions read
+\(\widetilde{\mG}_{\bsigma',\bsigma''}\) are patched to \emph{different} levels, the bounds depend onf both of their patch numbers. With \(\chi_{\mF}\) and \(\chi_{\mG}\) denoting the bond dimensions of the corresponding non-patched tensors, and \(\chi_{\text{patch},\mF}\), \(\chi_{\text{patch},\mG}\) the caps imposed on each factor, the generalised conditions read
 
 \begingroup
 \renewcommand{\labelenumi}{(\alph{enumi})}
@@ -76,13 +76,13 @@ two MPO factors share the same patching depth~\(\bar\ell\).  If the left MPO \(\
         \item \textbf{Worst case}
         \begin{equation}
           N_{\text{patch},\mF}N_{\text{patch},\mG}
-    <\frac{\chi^2_{\widetilde{\mF}}\chi^2_{\widetilde{\mG}}}{\chi^2_{\text{patch},\widetilde{\mF}}\chi^2_{\text{patch},\widetilde{\mG}}}
+    <\frac{\chi^2_{\mF}\chi^2_{\mG}}{\chi^2_{\text{patch},\mF}\chi^2_{\text{patch},\mG}}
             \label{eq:newworstBoundApp}
         \end{equation}
       \item \textbf{Best case}
         \begin{equation}
           \Np^{\text{max}}
-    <\frac{\chi^2_{\widetilde{\mF}}\chi^2_{\widetilde{\mG}}}{\chi^2_{\text{patch},\widetilde{\mF}}\chi^2_{\text{patch},\widetilde{\mG}}} 
+    <\frac{\chi^2_{\mF}\chi^2_{\mG}}{\chi^2_{\text{patch},\mF}\chi^2_{\text{patch},\mG}} 
             \label{eq:newbestBoundApp}
         \end{equation}
       where $\Np^{\text{max}} = \max \{N_{\text{patch},\mF},N_{\text{patch},\mG}\}$.
@@ -90,7 +90,7 @@ two MPO factors share the same patching depth~\(\bar\ell\).  If the left MPO \(\
      \item \textbf{Average case} Let \(\bar\ell_{\min}\) be the smaller and \(\bar\ell_{\max}\) the larger patching level for the two factors.  The number of admissible patch pairs is \(d^{\bar\ell_{\min}}d^{\bar\ell_{\min}(D-1)/D}d^{\bar\ell_{\max}-\bar\ell_{\min}}\) (cf. \prettyref{eq:averageBound}), leading to
         \begin{equation}
           N^{\frac{D-1}{D}}_{\text{patch},\mF}N_{\text{patch},\mG}\
-    <\frac{\chi^2_{\widetilde{\mF}}\chi^2_{\widetilde{\mG}}}{\chi^2_{\text{patch},\widetilde{\mF}}\chi^2_{\text{patch},\widetilde{\mG}}}.
+    <\frac{\chi^2_{\mF}\chi^2_{\mG}}{\chi^2_{\text{patch},\mF}\chi^2_{\text{patch},\mG}}.
             \label{eq:newaverageBoundApp}
         \end{equation}
     \end{enumerate}
@@ -112,18 +112,18 @@ Irrespective of the simulation parameters ($\tau$, $\mR$), the total number of f
     \begin{enumerate}
         \item \textbf{Worst case}
         \begin{equation}
-          \order \bigl( N_{\text{patch},\mF}N_{\text{patch},\mG} \chi^2_{\text{patch},\widetilde{\mF}}\chi^2_{\text{patch},\widetilde{\mG}} \bigr).
+          \order \bigl( N_{\text{patch},\mF}N_{\text{patch},\mG} \chi^2_{\text{patch},\mF}\chi^2_{\text{patch},\mG} \bigr).
             \label{eq:newworstScalingApp}
         \end{equation}
       \item \textbf{Best case}
         \begin{equation}
-          \order \bigl( N_{\text{patch},\text{max}}N_{\text{patch},\mG} \chi^2_{\text{patch},\widetilde{\mF}}\chi^2_{\text{patch},\widetilde{\mG}} \bigr). 
+          \order \bigl( N_{\text{patch},\text{max}}N_{\text{patch},\mG} \chi^2_{\text{patch},\mF}\chi^2_{\text{patch},\mG} \bigr). 
             \label{eq:newbestScalingApp}
         \end{equation}
 
      \item \textbf{Average case}
      \begin{equation}
-          \order \bigl( N^{\frac{D}{D-1}}_{\text{patch},\mF}N_{\text{patch},\mG} \chi^2_{\text{patch},\widetilde{\mF}}\chi^2_{\text{patch},\widetilde{\mG}} \bigr).
+          \order \bigl( N^{\frac{D}{D-1}}_{\text{patch},\mF}N_{\text{patch},\mG} \chi^2_{\text{patch},\mF}\chi^2_{\text{patch},\mG} \bigr).
           \label{eq:newaverageScalingApp}
       \end{equation}
     \end{enumerate}
@@ -134,9 +134,7 @@ Irrespective of the simulation parameters ($\tau$, $\mR$), the total number of f
 \begin{figure}[htpb]
     \centering
     \includegraphics{figures/patchedMulMemoryScaling.pdf}
-    \caption{Total number of parameters in
-           \(\widetilde{\mathcal H}\) versus the scaling variables from
-           Eqs.~\eqref{eq:newworstScalingApp}–
+    \caption{Total number of parameters in set of patches representing \(\mathcal H\) versus the scaling variables from Eqs.~\eqref{eq:newworstScalingApp}–
            \eqref{eq:newaverageScalingApp}.  Solid lines illustrate data; dotted lines are the expected
            theoretical trends.}
     \label{fig:patchedMulMemoryScaling}
@@ -144,18 +142,49 @@ Irrespective of the simulation parameters ($\tau$, $\mR$), the total number of f
 
 
 \subsection{Element-wise multiplication}
+For an element–wise product of two tensors
+\(\mF_{\bsigma}\) and \(\mG_{\bsigma}\) the patch–count limit of Eq.~\eqref{eq:elemMulBound} generalises to
+\begin{equation}
+          \Np^{\text{max}}
+    <\frac{\chi^2_{\mF}\chi^2_{\mG}}{\chi^2_{\text{patch},\mF}\chi^2_{\text{patch},\mG}} 
+            \label{eq:newElemBoundApp}
+        \end{equation}
+where $\Np^{\text{max}} = \max \{N_{\text{patch},\mF},N_{\text{patch},\mG}\}$. \prettyref{fig:elemMulBounds} plots the difference between the left– and right–hand sides for all data points of \prettyref{fig:elemMulResults}.  
+Negative bars mark those instances where the patched run exceeds the bound.
 
 \begin{figure}[htpb]
     \centering
     \includegraphics{figures/elemMulBounds.pdf}
-    \caption{}
+    \caption{Deviation from the bound
+           in Eq.~\eqref{eq:newElemBoundApp} for element-wise
+           multiplication of \(\mF_{\bsigma}\) and \(\mG_{\bsigma}\).
+           Separate series are shown for fused and interleaved index
+           orderings.  Negative values indicate a violation of the bound.}
     \label{fig:elemMulBounds}
 \end{figure}
+
+As measure of contraction complexity, the total number of floating-point parameters in the patched product should scale as
+
+\begin{equation}
+  \mathcal{O} \bigl(
+    N_{\text{patch},\max}\,
+    N_{\text{patch},\min}\,
+    \chi_{\text{patch},\mF}^{2}\,
+    \chi_{\text{patch},\mG}^{2}
+  \bigr),
+  \label{eq:newElemScalingApp}
+\end{equation}
+
+with \(N_{\text{patch},\min} =\min\{N_{\text{patch},\mF},N_{\text{patch},\mG}\}\).
+\prettyref{fig:elemMulMemoryScaling} compares the measured parameter
+counts with this prediction; the dotted lines trace the theoretical trend and
+closely follow the numerical data.
 
 \begin{figure}[htpb]
     \centering
     \includegraphics{figures/elemMulMemoryScaling.pdf}
-    \caption{Memory scaling element-wise multiplication + fit  }
+    \caption{Total parameter count of the patched tensor \(\mF\mG\) versus the scaling variable from Eq.~\eqref{eq:newElemScalingApp}.  Solid lines: data (fused and interleaved orderings); dotted lines: expected scaling.}
+    \label{fig:elemMulMemoryScaling}
 \end{figure}
 
 
