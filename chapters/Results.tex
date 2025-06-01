@@ -1,7 +1,6 @@
 \chapter{Numerical results}
 \label{chap:results}
 
-
 \prettyref{chap:patching} and \prettyref{chap:MPOcontr} introduced our \emph{patched QTCI} and \emph{patched MPO–MPO contraction} algorithms in detail. By extending the state-of-the-art implementation of the QTCI algorithm, we have implemented a \textit{divide‐and‐conquer} version of TCI that targets scenarios in which the standard routine may struggle.
 
 In this chapter we first present representative benchmarks (\prettyref{sec:2DGreen} and \prettyref{sec:benchmarkMPOMPOContr}) that highlight the performance of the new routines. We then apply them to two physics problems that have previously posed computational bottlenecks: the computation of the bare susceptibility for the 2D Hubbard model with momentum dependence (\prettyref{sec:bubbleCalc}) and vertex contractions during the solution of the Bethe-Salpeter for the single‐impurity Anderson model (Sec.~\ref{sec:patchBSE}). Both cases were recently addressed with QTCI or patched quantics SVD–based tensor trains approaches \cite{Hiroshi2023,Rohshap2025}. Our patched QTCI method complements and extends those efforts, demonstrating improved efficiency on the same benchmark tasks.
@@ -381,12 +380,12 @@ The Hamiltonian of the Hubbard model reads
     \mathcal{H} = \sum_{\langle ij \rangle, \sigma} \hat{c}^\dag_{i\sigma}\hat{c}_{\sigma} + U \sum_{i} \hat{n}_{i\uparrow}\hat{n}_{i\downarrow} - \mu\sum_{i,\sigma}\hat{n}_{i\sigma}
     \label{eq:HubbardHamiltonian}
 \end{equation}
-where $\hat{c}^\dag_{i\sigma}$ is the creation operator of an electron with spin $\bsigma$ at site $i$ and $\hat{n}_{i\sigma}=\hat{c}^\dag_{i\sigma}\hat{c}_{i\sigma}$. $U$ is the onsite repulsion and $\mu$ is the chemical potential ($\mu=U/2$ at half filling). The nearest-neighbour hopping is set to one.
+where $\hat{c}^\dag_{i\sigma}$ is the creation operator of an electron with spin $\sigma$ at site $i$ and $\hat{n}_{i\sigma}=\hat{c}^\dag_{i\sigma}\hat{c}_{i\sigma}$. $U$ is the onsite repulsion and $\mu$ is the chemical potential ($\mu=U/2$ at half filling). The nearest-neighbour hopping is set to one.
 In the FLEX approximation \cite{Bickers1989}, for a paramagnetic state the self-energy is approximated as
 \begin{equation}
     \Sigma(\bk, i\nu) = \frac{1}{\beta N_{\bk} } \sum_{\bq,i\omega}V(\bq, i\omega) G(\bk - \bq, i\nu - i\omega)
 \end{equation}
-where $N_{\bk}$ is the size of the two-dimensional momentum grid, $\bq$ is a bosonic momentum, $\nu$ and $\omega$ are Matsubara frequencies, respectively, and $\beta$ is the inverse of the temperature. The effective interaction is defined as
+where $N_{\bk}$ is the size of the two-dimensional momentum grid, $\bq$ is a bosonic momentum, $\nu$ and $\omega$ are Matsubara frequencies, fermionic and bosonic, respectively, and $\beta$ is the inverse of the temperature. The effective interaction is defined as
 \begin{equation}
     V(\bq, i\omega) = U^2\left(\frac{3}{2} \chi_{\text{s}}(\bq, i\omega) + \frac{1}{2} \chi_{c}(\bq, i\omega) - \chi_{0}(\bq, i\omega)\right)
 \end{equation}
@@ -404,10 +403,10 @@ where the Green's function in the Matsubara axis is given by
        {\,i\nu+\mu-\varepsilon_{\mathbf{k}}-\Sigma(\bk, i\nu)},
        \label{eq:greenBubble}
 \end{equation}
-with $\varepsilon_{\bk} = -2 \cos (k_x) - 2 \cos (k_y)$ and $\mu=0$. Hence the bare susceptibility $\chi_{0}(\bq, i\omega)$ is a crucial ingredient in the self-consistent FLEX scheme, where one repeatedly updates the self-energy $\Sigma(\bk, i\nu)$. The convolution in \prettyref{eq:bareSusceptibility} quickly becomes the dominant cost, in particular at low temperatures ($\beta \to \infty$). This is because the fermionic Matsubara grid \(\nu_n=(2n+1)\pi/\beta\) grows denser while, at the same time, the Green’s function $G(\mathbf{k}, i\nu)$ develops increasingly sharp, localized peaks (cf. \prettyref{sec:2DGreen}), direct numerical evaluation is both memory- and time-intensive. These characteristics suggest that a domain-adaptive strategy--specifically, the pQTCI-based patched contraction routines introduced above--can alleviate the bottleneck by concentrating bond dimension only where the integrand is genuinely singular.
+with $\varepsilon_{\bk} = -2 \cos (k_x) - 2 \cos (k_y)$ and $\mu=0$. Hence the bare susceptibility $\chi_{0}(\bq, i\omega)$ is a crucial ingredient in the self-consistent FLEX scheme, where one repeatedly updates the self-energy $\Sigma(\bk, i\nu)$. Therefore, the convolution in \prettyref{eq:bareSusceptibility} quickly becomes the dominant cost, in particular at low temperatures ($\beta \to \infty$). This is because the fermionic Matsubara grid \(\nu_n=(2n+1)\pi/\beta\) grows denser while, at the same time, the Green’s function $G(\mathbf{k}, i\nu)$ develops increasingly sharp, localized peaks (cf. \prettyref{sec:2DGreen}); direct numerical evaluation is both memory- and time-intensive. These characteristics suggest that a domain-adaptive strategy--specifically, the pQTCI-based patched contraction routines introduced above--can alleviate the cost of the convolution by concentrating bond dimension only where the integrand is genuinely singular.
 
 A direct tensor‐train treatment of the convolution in \prettyref{eq:bareSusceptibility} would require handling a six-dimensional integrand-- a challenging task even for QTCI. The remedy is to migrate the calculation to “real” space–time, where the
-convolution becomes an \emph{element-wise} product of two functions after a Fourier transform (FT) (cf. Ref \cite{Rakhuba2015}).
+convolution becomes an \emph{element-wise} product of two functions, after Fourier transform (FT) (cf. Ref.~\cite{Rakhuba2015}).
 We define the forward and inverse transforms of the Green’s function as
 \begin{align}
      G(\bk, i\nu) &=  \frac{\beta}{\sqrt{N_{\bk}}}\int_{0}^{\beta} d\tau \sum_{\boldsymbol{r}} e^{+\bk\boldsymbol{r}+i\nu\tau}  G(\boldsymbol{r}, \tau) 
@@ -422,7 +421,7 @@ With these conventions the bare susceptibility reads
 \begin{equation}
     \chi_{0}(\bq, i\omega) = \text{FT}\left[ \chi(\boldsymbol{r}, \tau) \right] = \text{FT}\left[ G(\br, \tau)G(-\br, -\tau)\right]
 \end{equation}
-where  $G(-\br, -\tau)$  is obtained from \prettyref{eq:invFTGreensFunc} by reversing the signs in the exponent. Thus the six-dimensional convolution is replaced by a pointwise product in $(\br, \tau)$ space -- well suited for the patched element-wise contraction routines introduced earlier.
+where  $G(-\br, -\tau)$  is obtained from \prettyref{eq:invFTGreensFunc} by reversing the signs in the exponent. Thus, the six-dimensional convolution is replaced by a pointwise product in $(\br, \tau)$ space -- well suited for the patched element-wise contraction routines introduced earlier.
 
 The complete workflow for evaluating the bare susceptibility \(\chi_{0}(\mathbf q,i\omega)\) is depicted in the flowchart of \prettyref{fig:bubbleFlowchart}.  
 
@@ -442,7 +441,7 @@ We proceed through the following stages:
     \item A QTCI compression of the Green’s function in \prettyref{eq:greenBubble} is performed with the momentum/frequency
     index order \(\bk(\bsigma_{\bk})=\mathbf k(\sigma_{1},\dots,\sigma_{2\mathcal R})\),
     \(i\nu(\bsigma_{i\nu})=i\nu(\sigma_{2\mathcal R+1},\dots,\sigma_{3\mathcal R})\), yielding the TT \(\widetilde G_{\bsigma_{\bk}\bsigma_{i\nu}}\).
-    \item The inverser quantics Fourier transform ($\text{QFT}^{-1}$) is applied separately to the \(\bk\) and \(i\nu\) registers, producing the real–space tensors \(\widetilde G_{\bsigma_{\br}\bsigma_{\tau}}\) and \(\widetilde G_{\bsigma_{-\br}\bsigma_{-\tau}}\), with reordered indices \(\br(\bsigma_{\br})=\mathbf r(\sigma_{\mathcal R+1},\dots,\sigma_{3\mathcal R})\)
+    \item The inverse quantics Fourier transform ($\text{QFT}^{-1}$) is applied separately to the \(\bk\) and \(i\nu\) registers, producing the real–space tensors \(\widetilde G_{\bsigma_{\br}\bsigma_{\tau}}\) and \(\widetilde G_{\bsigma_{-\br}\bsigma_{-\tau}}\), with reordered indices \(\br(\bsigma_{\br})=\mathbf r(\sigma_{\mathcal R+1},\dots,\sigma_{3\mathcal R})\)
     and \(\tau(\bsigma_{\tau})=\tau(\sigma_{1},\dots,\sigma_{\mathcal R})\)
     (index reversal is an intrinsic feature of the QFT; see \prettyref{app:QFT}).
     \item Two copies, \(\widetilde G(\mathbf r,\tau)\) and \(\widetilde G(-\mathbf r,-\tau)\), are each patched with pQTCI, by fixing a bond-dimension cap \(\chi_{\text{patch}}\) and a compression tolerance $\tau$. 
@@ -456,62 +455,178 @@ We proceed through the following stages:
 
 
 In step~(1) we deliberately place the \(\bk\) bits before the \(i\nu\) bits to minimise the intermediate bond dimension of
-\(\widetilde G_{\bsigma_{\bk}\bsigma_{i\nu}}\). Because the quantics Fourier transform reverses the bit order within each register, the subsequent real-space representation naturally acquires the ordering
+\(\widetilde G_{\bsigma_{\bk}\bsigma_{i\nu}}\). Because the quantics Fourier transform reverses the bit order within each register (see \prettyref{app:QFT}), the subsequent real-space representation naturally acquires the ordering
 \(\mathbf r(\bsigma_{\mathbf r})=\mathbf r(\sigma_{\mathcal R+1},\dots,
   \sigma_{3\mathcal R})\) and
 \(\tau(\bsigma_{\tau})=\tau(\sigma_{1},\dots,\sigma_{\mathcal R})\),
-as noted above. This re-ordering is performed by inverting the site tensors in real space in order to obtain a sequential index ordering while conserving the link dimensions between the transformed sites. 
+after index rearragnement. The rearrangement is performed by inverting the site tensors in real space in order to obtain a sequential index ordering, while conserving the links between the transformed site tensors. Hence, the frequency indices move from the back to the front of the TT in real space. 
 
+Figure \prettyref{fig:heatmapBubble} tracks the steps of the FLEX ``bubble'' $\chi_0$ calculation:
+\begingroup
+\renewcommand{\labelenumi}{($\alph{enumi}$)}
+\begin{enumerate}
+    \item  \(\lvert G(\mathbf k,i\pi/\beta)\rvert\) on the Brillouin zone
+  \([-\pi,\pi]^{2}\) together with the bond dimension profile of its QTCI representation.
+\item Resulting bare susceptibility
+  \(\chi_{0}(\mathbf q,\omega\!=\!0)\) and the bond dimensions of its single-TT compression after the final $\text{QFT}^{-1}$.
+\item Patch layout produced by pQTCI for the real-space Green’s function \(G(\mathbf r,\tau=\beta)\). Colours indicate distinct patches; correspondent color coding is used for the bond dimensionsof each TT patch, contrasted with those of a global non-patched TT approximation of the real space Green's function.
+\end{enumerate}
+\endgroup 
 
+The data in \prettyref{fig:heatmapBubble} were obtained with $\mR=13$ bits for each spatial and frequency variable, an inverse
+temperature $\beta=100$ , and a uniform accuracy target $\tau=10^{-7}$ (applied to the QTCI and pQTCI compressions and--as $\tau^2$--to the local truncation threshold in every MPO-MPO contraction).
 
-
-\begin{figure}[ht!]
-    \caption{Memory and time scaling vs function parameter ($\beta$, $R$, $\epsilon$) comparison patch/non-patch }
+\begin{figure}[htpb]
+    \centering 
+    \includegraphics{figures/heatmapBubble.pdf}
+    \caption{Heat-map overview of the bare-susceptibility workflow with $\mR=13$, $\beta=100$ and tolerance $\tau=10^{-7}$.
+    $(a)$ Absolute value of the Green’s function $G(\bk,i\nu)$ at the first positive fermionic Matsubara frequency, including QTCI bond dimensions 
+    $(b)$ Bare susceptibility \(\chi_{0}(\bq,\omega=0)\) with the bond dimensions of its single-TT approximation. 
+    $(c)$ Adaptive patching pattern for \(G(\mathbf r,\tau=\beta)\) with bond dimensions profile of each patch and analogous non-patched approximation.}
+    \label{fig:heatmapBubble}
 \end{figure}
 
-We decide to employ pQTCI only for the element-wise multiplication being this the real bottleneck of the calculation. One could in theory also approximate $G(\bk,i\nu)$ using pQTCI from the beginning. 
+Let us now benchmark the results of the computation. We first verify that the bit-depth chosen for the final calculation, \(\mathcal R=13\), yields a sufficiently converged susceptibility.
+Panel $(a)$ of \prettyref{fig:bubbleResults} plots the configuration-space error
 
+\begin{equation}
+    \varepsilon(\mathcal R)
+  = \frac{1}{\sqrt{N_{\text{err}}}} \sqrt{\sum_{\bsigma_{\bq},\bsigma_{i\omega}} \bigl|
+      \chi_{0, \bsigma_{\bq},\bsigma_{i\omega}}^{(\mathcal R,\tau)}
+      -\chi_{0, \bsigma_{\bq},\bsigma_{i\omega}}^{(13, 10^{-9})}
+    \bigr|^2}
+\end{equation}
 
+as a function of $\mR$, for $N_{\text{err}}$ points extracted randomly from the configuration space.  While the curve indicates that \(\chi_{0}\) has not reached the desired precision, the residual error suffices for the present comparative study.
 
-\section{Bethe-Salpeter equations}
+Panel $(b)$ compares the total parameter count of the patched QTCI representation of \(G(\mathbf r,\tau)\) (the same holds for
+\(G(-\mathbf r,-\tau)\)) with that of a single-TT QTCI approximation. The patched version saves memory, showing that its patch number respects the theoretical limit
+(\prettyref{eq:chiPatchBound}) and, by extension, the element-wise-product bound (\prettyref{eq:elemMulBound}). Hence, we expect an advantage for the patched point-wise contraction. 
+
+Panel $(c)$ reports the wall-clock time on an
+Intel\textsuperscript{\textregistered} Xeon\textsuperscript{\textregistered}
+E5-2680\,v4 @ 2.40 GHz for the patched element-wise contraction versus the
+``naïve'' single-shot contraction, scanned over tolerances \(\tau\) and inverse temperatures \(\beta\). The patched routine accelerates the
+calculation by up to an order of magnitude.  For the coldest cases $\beta=100,1000$ the monolithic contraction could not be completed owing to excessive memory demands, whereas the patched algorithm ran comfortably, illustrating the practical benefit of trading one large \(\chi^{4}\) operation for many lower-rank contractions.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics{figures/convergenceBubble.pdf}
+    \caption{Performance of the bubble calculation.
+    $(a)$ Convergence of \(\chi_{0}\) with bit depth \(\mathcal R\).
+    $(b)$ Total number of floating-point parameters in the patched (solid) versus single-TT (dotted lines) representations of \(G(\mathbf r,\tau)\) at \(\tau=10^{-9}\) and $\mR=13$.
+    (c) CPU time for the patched element-wise product compared with the monolithic contraction as a function of tolerance \(\tau\) and at different inverse temperatures \(\beta\).}
+    \label{fig:bubbleResults}
+\end{figure}
+
+\prettyref{fig:betaScaling} tracks the CPU time required for the patched element-wise product as the inverse temperature \(\beta\) is varied
+at several accuracy targets \(\tau\).
+Within numerical scatter the data follow an \emph{approximately linear} growth, \(t_{\text{CPU}}\propto\beta\) as indicated by the dotted line.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics{figures/betaScalingBubble.pdf}
+    \caption{Run-time versus inverse temperature \(\beta\) for the patched
+    element-wise contraction (solid curves) at three tolerances \(\tau\). Times are measured on an Intel\textsuperscript{\textregistered} Xeon\textsuperscript{\textregistered} E5-2680 v4 @ 2.40 GHz.  The patched algorithm exhibits an almost linear \(\beta\) dependence as highlighted by the fit (dotted curve).}
+    \label{fig:betaScaling}
+\end{figure}
+
+In this prototype calculation we applied pQTCI and patched contractions \emph{only} to the element-wise multiplication step, which is the dominant bottleneck.
+A fully patched treatment of the momentum-space Green’s function \(G(\bk,i\nu)\) would in principle yield an additional speed-up, but was not necessary to demonstrate the merits of the method: even this partial application suppresses the \(\chi^{4}\) scaling, delivers
+order-of-magnitude run-time gains, and keeps the memory footprint below that of the traditional approach. These results underline the practicality of the patched QTCI
+toolkit for low-temperature perturbative many-body calculations.
+
+\section{Bethe-Salpeter equations with pQTCI} 
 \label{sec:patchBSE}
-The Hubbard model can be drastically simplified by considering a single indipendent atom, described by the Hamiltonian
+The many-body Hubbard lattice can be reduced to a single, isolated site whose Hamiltonian is
 \begin{equation}
     \mathcal{H} = U\hat{n}_{\uparrow}\hat{n}_{\downarrow} - \mu(\hat{n}_{\uparrow} - \hat{n}_{\downarrow})
 \end{equation}
-where the hopping is naturally set to zero and the other parameters are the same as in \prettyref{eq:HubbardHamiltonian}. This simple model is able to describe many of the features of Hubbard model in the strong coupling limit \cite{Thunstrom2018}. 
+where the hopping is naturally set to zero and $\mu$ and $U$ are set to the same values as in \prettyref{eq:HubbardHamiltonian} (half-filling). Despite its simplicity, this \emph{atomic limit} reproduces many key features of the Hubbard model in the strong-coupling regime \cite{Thunstrom2018}.
 
-In the single-impurity Anderson model (SIAM), the interacting atom is coupled to a a bath on non-interacting electrons. The SIAM Hamiltonian reads \cite{Hewson1993}
+In the \emph{single–impurity Anderson model} (SIAM) one embeds this single interacting site in a bath of non-interacting electrons. The SIAM Hamiltonian reads \cite{Hewson1993}
 \begin{equation}
     \begin{aligned}
-    \mathcal{H} &= \sum_{\bk\sigma}\hat{c}^\dag_{\bk\sigma}\hat{c}_{\bk\sigma} + \sum_{\bk\sigma}\left( V_{\bk}\hat{c}^\dag_{\bk\sigma}\hat{d}_{\sigma} + V^*_{\bk}\hat{d}^\dag_{\sigma}\hat{c}_{\bk\sigma}\right) \\ &+ U\hat{n}_{d\uparrow}\hat{n}_{d\downarrow} + \varepsilon_d (\hat{n}_{\uparrow} + \hat{n}_{\downarrow})
+    \mathcal{H} &= \sum_{\bk\sigma}\varepsilon_{\bk}\hat{c}^\dag_{\bk\sigma}\hat{c}_{\bk\sigma} + \sum_{\bk\sigma}\left( V_{\bk}\hat{c}^\dag_{\bk\sigma}\hat{d}_{\sigma} + V^*_{\bk}\hat{d}^\dag_{\sigma}\hat{c}_{\bk\sigma}\right) \\ &+ U\hat{n}_{d\uparrow}\hat{n}_{d\downarrow} + \varepsilon_d (\hat{n}_{\uparrow} + \hat{n}_{\downarrow})
         \end{aligned}
 \end{equation}
-where the impurity is described by the fermionic annihilation (creation) operators $\hat{d}^{(\dag)}_{\sigma}$. 
+where $\hat{d}^{(\dag)}_{\sigma}$ annihilates (creates) an electron with
+spin $\sigma$ in the impurity level $\varepsilon_d=-U/2$, $\hat{n}_{d,\sigma}=\hat{d}^{\dag}_{\sigma}\hat{d}_{\sigma}$, and $V_{\bk}$ hybridises the impurity with the conduction states $\hat{c}^\dag_{\bk\sigma}$, $\hat{c}^\dag_{\bk\sigma}$. The SIAM provides a microscopic description of Kondo physics in heavy-fermion compounds and Kondo insulators, and underlies many dynamical mean-field-theory (DMFT) calculations \cite{Schrieffer1966,Hewson1993, Georges1996}. 
+
+We shall not revisit the physics of the SIAM itself; instead, we focus on the computational bottleneck identified in Ref.~\cite{Rohshap2025} and show how it can be alleviated by our patched contraction scheme.
+
+In the parquet formalism \cite{Rohringer2012} the single–impurity problem is reformulated in terms of coupled two-particle vertex equations. In the particle–hole (\textit{ph}) channel the Bethe–Salpeter equations (BSEs) for the density $(d)$ and magnetic $(m)$ components read
+\begin{align}
+    F_{d}^{\nu\nu'\omega} &= \Gamma_d^{\nu\nu'\omega} - \frac{1}{\beta^2} \sum_{\nu_1\nu_2} \Gamma_d^{\nu\nu_1\omega}\chi_{0,ph}^{\nu_1\nu_2\omega}F_d^{\nu_2\nu'\omega}
+    \label{eq:dBSEs}\\
+    F_{m}^{\nu\nu'\omega} &= \Gamma_m^{\nu\nu'\omega} - \frac{1}{\beta^2} \sum_{\nu_1\nu_2} \Gamma_m^{\nu\nu_1\omega}\chi_{0,ph}^{\nu_1\nu_2\omega}F_m^{\nu_2\nu'\omega}.
+    \label{eq:mBSEs}
+\end{align} 
+The right–hand side of each equation is a three-indexed three-tensor contraction that must be evaluated many times during the iterative Parquet loop, and thus dominates the overall cost. Rohshap, Ritter \textit{et al.} \cite{Rohshap2025} solved Eqs.\eqref{eq:dBSEs}–\eqref{eq:mBSEs} with great success using QTCI-based tensor trains. Here we revisit the same contraction but replace the monolithic MPO–MPO multiplication by the \emph{patched} strategy developed in \prettyref{chap:MPOcontr}, expecting further savings from the control of local bond dimensions.
+
+\prettyref{fig:vertexMPStoMPO} sketches the workflow for converting a three–frequency vertex
+\(V_{\nu\,\nu'\,\omega}\) (\(\nu,\nu'\) fermionic, \(\omega\) bosonic) into the MPO format required by the MPO-MPO contraction algorithms.
+\begingroup
+\renewcommand{\labelenumi}{(\alph{enumi})}
+\begin{enumerate}
+  \item Each Matsubara variable is discretised on a binary grid of \(\mathcal R\) bits. Applying QTCI yields a tensor–train\footnotemark\, \( \widetilde V_{\nu,\nu',\omega}\).
+  \item The TT is reshaped into an MPO by
+        (i) regrouping fermionic indices according to \prettyref{eq:MPStoMPO}, and
+        (ii) ``diagonalising'' bosonic tensor cores as in \prettyref{eq:diagMPOs}.  
+        This produces an efficient MPO representation whose structure matches the mixed matrix-multiplication and Hadamard operations in
+        the Bethe-Salpeter equations.
+  \item For a patched treatment the same sequence is applied \textit{per
+        patch}: the global QTCI compression is replaced by pQTCI, and the
+        subsequent reshaping steps are local to each patch.
+\end{enumerate}
+\endgroup
+\footnotetext{For brevity we drop the subscript $\sigma$ on all quantics bit strings; the frequency is now written simply as $\nu=(\nu_1,\dots,\nu_{\mR})$ which unambiguously denotes the $\mR$-bit representation of the Matsubara index.}
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics{figures/MPStoMPOVertex.pdf}
+    \caption{Transformation of a three-frequency vertex
+    \(V_{\nu\,\nu'\,\omega}\) into an MPO: QTCI compression on a \(\mathcal R\)-bit mesh per frequency; TT \(\rightarrow\) MPO mapping via Eqs.~\eqref{eq:MPStoMPO} and~\eqref{eq:diagMPOs}; resulting contraction-ready MPO \(\widetilde V_{(\nu\omega)(\nu'\omega')}\).
+    For patched calculations the first step is replaced by pQTCI and the second step is performed on each patch.}
+    \label{fig:vertexMPStoMPO}
+\end{figure}
+
+
+The initial stage of the patched BSE scheme is visualised in \prettyref{fig:patchedVertices}.
+Using the interleaved slicing order (see
+\prettyref{fig:patchingPatternsMatMul}), each two-particle vertex is compressed with pQTCI so that the resulting patch grid adapts to the
+structure of the data.
+For clarity we display two-dimensional cuts at the bosonic frequency $\omega=0$; the axes correspond to the fermionic frequencies on a $2^{\mR}\times2^{\mR}$ mesh with $\mR = 7$.
+The color scale shows $|F_d|$, $|\Gamma_d|$ and $|\chi_{0,ph}|$, respectively, each reconstructed from their patched approximation up to a tolerance $\tau=10^{-7}$. One sees that smaller, tiles concentrate in the regions where the vertices exhibit pronounced structure, whereas featureless areas are covered by larger patches.
+
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics{figures/patchedVertices.pdf}
+    \caption{pQTCI compression of the Bethe-Salpeter vertices at $\omega=0$. Panels show $|F_d|$ $(a)$, $|\Gamma_d|$ $(b)$ and $|\chi_{0,ph}|$ $(c)$ on the respective $(\nu_2,\nu')$, $(\nu_1,\nu)$ and $(\nu_2,\nu_1)$ grids for $\mR=7$ and tolerance $\tau=10^{-7}$. Patch boundaries reveal how the adaptive slicing refines only those regions where the vertex is more interesting, also for three dimensional objects.}
+    \label{fig:patchedVertices}
+\end{figure}
+
+\prettyref{fig:BSEresult} compares the wall-clock time required to evaluate the contraction on the right-hand side of the BSEs with and without patching.  
+Calculations were performed on an
+Intel\textsuperscript{\textregistered} Xeon\textsuperscript{\textregistered}
+E5-2680 v4 @ 2.40 GHz; the horizontal axis shows the number of bits \(\mathcal R\) used per fermionic frequency (i.e.\ \(\mathcal R=\log_{2}N_{\nu}\) with $N_{\nu}$ total frequencies). Four target tolerances \(\tau\) are reported.  
+Over the entire range the patched algorithm outperforms the conventional single-MPO contraction by up to an order of magnitude.  
+For the stringent tolerance \(\tau=10^{-10}\) the monolithic approach was no longer feasible beyond \(\mathcal R=7\) owing to excessive memory requirements, whereas the patched routine remained tractable.
 
 
 \begin{figure}[ht!]
-    \caption{Algorithm flowchart of matrix + element-wise multiplication\\(\texttt{automul}).}
+    \includegraphics{figures/BSEContraction_R_vs_time_comparTCI.pdf}
+    \caption{CPU time for the BSE vertex contraction versus the frequency resolution
+    \(\mathcal R\) (bits per Matsubara axis).
+    Solid curves: patched MPO–MPO contraction;
+    dashed curves: conventional (non-patched) contraction. Colours denote the compression tolerance \(\tau\).}
+    \label{fig:BSEresult}
 \end{figure}
 
-\begin{figure}[ht!]
-    \caption{Heatmap of TCI and patched TCI approximation of the BSE vertices with patch grid (2D slices or multiple 2D sliced for 3D figure )}
-\end{figure}
-
-\begin{figure}[ht!]
-    \caption{Memory vs patch bond dimension comparison patched/non-patched (show sub-optimal approximation)}
-\end{figure}
-
-\begin{figure}[ht!]
-    \caption{N patches vs patch bond dimension with optimal number of patches reference for matrix muliplication for each BSE vertex (highlight chosen data for contraction)}
-\end{figure}
-
-\begin{figure}[ht!]
-    \caption{Memory and time scaling patched/non-patched BSE contraction vs $R$ and $\epsilon$.}
-\end{figure}
-
-
-
+By decomposing the three-index vertex product into many low-rank patch contractions, the patched MPO strategy removes the \(\chi^{4}\) bottleneck that plagues the standard approach.  
+The resulting speed-up highlights the potential of patched tensor-network techniques for
+self-consistent parquet calculations at high frequency resolution.
 
 % \section{Gaussian Orbital Overlap}
 

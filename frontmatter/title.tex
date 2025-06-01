@@ -61,12 +61,89 @@
     
     
  {\LARGE M.Sc. Quantum Science \& Technology, }\\[0.5\baselineskip]
-    {\LARGE Ludwig Maximilians University of Munich, }\\[0.5\baselineskip]
-    {\LARGE Technical University of Munich }\\[2\baselineskip]
+    {\LARGE Ludwig-Maximilians-Universität München, }\\[0.5\baselineskip]
+    {\LARGE Technische Universität München }\\[2\baselineskip]
     
     {\LARGE
       \textbf{Supervisor:} Prof.\ Jan von Delft\\[0.5\baselineskip]
       \textbf{Co-Supervisor:} PhD. Luigi Iapichino\\[0.5\baselineskip]
+    }\\[3\baselineskip]
+
+    {\noindent \Large \textit{\today, Munich}}
+  \end{minipage}%
+  \bookpageend
+}
+
+
+\newcommand*{\mytitlede}{%
+    \cleardoublepage
+    \thispagestyle{empty}
+  % Overlay for images + vertical line
+  \begin{tikzpicture}[remember picture, overlay]
+    % Example background image near bottom-right
+    \node[
+      scale=1.25,
+      anchor=center,
+      xshift=-2cm,
+      yshift=2cm,
+      opacity=0.1
+    ] at (current page.south east)
+    {
+      \includegraphics[width=0.7\paperwidth,height=\paperheight,keepaspectratio]
+      {figures/lmu-logo.pdf}%
+    };
+
+    % Example background image near top-right
+    \node[
+      scale=0.6,
+      anchor=north east,
+      opacity=0.15,
+      xshift=-1cm,
+      yshift=-1cm
+    ] at (current page.north east)
+    {
+      \includegraphics[width=0.7\paperwidth,height=\paperheight,keepaspectratio]
+      {figures/tum-logo.pdf}%
+    };
+
+    % The thick vertical line at the *physical* left page edge (0in from paper),
+    % from 2cm below top edge to 3cm above bottom edge.
+    \draw[line width=2pt]
+      ($ (current page.north west) + (\spinemargin, -\uppermargin)$)
+      --
+      ($ (current page.south west) + (\spinemargin, \lowermargin)$);
+  \end{tikzpicture}%
+
+  % Optional vertical spacing from top
+  \vspace*{1cm}
+
+  % Indent so the text is 1cm to the right of the thick line
+  %   (2pt = line thickness, plus 1cm gap).
+  \noindent
+  \hspace*{\dimexpr 2pt + 1cm \relax}%
+  %
+  % Adjust the width to your liking. 0.6\textwidth or 0.7\textwidth
+  \begin{minipage}{\textwidth}
+    % If you want to avoid underfull justification warnings, consider ragged text:
+    % \raggedright
+
+    {\sffamily
+    \HUGE\bfseries
+      Effiziente Tensorkompression\\[0.5\baselineskip] durch Quantics- \\[0.5\baselineskip]
+      Tensorkreuzinterpolation \\[0.5\baselineskip]
+      mit adaptivem Patching
+    }\\[0.5\baselineskip]
+
+    {\LARGE Gianluca Grosso}\\[11\baselineskip]
+    
+    
+ {\LARGE M.Sc. Quantum Science \& Technology, }\\[0.5\baselineskip]
+    {\LARGE Ludwig-Maximilians-Universität München, }\\[0.5\baselineskip]
+    {\LARGE Technische Universität München }\\[2\baselineskip]
+    
+    {\LARGE
+      \textbf{Betreuer:} Prof.\ Jan von Delft\\[0.5\baselineskip]
+      \textbf{Zweitbetreuer:} PhD. Luigi Iapichino\\[0.5\baselineskip]
     }\\[3\baselineskip]
 
     {\noindent \Large \textit{\today, Munich}}

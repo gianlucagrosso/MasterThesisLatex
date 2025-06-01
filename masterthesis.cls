@@ -284,12 +284,23 @@ captionpos=b,
 \newcommand{\copyrightpage}{
     \cleartoverso
   \thispagestyle{empty}%
-  \vspace*{\fill}
+  \vspace*{\stretch{1}}
 	\begin{center}
 		{\scshape \noindent \small \copyright \small 2025\hspace{3pt}-- Gianluca Grosso }\\
 		\noindent All rights reserved.
 	\end{center}
-	\vspace*{\fill}
+	\vspace*{\stretch{1}}
+}
+
+
+%%% dedication pate %%%
+\newcommand{\dedication}{
+    \cleartorecto
+  \thispagestyle{empty}%
+  \vspace*{\stretch{1}}
+  \hspace*{\dimexpr 2pt + 1cm \relax}%
+		{\itshape To my friends and family}
+	\vspace*{\stretch{3}}
 }
 
 %%% abstract page %%%
