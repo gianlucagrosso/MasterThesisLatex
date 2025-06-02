@@ -20,7 +20,7 @@
 
 \RequirePackage{adjustbox}
 
-\LoadClass[fontsize=11pt,a4paper,twoside,extrafontsizes, onecolumn, openright, draft, %showtrims
+\LoadClass[fontsize=11pt,a4paper,twoside,extrafontsizes, onecolumn, openright, final, %showtrims
 	]{memoir}
 %% N.B: Change draft -> final for the final version not showing over-
 %% full boxes
@@ -333,9 +333,19 @@ captionpos=b,
 
 
 \newcommand{\acknowledgments}{
-	\cleardoublepage
+	\cleartorecto
 	\chapter*{Acknowledgements}
 	\noindent
+}
+
+%%%   my blank page   %%%
+\newcommand{\myblankpage}{
+    \cleartoverso
+  \thispagestyle{empty}%
+  \centering
+  \vspace*{\stretch{5}}
+		{\itshape This is a blank page...}
+	\vspace*{\stretch{1}}
 }
 
 

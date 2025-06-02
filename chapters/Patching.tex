@@ -2,7 +2,7 @@
 \label{chap:patching}
 
 We've come now to the original part of this manuscript. In \prettyref{chap:QTCI} we introduced the state-of-the art implementation of the (Quantics) Tensor Cross Interpolation algorithm. We have briefly illustrated the capabilities of this numerical method through several simple examples, which have also been demonstrated in a more thorough manner in other studies \cite{Fernandez2022, Fernandez2024,
-Ritter2024, Jolly2024, Sakurai2025, Oseledets2010, Dolgov2020}. Nevertheless, the final section of the previous chapter highlighted a few shortcomings of the standard implementation, particularly when dealing with more ill-defined cases. 
+Ritter2024, Jolly2024, Sakurai2025, Oseledets2010, Dolgov2020}. Nevertheless, the final section of the previous chapter highlighted a shortcoming of the standard implementation, particularly the approximation of multivariate functions with sharp local features. 
 
 Here we present a more structured solution to these shortcomings than the one proposed in \prettyref{sec:TCIFallbacks} above, based on a \textit{``divide and conquer''} variant of the standard QTCI. Similar d.\&c. approaches have already been investigated in other tensor-focused works, including the use of an SVD-based Quantics Tensor Train (QTT) method for approximating many-body correlation functions \cite{Hiroshi2023, Murray2024}, and tensor compression techniques employing standard and High-Order Singular Value Decomposition (HOSVD) within adaptive or greedy frameworks \cite{Ehrlacher2021, FuenteRuizPhDThesis, Ehrlacher2022}. Our novel implementation of this method -- ``standing on the shoulder of these giants'' --  exploits the  advantages of TCI and performs TCI tensor compression and function approximation in a \textit{patched} way. 
 
@@ -13,13 +13,13 @@ The upcoming chapter will be structured as follows: \prettyref{sec:patchAlg} cov
 \section{The algorithm}
 \label{sec:patchAlg}
 
-Patched Quantics Tensor Cross Interpolation (pQTCI) is an adaptive partitioning method \cite{Deng2008} based on rank-revealing cross approximation for high-dimensional tensors. Cross interpolation represents only a subroutine for our algorithm, hence, we will assume that the reader is familiarized with all TCI's functionalities (cf. \prettyref{chap:QTCI} and Ref. \cite{Fernandez2024} otherwise). Since it is built upon the TCI framework, pQTCI also falls within the class of \emph{rank‑revealing} algorithms introduced in \prettyref{def:rkralg}.
+Patched Quantics Tensor Cross Interpolation (pQTCI) is an adaptive partitioning method \cite{Deng2008} based on rank-revealing cross approximation for high-dimensional tensors. Cross interpolation represents only a subroutine for our algorithm, hence, we will assume that the reader is familiar with all TCI's functionalities (cf. \prettyref{chap:QTCI} and Ref. \cite{Fernandez2024} otherwise). Since it is built upon the TCI framework, pQTCI also falls within the class of \emph{rank‑revealing} algorithms introduced in \prettyref{def:rkralg}.
 
-Given a high dimensional tensor $\mT$ with hidden low-rank structure and desirably -- but not necessarily -- very localized features in configurational space (\textit{i.e.} only for a small subset of $\bsigma$, $\mT_{\bsigma}$ is non-trivial) as input, pQTCI returns a \textit{collection} of TT unfoldings as output, that, when resummed, approximate the tensor $\mT$ on its whole domain. Let us dive into the prerequisites needed for the construction of pQTCI.
+Given a tensor $\mT$ with hidden low-rank structure and desirably -- but not necessarily -- very localized features in configurational space (\textit{i.e.} only for a small subset of $\bsigma$, $\mT_{\bsigma}$ is non-trivial) as input, pQTCI returns a \textit{collection} of TT unfoldings as output, that, when resummed, approximate the tensor $\mT$ on its whole domain. Let us dive into the prerequisites needed for the construction of pQTCI.
 
 
 \subsection{Element-wise addition of TTs}
-An indispensable piece to assemble the pQTCI algorithm is the TT summation operation. Consider the following definition
+An key component of the pQTCI algorithm is the TT summation operation. Consider the following definition
 \begin{definition}[Direct sum]
 	The {\normalfont \textbf{direct sum}} of $N$-dimensional tensors $X_{\bsigma} \in \mathds{K}^{d_1 \times d_2 \times \cdots d_N}$ and $Y_{\bsigma'} \in \mathds{K}^{d'_1 \times d'_2 \times \cdots d'_N}$ is defined by 
 	\begin{equation}
@@ -34,12 +34,11 @@ An indispensable piece to assemble the pQTCI algorithm is the TT summation opera
 		\end{cases}
 	\end{equation}
 \end{definition}
-A special case of the direct sum of two tensors is the so-called \textit{partial direct sum} $\boxplus$ \cite{Lee2018}. A partial direct sum of two tensors $X_{\bsigma} \in \mathds{K}^{d_1 \times d_2 \times \cdots d_n \times d_{n+1} \times \cdots d_N}$ and $Y_{\bsigma'} \in \mathds{K}^{d'_1 \times d'_2 \times \cdots d'_n \times d_{n+1} \times \cdots d_N}$ is defined as 
+A special case of the direct sum of two tensors is the so-called \textit{partial direct sum} $\boxplus$ \cite{Lee2018}. A partial direct sum of two tensors $X_{\bsigma} \in \mathds{K}^{d_1 \times d_2 \times \cdots d_n \times d_{n+1} \times \cdots d_N}$ and $Y_{\bsigma'} \in \mathds{K}^{d'_1 \times d'_2 \times \cdots d'_n \times d_{n+1} \times \cdots d_N}$, that have the same dimensions for their last $N-n$ indices $\sigma_{n+1}, \cdots, \sigma_{N}$, is defined as 
 
 \begin{equation}
 	Z_{\bsigma''} = X_{\bsigma}\boxplus Y_{\bsigma'} \in \mathds{K}^{(d_1+d'_1) \times (d_2+d'_2) \times \cdots (d_n+d'_n) \times d_{n+1} \times \cdots d_N}
 \end{equation}
-
 where $Z_{\bsigma''}$, by means of the slicing operation introduced in \prettyref{eq:Tslices}, has subtensors
 
 \begin{equation}
@@ -57,7 +56,7 @@ Given now two $\mL$-dimensional tensor trains, $\widetilde{A}_{\bsigma}$ and $\w
  \widetilde{B}_{\bsigma}
  &= B_1 B_2 \cdots B_\mL = \raisebox{-5.5mm}{\includegraphics[scale=0.95]{figures/BTensorTrain.pdf}}
 \end{align}
-their element-wise sum $\widetilde{C}_{\bsigma} =  \widetilde{A}_{\bsigma} + \widetilde{B}_{\bsigma}$ is still a tensor trained shaped as
+with identical phyisical dimensions, $d^A_\ell = d^B_\ell$ $\forall \ell$, but possibly different virtual dimensions $\chi^A_\ell$, $\chi^B_\ell$. Their element-wise sum $\widetilde{C}_{\bsigma} =  \widetilde{A}_{\bsigma} + \widetilde{B}_{\bsigma}$ is still a tensor trained shaped as
 \begin{equation}
 	\label{eq:TensorTrainsSum}   
 	\widetilde{C}_{\bsigma}
@@ -80,7 +79,7 @@ where the partial sum between $A$'s and $B$'s sitetensors is performed by fixing
 	\label{eq:siteTenosorsTTSum}  
 \end{equation}
 
-The new internal bonds $c_\ell$ are dependent on the original bonds, in fact $a_\ell = c_\ell$ and $b_\ell = c_\ell - \chi^A_\ell$. Hence, the bond dimensions\footnotemark \;of the sum are also additive \textit{w.r.t} to the bond dimensions of its addends
+The new internal bonds $c_\ell$ are dependent on the original bonds, in fact $a_\ell = c_\ell$, for $c_\ell \in \{1,\chi^A_\ell\}$, and $b_\ell = c_\ell - \chi^A_\ell$, for $c_\ell \in \{\chi^A_\ell+1,\chi^A_\ell+\chi^B_\ell\}$. Hence, the bond dimensions\footnotemark \;of the sum are also additive \textit{w.r.t} to the bond dimensions of its addends
 
 \begin{equation}
 	\chi^C_\ell = \chi^A_\ell + \chi^B_\ell.
@@ -93,14 +92,14 @@ The second requirement needed to construct patched QTCI is, what we will refer t
 
 Consider a $\mL$-dimensional tensor $\Psi_{\bsigma}$; $\Psi_{\bsigma}$ can be interpreted as the collection of coefficients of a generic quantum state $\ket{\Psi}$, when represented on a specific basis of the Hilbert space it belongs to, as
 \begin{align}
-	\ket{\Psi} = \Psi_{\bsigma}\ket{\bsigma} &= \Psi_{\sigma_1,\sigma_2,\dots,\sigma_\mL} \ket{\sigma_1}, \ket{\sigma_2}\dots \ket{\sigma_\mL} \\[6pt]
+	\ket{\Psi} = \Psi_{\bsigma}\ket{\bsigma} &= \ket{\sigma_1}\ket{\sigma_2}\dots \ket{\sigma_\mL} \Psi_{\sigma_1,\sigma_2,\dots,\sigma_\mL} \\[6pt]
 	\nonumber &= \raisebox{-5mm}{\includegraphics[scale=0.95]{figures/LTensor_ell_leg.pdf}}\; \footnotemark.
 \end{align}
 \footnotetext{By abuse of notation we identify the tensor $\Psi_{\bsigma}$ with the quantum state $\ket{\Psi}$.}
 In the same way, its MPS unraveling
 \begin{align}
 	\label{eq:quantumMPS}
-	\ket{\Psi} = \widetilde{\Psi}_{\bsigma}\ket{\bsigma} &=  [M_1^{\sigma_1}]_{1 m_1}\ket{\sigma_1}  [M_2^{\sigma_2}]_{m_1 m_2} \ket{\sigma_2} \cdots  [M_\mL^{\sigma_\mL}]_{m_{\mL -1} 1} \ket{\sigma_\mL} \\[6pt]
+	\ket{\Psi} = \widetilde{\Psi}_{\bsigma}\ket{\bsigma} &=  \ket{\sigma_1}[M_1^{\sigma_1}]_{1 m_1}   \ket{\sigma_2}[M_2^{\sigma_2}]_{m_1 m_2} \cdots \ket{\sigma_\mL}[M_\mL^{\sigma_\mL}]_{m_{\mL -1} 1} \\[6pt]
 	\nonumber &= \raisebox{-5mm}{\includegraphics[scale=0.95]{figures/MTensorTrain.pdf}}.
 \end{align}
 
@@ -108,12 +107,12 @@ If we restrict the configuration space to a subset space where $\ket{\sigma_\ell
 
 \begin{align}
 	\label{eq:tensorSlice}
-	\nonumber \ket{\Psi^{p_\ell}} &= \Psi_{\sigma_1,\dots,\sigma_{\ell -1}, p_\ell, ,\sigma_{\ell +1}, \dots, \sigma_\mL} \ket{\sigma_1},\dots,\ket{\sigma_{\ell -1}},\ket{p_\ell},\ket{\sigma_{\ell +1}},\dots, \ket{\sigma_\mL}\\[6pt]
-	&= \Psi^{p_\ell}_{\sigma_1,\dots,\sigma_{\ell -1},\sigma_{\ell +1}, \dots, \sigma_\mL} \ket{\sigma_1},\dots,\ket{\sigma_{\ell -1}},\ket{p_\ell},\ket{\sigma_{\ell +1}},\dots, \ket{\sigma_\mL}\\[6pt]
+	\nonumber \ket{\Psi^{p_\ell}} &= \ket{\sigma_1}\cdots\ket{\sigma_{\ell -1}}\ket{p_\ell}\ket{\sigma_{\ell +1}}\cdots\ket{\sigma_\mL} \Psi_{\sigma_1,\dots,\sigma_{\ell -1}, p_\ell, ,\sigma_{\ell +1}, \dots, \sigma_\mL}\\[6pt]
+	&=  \ket{\sigma_1}\cdots\ket{\sigma_{\ell -1}}\ket{p_\ell}\ket{\sigma_{\ell +1}},\cdots\ket{\sigma_\mL}\Psi^{p_\ell}_{\sigma_1,\dots,\sigma_{\ell -1},\sigma_{\ell +1}, \dots, \sigma_\mL}\\[6pt]
 	\nonumber &= \raisebox{-5mm}{\includegraphics[scale=0.95]{figures/PsiPSubtensor.pdf}} =\; \raisebox{-4.5mm}{\includegraphics[scale=0.95]{figures/PsiSubtensor.pdf}}.
 \end{align}
 
-This procedure resembles a quantum projection, \textit{i.e.} $\ket{\Psi^{p_\ell}} = \ket{p_\ell}\braket{p_\ell|\Psi}$, ergo the \textit{projection} labeling of the operation. 
+This procedure resembles a quantum projection, \textit{i.e.} $\ket{\Psi^{p_\ell}} = \ket{p_\ell}\braket{p_\ell|\Psi}$. 
 For now, the object \raisebox{-1.5mm}{\includegraphics[scale=0.95]{figures/ProjectionTensor.pdf}} is only used as a placeholder to relate our subtensor of interest $\Psi^{p_\ell}_{\sigma_1,\dots,\sigma_{\ell -1},\sigma_{\ell +1}, \dots, \sigma_\mL}$  to the original configuration space of the full tensor $\Psi_{\bsigma}$, but has otherwise no other meaning. Indeed, within the $\ket{p_\ell}$-subspace, $\ket{\Psi^{p_\ell}}$ is completely defined by the $\mL - 1$ indices $(\sigma_1,\dots,\sigma_{\ell-1},\sigma_{\ell+1},\dots,\sigma_\mL)$. The \raisebox{-1.5mm}{\includegraphics[scale=0.95]{figures/ProjectionTensor.pdf}} items act as \textit{slicing} or \textit{projection} operators that limit us to the subsector of $\Psi_{\bsigma}$ where the $\ell^{\text{th}}$ index is fixed to $p_\ell$. It is trivial to deduce that
 \begin{equation}
 	\ket{\Psi} = \sum_{p_\ell = 1}^{d_\ell} \ket{\Psi^{p_\ell}},
@@ -138,26 +137,26 @@ wherein we generalized \raisebox{-1.5mm}{\includegraphics[scale=0.95]{figures/Pr
 		[0]_{m_{\ell-1},m_\ell} & \text{otherwise},
 	\end{cases}
 \end{equation}
-with bonds $m_{\ell-1}$ and $m_{\ell}$ of same dimension and where $0_{m,n}$ denotes the element $(m,n)$ of the zero matrix.
+with bonds $m_{\ell-1}$ and $m_{\ell}$ of same dimension and where $0_{m,n}$ denotes the element $(m,n)$ of the zero matrix of dimension $\chi_{\ell-1}\times\chi_\ell$.
 From \prettyref{eq:subTensorSum} we can recognize that 
 
 \begin{equation}
 	\Psi_{\bsigma} \simeq \sum_{p_\ell = 1}^{d_\ell} \widetilde{\Psi}^{p_\ell} =  \sum_{p_\ell = 1}^{d_\ell} \raisebox{-5.5mm}{\includegraphics[scale=0.95]{figures/ProjTensorTrain.pdf}}
 \end{equation}
-where the first equality reflects the error associated with an arbitrary MPS approximation and the sum is performed according to the element-wise TT addition described by \prettyref{eq:TensorTrainsSum} in the section above. Without loss of generality, the same line of reasoning can be applied to smaller subspaces in such a way
+where the first approximation reflects the error associated with an arbitrary MPS approximation and the sum is performed according to the element-wise TT addition described by \prettyref{eq:TensorTrainsSum} in the section above. Without loss of generality, the same line of reasoning can be applied to smaller subspaces
 \begin{equation}
 	\Psi_{\bsigma} \simeq \widetilde{\Psi}^{+}_{\bsigma} = \sum_{p_{\ell_1}= 1}^{d_{\ell_1}} \cdots \sum_{p_{\ell_N}= 1}^{d_{\ell_N}} \widetilde{\Psi}^{p_{\ell_1},\dots,p_{\ell_N}}
 	\label{eq:NslicesSum}
 \end{equation}
-taking $(\ell_1, \dots, \ell_N) \in \{1,\dots, \mL\}^{N(\leq \mL)}$ ($\ell_i \neq \ell_j$ for every $i\neq j$) without any specific order constraint. $\widetilde{\Psi}^{+}_{\bsigma}$ is good approximation of the original tensor $\Psi_{\bsigma}$.
+taking $(\ell_1, \dots, \ell_N) \in \{1,\dots, \mL\}^{N(\leq \mL)}$ ($\ell_i \neq \ell_j$ for every $i\neq j$) without any specific order constraint. Whenever the sum \prettyref{eq:NslicesSum} retains a low rank, after recompression, $\widetilde{\Psi}^{+}_{\bsigma}$ represents good approximation of the original tensor $\Psi_{\bsigma}$.
 
 \subsection{The Patching scheme}
 Having laid out all the necessary ingredients, we now return to detailing our patched (Q)TCI algorithm. 
 Consider a generic tensor $\mT_{\bsigma}$ and its TCI approximation $\widetilde{\mT}_{\bsigma}$. As noted in \prettyref{sec:TCIFallbacks}, when the tensor $\mT$ exhibits sharply localised structures, its compression $\widetilde{\mT}$ can be made more memory-efficient by adopting a \textit{divide-et-impera} approach. Nevertheless, although the naive domain-splitting approach outlined in \prettyref{sec:TCIFallbacks} proved functional, it provided no means of numerical control and presumed that both the location and spatial extent of the tensor’s relevant features were known a priori. Such ideal conditions are rarely encountered in real-world applications, particularly when the tensor $\mT$ stems from complex computations that estimate unknown variables. However, the preceding example shows that memory usage for a (local) TT approximation is effectively characterised by its bond dimensions $\chi_\ell$—specifically, by the maximum bond dimension $\chi$. Recognizing this allows us to devise a more intelligent, adaptive, and general solution to the compression of tensors presenting sharp localized features.
 
-The standard TCI implementation provided by \texttt{TCI.jl} \cite{TensorCrossInterpolation.jl}, as illustrated in Listing \ref{code:crossinterpolate2}, offers a mechanism to control the bond dimension of the approximation. Specifically, setting the input variable \texttt{maxbonddim} within \texttt{crossinterpolate2} constrains the size of the pivot lists $\mathcal{I}\ell$ and $\mathcal{J}\ell$, thereby restricting the bond dimensions $\chi_\ell$ of the resulting MPS. Although this strategy effectively reduces the memory footprint of the TCI approximation, it also hampers the convergence of the algorithm. Consequently, to ensure convergence, the approximation domain must be suitably reduced. 
+The standard TCI implementation provided by \texttt{TCI.jl} \cite{TensorCrossInterpolation.jl}, as illustrated in Listing \ref{code:crossinterpolate2}, offers a mechanism to control the bond dimension of the approximation. Specifically, setting the input variable \texttt{maxbonddim} within \texttt{crossinterpolate2} constrains the size of the pivot lists, thereby restricting the bond dimensions $\chi_\ell$ of the resulting MPS. Although this strategy effectively reduces the memory footprint of the TCI approximation, it also hampers the convergence of the algorithm. Consequently, to ensure convergence, the approximation domain must be suitably reduced. 
 
-We partition the approximation domain through \textit{subdomain projection} operation—or tensor \textit{slicing}- as detailed in the previous section. Once the original tensor has been decomposed into subtensors, hereafter called \textit{patches} \footnotemark, we run TCI on each patch separately. Working on these reduced domains improves the likelihood of convergence since each patch explores a much smaller configuration space, even when the bond dimension is capped at the prescribed threshold $\chi_{\text{patch}}$, a bound that will then not be reached.
+We partition the approximation domain through \textit{subdomain projection} operation as detailed in the previous section. Once the original tensor has been decomposed into subtensors, hereafter called \textit{patches} \footnotemark, we run TCI on each patch separately. Working on these reduced domains improves the likelihood of convergence since each patch explores a much smaller configuration space, even when the bond dimension is capped at the prescribed threshold $\chi_{\text{patch}}$, a bound that will then not be reached.
 This whole procedure can be repeated iteratively and adaptively, as shown in \prettyref{fig:patchingAlg}. We shall refer to this routine as the \textit{patching scheme}, or simply \textit{patched TCI}.
 The algorithm proceeds as follows:
 \footnotetext{Henceforth, the term \textit{patch} will denote both the subtensor $\mT^{p_1,\dots,p_\ell}$ and its TT-unfolded form $\widetilde{\mT}^{p_1,\dots,p_\ell}$.}
@@ -170,32 +169,33 @@ The algorithm proceeds as follows:
 		\item a tailored set of global pivots, if prior information about local features of $\mT$ is available.
 	\end{itemize}
 	The rank reveal of the tensor train $\widetilde{\mT}$ is constrained by the prescribed limit $\chip$. If $\widetilde{\mT}_{\bsigma}$ converges, the algorithm terminates. 
-	\item If convergece is not reached, slice $\mT_{\bsigma}$ along its first index to produce subtensors 
+	\item If convergence is not reached, slice $\mT_{\bsigma}$ along its first index\footnotemark\; to produce subtensors 
 	$$\mT^{p_1}\quad \forall p_1 \in \{1,\dots,d_1\}\quad \text{(cf. \prettyref{eq:tensorSlice}).}$$
 	\item Use the pivot lists $\mathcal{I}_\ell$ and $\mathcal{J}_\ell$ from the preceding (failed) TT to form new global pivots: $\hat{\sigma} = i_\ell \oplus j_{\ell +1}$, with $i_\ell \in \mathcal{I}_\ell$, $j_{\ell+1} \in \mathcal{J}_{\ell +1}$. 
 	A pivot $\hat{\sigma}$ is assigned to subtensor $\mT^{p_1}$ whenever its first component satisfies $\hat{\sigma}_1 = p_1$.
 	\item Compress each subtensor $\mT^{p_1}$ with TCI  (bond dimension is still capped at $\chip$) over the reduced cofiguration domain $(\sigma_2, \dots, \sigma_\mL)$.  Store all the converged \textit{patches} $\widetilde{\mT}^{p_1}$; discard those that fail to converge. 
 	\item For every unconverged subtensor $\mT^{p_1}$, slice further along the next index to obtain $\mT^{p_1, p_2}\  \forall p_2\in {1,\dots,d_2}$. Build the next set of global pivots subject to $\hat{\sigma}_1 = p_1$ and $\hat{\sigma}_2 = p_2$.
-	\item Repeat step (4)-(5), recursively increasing the slicing depth, until no \textit{patches} remain to be converged. 
+	\item Repeat (4)-(5), recursively increasing the slicing depth, until no \textit{patches} remain to be converged. 
 \end{enumerate}
 \endgroup
+\footnotetext{A different choice for the starting index is possible, see below. For pedagogical purposes we start from $\sigma_1$.}
 
 \begin{figure}[ht!]
 	\includegraphics{figures/PatchingAlgorithm.pdf}
-	\caption{Flowchart of the patched TCI algorithm. $(a)$ Convergence criterion for the subtensors $\widetilde{\mT}^{p_1,\dots,p_{\bar \ell}}$ -- or \textit{patches} -- defined by the parameters $\chi_{\text{patch}}$ and $\varepsilon$, and the two sets of subtensors that have already converged -- \texttt{results} -- and those yet to converge  -- \texttt{tasks}. $(b)$ Flowchart of the \textit{patching scheme}. The TCI approximation is adaptively decomposed into smaller computations through \textit{slicing} (cf. \prettyref{eq:tensorSlice}). Each subtensor is TCI compressed within the smaller domain. The converged \textit{patches} are added to \texttt{results}, the yet-to-converge ones to \texttt{tasks}. The algorithm terminates -- \includegraphics[scale=0.95]{figures/TerminalSquare.pdf} -- when \texttt{tasks} is empty. We refer the reader to the main manuscript for additional details.}
+	\caption{Flowchart of the patched TCI algorithm. $(a)$ Convergence criterion for the subtensors $\widetilde{\mT}^{p_1,\dots,p_{\bar \ell}}$ -- or \textit{patches} -- defined by the parameters $\chi_{\text{patch}}$ and $\tau$, and the two sets of subtensors that have already converged -- \texttt{results} -- and those yet to converge  -- \texttt{tasks}. $(b)$ Flowchart of the \textit{patching scheme}. The TCI approximation is adaptively decomposed into smaller computations through \textit{slicing} (cf. \prettyref{eq:tensorSlice}). Each subtensor is TCI compressed within the smaller domain. The converged \textit{patches} are added to \texttt{results}, the yet-to-converge ones to \texttt{tasks}. The algorithm terminates -- \includegraphics[scale=0.95]{figures/TerminalSquare.pdf} -- when \texttt{tasks} is empty. We refer the reader to the main manuscript for additional details.}
 	\label{fig:patchingAlg}
 \end{figure}
 
-A series of remarks are in order. The output result of the algorithm seems to be a collection of tensor trains of the form 
+Remarks are in order. The output result of the algorithm seems to be a collection of tensor trains of the form 
 \begin{equation}
 	\raisebox{-4.5mm}{\includegraphics{figures/PatchTensorTrain.pdf}}
 	\label{eq:patchedTT}
 \end{equation}
 where both the \textit{prefix} indices $(p_1,\dots,p_{\bar{\ell}}) \in \mathds{I}_{\bar{\ell}}$ and the length of the prefix -- the \textit{paching level} -- $\bar{\ell} \in \{1,\dots,\mL\}$ can take very different values. Nevertheless, two conditions are respected from our implementation:
 \begin{itemize}
-	\item since any subtensor that is further subdivided has its non-convergent TT approximation discarded, all pairs of index prefixes satisfy
+	\item any subtensor that is further subdivided has its non-convergent TT approximation discarded, all pairs of index prefixes satisfy
 	\begin{equation}
-		(p_1,\dots,p_{\bar{\ell}_1}) \nsubseteq (p_1,\dots,p_{\bar{\ell}_2}) \quad \forall\, \bar{\ell}_1, \bar{\ell}_2
+		(p_1,\dots,p_{\bar{\ell}_1}) \nsubseteq (p_1,\dots,p_{\bar{\ell}_2}) \quad \forall\, \bar{\ell}_1 \neq \bar{\ell}_2
 	\end{equation}
 	 Consequently, the patched-TCI procedure produces TT approximations $\widetilde{\mT}^{p_1,\dots,p_{\bar \ell}}$ that are strictly \textit{non-overlapping} (\textit{disjointed}) in configuration space; 
 	\item the collection of TTs of the form in \prettyref{eq:patchedTT}, in order to constitute a good approximation for the full tensor $\mT_{\bsigma}$, satisfies the condition  
@@ -209,10 +209,10 @@ In \prettyref{fig:patchingAlg} we displayed a version of the patched TCI where t
 % (we refer the reader to \prettyref{app:patchordering} for details about the impact of the \textit{prefix ordering} -- or \textit{patch ordering} -- on the approximation)
 The \textit{prefix} of each subtensor $\mT^{p_1,\dots,p_{\bar \ell}}$ -- that indicates to which slice of $\mT$ it corresponds to -- can be taken randomly, in an exclusive manner, from the set of tensor indices $\{\sigma_1,\dots,\sigma_\mL\}$ (considered labels in this context).
 
-Let us consider now the specific case when we intend to TT approximate a multi-variate function, call it $f(\boldsymbol{x})$. \prettyref{sec:TCIalgorithm} taught us that, when we intend to properly resolute all the relevant features of $f$, it is a clever choice to numerically represent it as a tensor utilizing the quantics discretization (with $\mR$ bits per spatial dimention $x_i$): in fact, the discretization error of the approximation decreases exponentially by increasing $\mR$ only linearly. 
+Let us consider now the specific case when we intend to TT approximate a multi-variate function, call it $f(\boldsymbol{x})$. \prettyref{sec:TCIalgorithm} taught us that, when we intend to properly resolve all the relevant features of $f$, it is a clever choice to numerically represent it as a tensor utilizing the quantics discretization (with $\mR$ bits per spatial dimention $x_i$): in fact, the discretization error of the approximation decreases exponentially by increasing $\mR$ only linearly. 
 
 Assume now that $f$ is characterized by narrow peaks sparsely distributed across its domain. Its tensor representation $\mF_{\bsigma} = f(\boldsymbol{x}(\bsigma))$ inherits the same structure. When we apply the patched TCI procedure to $\mF_{\bsigma}$, the scale separation introduced by the quantics format (where $\sigma_{\ell(n,r)} \to 2^{-r}$ length scale) implies that each patch $\widetilde{\mF}^{p_1,\dots,p_{\bar \ell}}$ simply captures $f(\boldsymbol{x}(\bsigma))$ restricted to a distinct sub-region of the original domain.
-\prettyref{fig:patchSubdivision} makes the idea clearer for a bivariate function.
+\prettyref{fig:patchSubdivision} illustrates this idea for a bivariate function.
 The tensor $\mF$ is indexed by scale: for example, with an interleaved 2-D ordering, the first two indices $\sigma_1$ and $\sigma_2$ encode the resolution $2^{-1}$ in the $x$- and $y$-directions. Fixing these two indices—i.e., taking the corresponding slice—yields a smaller subtensor that represents $f$ on one quarter of the domain (see the second panel on the right in \prettyref{fig:patchSubdivision}). This motivates our previous terminology: we call each such subtensor slice a \textit{patch}.
 \begin{figure}[ht!]
 	\includegraphics{figures/PatchDivision.pdf}
@@ -222,7 +222,7 @@ The tensor $\mF$ is indexed by scale: for example, with an interleaved 2-D order
 
 Patched QTCI refines the domain more aggressively in regions where the target function $f$ exhibits higher complexity. Areas that contain sharp, localised peaks incur a larger memory footprint, driving up the tensor-train rank $\chi$. Panel $(a)$ of \prettyref{fig:patchTree} illustrates this effect for a generic, single-peaked bivariate function. As noted earlier, patched TCI returns a collection of TT representations that are mutually disjoint in configuration space; in the context of pQTCI this means that the resulting set of patches forms a non-overlapping cover of the entire domain of $f$. Panel $(b)$ shows how this cover is built: the algorithm traverses the patch tree and, for each slice $\widetilde{\mF}^{p_1,\dots,p_{\bar\ell}}$, checks the stopping criteria: 
 \begin{equation}
-	\| \mF^{(\cdot)} - \widetilde{\mF}^{(\cdot)} \| < \varepsilon \quad \text{and} \quad \chi < \chip.
+	\| \mF^{(\cdot)} - \widetilde{\mF}^{(\cdot)} \|_{\infty} < \tau \quad \text{and} \quad \chi < \chip.
 	\label{eq:patchConvergence}
 \end{equation}
 adaptively refining only those slices that violate either boundary. The total number of red colored leaves in \prettyref{fig:patchTree} is the number of patches, $\Np$, for a specific approximation.
@@ -241,14 +241,14 @@ since all TCI algorithms involve sampling, none of them is fully immune against 
 
 At first sight, the patched (Q)TCI algorithm shown in \prettyref{fig:patchingAlg} appears to burden the original TCI routine with considerable overhead: in the worst-case, \texttt{crossinterpolate2} is invoked on the order of $\mathcal{O}\bigl(d^{\bar\ell}\bigr)$ times, where $\bar\ell$ is the deepest patching level reached (assuming a uniform subdivision and ignoring adaptivity).
 
-In practice, however, patched QTCI can run faster than the plain TCI workflow. Every call to \texttt{crossinterpolate2} is restricted by the bond-dimension cap $\chi_{\text{patch}}$, so each local TCI solve is far cheaper than a full-rank solve on the entire tensor $\mT$. Only when we reach patch spatial dimension containing features we are able to approximate within a bond dimension of $\chip$ then the TCI procedure runs to its full extent, reaching convergence. 
+In practice, however, patched QTCI can run faster than the plain TCI workflow. Every call to \texttt{crossinterpolate2} is restricted by the bond-dimension cap $\chi_{\text{patch}}$, so each $\chi_{\text{patch}}$-capped local TCI is far cheaper than a non-capped TCI on the entire tensor $\mT$. Only when we reach patch spatial dimension containing features we are able to approximate within a bond dimension of $\chip$ then the TCI procedure runs to its full extent, reaching convergence. 
 
 The preceding discussion makes it clear that both the total number of resulting patches, $\Np$, and relative computational resources expenditure, are governed largely by the bond-dimension cap assigned to each patch, $\chi_{\text{patch}}$. 
 
 \subsection{Runtime \& Memory vs. $\chip$}
 
-To estimate actual resource usage of pQTCI, we begin with a theoretical analysis (empirical fits are presented later in \prettyref{chap:results}). 
-Consider a generic Tensor-Train $\widetilde{\mT}$ of the form given in \prettyref{eq:quantumMPS} whose maximum bond dimension is $\chi$. When $\widetilde{\mT}$ is constructed by successive SVD unfoldings of the full tensor $\mT$, truncating each SVD at the rank $\chi$ \cite{vonDelftTNNotes, Fannes1992, tensornetwork.org}, the bond dimension along the chain typically evolves  as illustrated in \prettyref{fig:typicalBondDim}.
+To estimate actual resource usage of pQTCI, we begin with a theoretical analysis (empirical fits are in \prettyref{app:bounds}). 
+Consider a generic $\widetilde{\mT}$ of the form given in \prettyref{eq:quantumMPS} whose maximum bond dimension is $\chi$. When $\widetilde{\mT}$ is constructed by successive SVD unfoldings of the full tensor $\mT$, truncating each SVD at the rank $\chi$ \cite{vonDelftTNNotes, Fannes1992, tensornetwork.org}, the bond dimension along the chain typically evolves  as illustrated in \prettyref{fig:typicalBondDim}.
 
 \begin{figure}[ht!]
 	\centering
@@ -261,16 +261,15 @@ A convenient way to gauge the memory footprint of a tensor-train approximation i
 
 \begin{equation}
 	\begin{aligned}
-		N^{\raisebox{.5pt}{\tiny \textcircled{\raisebox{-0.6pt} {1}}}}_{\text{par}} &= 2 *\sum\limits_{\ell = 1}^{\ell^*} d^{2\ell}  \\[6pt]
+		N^{\raisebox{.5pt}{\tiny \textcircled{\raisebox{-0.6pt} {1}}}}_{\text{par}} &= 2\;\sum\limits_{\ell = 1}^{\ell^*} d^{2\ell}  \\[6pt]
 		N^{\raisebox{.5pt}{\tiny \textcircled{\raisebox{-0.6pt} {2}}}}_{\text{par}} &= \sum\limits_{\ell = \ell^* + 1}^{\mL - \ell^* - 1} \chi^2d
 	\end{aligned}
 \end{equation}
-
-Hence, the total number of parameters for a generic TT of this form is bounded by
+where $\ell^*$ is fixed by the relation $d^{2\ell^*} = \chi$. Hence, the total number of parameters for a generic TT of this form is bounded by
 \begin{equation} 
 	N_{\text{par}} \lesssim 2 d^2 \frac{1 - \chi^2 }{1 - d^2} + \chi^2d (\mL - 2 \log_d \chi - 2). 
 \end{equation}
-Assume the worst-case scenario in which patched QTCI subdivides the entire domain into a lattice of equally ranked patches. After sequential slicing ($\sigma_1 \to \sigma_2 \to \cdots$), the procedure halts at \textit{patching level} ${\bar \ell}$, yielding a total number of patches $\Np$ all with rank $\chip$ and with bond dimension development as in \prettyref{fig:typicalBondDim}. The memory footprint of this final object would be 
+Assume the worst-case scenario in which patched QTCI subdivides the entire domain into a lattice of patches. After sequential slicing ($\sigma_1 \to \sigma_2 \to \cdots$), the procedure halts at \textit{patching level} ${\bar \ell}$, yielding a total number of patches $\Np$ all with rank $\chip$ and with bond dimension development as in \prettyref{fig:typicalBondDim}. The memory footprint of this final object would be 
 \begin{equation}
 	\begin{aligned}
 		N_{\text{par}} &= \Np\, N_{\text{par}\times \text{patch}}\\
@@ -320,7 +319,7 @@ To explore the dependence of $\Np$ by the fixed parameter $\chip$, let us examin
 \end{gathered}
 \end{equation}
 
-We restate the formula here for simplicity
+We restate the formula here
 
 \begin{equation*}
 		f(\boldsymbol{r}) = A_1\,e^{-\frac{(\boldsymbol{r} - \boldsymbol{r}_1)^2}{2\sigma^2_1}} \sin(k_1\boldsymbol{r}) + A_2\,e^{-\frac{(\boldsymbol{r} - \boldsymbol{r}_2)^2}{2\sigma^2_2}} \sin(k_2\boldsymbol{r}). 
@@ -330,16 +329,16 @@ Lowering the bond-dimension cap $\chip$ in the patched QTCI algorithm forces eac
 
 \begin{figure}[htbp]
 	\includegraphics{figures/PatchEvolutionwithChi.pdf}
-	\caption{Evolution of the adaptive partitioning of the bivariate function $f(\boldsymbol{r})$ domain (cf. \prettyref{eq:localFunc} and \prettyref{eq:localFuncNewParams}), due to pQTCI. Interleaved or fused orderin is utilized for the indices of the tensor $\mF_{\bsigma} = f(\boldsymbol{r}(\bsigma))$. Smaller maximum bond dimensions per patch $\chip$ render finer partitionings of the domain.}
+	\caption{Evolution of the adaptive partitioning of the bivariate function $f(\boldsymbol{r})$ domain (cf. \prettyref{eq:localFunc} and \prettyref{eq:localFuncNewParams}), due to pQTCI. Both interleaved and fused ordering for the tensor $\mF_{\bsigma} = f(\boldsymbol{r}(\bsigma))$ are illustrated. Smaller maximum bond dimensions per patch $\chip$ render finer partitionings of the domain.}
 	\label{fig:patchEvolution}
 \end{figure}
 
 
 
 In \prettyref{fig:patchEvolution} each coordinate is discretised with $\mR = 17$ bits--enough to resolve every feature of $f(\boldsymbol{r})$
-f to a tolerance of $\varepsilon=10^{-7}$.
-The total patch count $\Np$ depends sensitively on the chosen bond-dimension cap $\chip$
-We can then understand that there exists a strond dependence of $\Np$ by $\chip$. From the memory estimate in \prettyref{eq:patchMemoryEstimate}, and assuming the overall parameter budget of the final approximation to stay roughly constant, we anticipate the following scaling law
+f to a tolerance of $\tau=10^{-7}$.
+The total patch count $\Np$ depends sensitively on the chosen bond-dimension cap $\chip$.
+We can then understand that there exists a dependence of $\Np$ by $\chip$. From the memory estimate in \prettyref{eq:patchMemoryEstimate}, and assuming the overall parameter budget of the final approximation to stay roughly constant, we anticipate the following scaling law
 \begin{equation}
 	\Np \propto 1 / \chip^2. 
 	\label{eq:scalingNpatchBonddim}
@@ -398,7 +397,7 @@ In effect, the algorithm redundantly stores the same information in multiple MPS
 \begin{figure}[htbp]
 	\centering
 	\includegraphics{figures/OverPatching.pdf}
-	\caption{Performance of patched QTCI on the two–dimensional oscillatory function of \prettyref{eq:2Dfunction}.  $(a)$ Example of the domain subdivision produced with $\mR = 15$, $\chip = 10$, and $\varepsilon = 10^{-4}$.  The partition is highly redundant and fails to align with the true feature layout of the function. $(b)$ Total number of TT parameters returned by pQTCI (solid curves) at three target tolerances, plotted against the bond-dimension cap $\chip$.  For comparison, the parameter count of a full-domain TCI compression is shown as a dotted line.  Once $\chi_{\text{patch}}\gtrsim 80$, every run collapses to a single patch and matches the TCI cost; for smaller caps, over-patching inflates the parameter count sharply.}
+	\caption{Performance of patched QTCI on the two–dimensional oscillatory function of \prettyref{eq:2Dfunction}.  $(a)$ Example of the domain subdivision produced with $\mR = 15$, $\chip = 10$, and $\tau = 10^{-4}$.  The partition is highly redundant and fails to align with the true feature layout of the function. $(b)$ Total number of TT parameters returned by pQTCI (solid curves) at three target tolerances, plotted against the bond-dimension cap $\chip$.  For comparison, the parameter count of a full-domain TCI compression is shown as a dotted line.  Once $\chi_{\text{patch}}\gtrsim 80$, every run collapses to a single patch and matches the TCI cost; for smaller caps, over-patching inflates the parameter count sharply.}
 	\label{fig:2DOverpatching}
 \end{figure}
 
@@ -406,7 +405,7 @@ To curb over-patching, several practical safeguards could be introduced in futur
 %
 \begin{itemize}
   	\item \textbf{Minimum patch size}: impose a lower bound $|\Omega|_{\min}$ on the spatial size of any patch $\Omega_{\mathbf p}$. If a candidate split would produce sub-domains smaller than this threshold, the recursion is halted and the current patch is accepted as is. This solution is particularly useful when the length scales of interest for a target function are known beforehand.
-  \item \textbf{Post-processing merge}: after the recursive phase, inspect neighbouring patches whose TT cores share the same effective ranks.  If the error of the combined residual of two siblings stays below $\varepsilon_{\text{merge}}$, replace them by a single, merged patch and recompress with TCI.
+  \item \textbf{Post-processing merge}: after the recursive phase, inspect neighbouring patches whose TT cores share the same effective ranks.  If the error of the combined residual of two siblings stays below $\tau_{\text{merge}}$, replace them by a single, merged patch and recompress with TCI.
 \end{itemize}
 
 These mechanisms ensure that domain refinement is driven by actual approximation error rather than the arbitrary attainment of the bond-dimension limit, thereby preventing an explosion in the number of patches and preserving the intended resource savings of patched QTCI.

@@ -6,7 +6,7 @@ MPO-MPO contractions are widely recognized as a critical computational bottlenec
 Besides the favourable complexity of the TCI algorithm itself, in general tensor representations are especially beneficial for convolution–type integrals, e.g.\ $h(x,y)\;=\;\int_{0}^{1}\! \mathrm{d}t\,f(x,t)\,g(t,y),$
 because they allow such integral to be carried out by simply contracting the MPOs representing the two integrands. More importantly, the contraction yields a ready‐made, reusable tensor‐train representation of the result~\(h\).
 
-While (Q)TCI substantially mitigates the cost of setting up convolution–type integrals, the subsequent MPO–MPO contraction still scales steeply with the bond dimensions of the two factors--typically $\order(\chi^{3}\kappa)$ or $\order(\chi^{2}\kappa^{2})$ \cite{Stoudenmire2010}-- depending on the algorithm employed.  This rank dependence motivates \emph{distributing} the contraction across smaller sub-problems whose bond dimensions are capped, in the spirit of
+While (Q)TCI substantially mitigates the cost of setting up convolution–type integrals, the subsequent MPO–MPO contraction still scales steeply with the bond dimensions of the two factors--typically $\order(\chi^{4})$ \cite{Stoudenmire2010}-- depending on the algorithm employed.  This rank dependence motivates \emph{distributing} the contraction across smaller sub-problems whose bond dimensions are capped, in the spirit of
 patched (Q)TCI.  We refer to such strategies collectively as \emph{patched MPO–MPO contractions}.
 
 The remainder of this chapter is organised as follows: \prettyref{sec:MPOMPOcontr} reviews conventional MPO–MPO contraction schemes and establishes the notation used later;  \prettyref{sec:PatchMPOMPOContr} introduces the patched approach, analysing its advantages and resource scaling for several representative tensor products; finally, \prettyref{sec:AdaptivePatchMPOMPOContr} presents a new \emph{adaptive} contraction algorithm that, analogously to pQTCI, dynamically partitions the tensors and caps the local bond dimension, thereby balancing the contraction workload across patches.
@@ -20,7 +20,7 @@ Consider the tensor-train representation
 \begin{equation}
     \widetilde{M}_{\bsigma\bsigma'} = \raisebox{-5.5mm}{\includegraphics{figures/GenericMPO.pdf}}, \quad \text{with} \quad  M_\ell = \raisebox{-5.5mm}{\includegraphics{figures/MPOSiteTensor.pdf}}.
 \end{equation}
-In the quantum-many-body community such a tensor train  with two physical legs per site is known as a \textit{Matrix Product Operator} (\textit{MPO}) \cite{Hubig2017, McCulloch2008, vonDelftTNNotes, Schollwock2011}. In numerical mathematics the same object appears under the name \textit{Tensor-Train Operator} (\textit{TTO}) \cite{Oseledets2011}. Each four-legged core $M_\ell$ carries two virtual indices and two physical indices, and the largest virtual dimension $\chi = \max_\ell m_\ell$ is called the rank of the MPO, mirroring the definition for matrix-product states (MPSs). MPOs are routinely built to encode operators—Hamiltonians, density matrices, transfer matrices, projectors—that act on an MPS \cite{Hubig2017, Verstraete2008}. They underpin modern DMRG algorithms, time-evolution schemes, finite-temperature purification, and many other tensor-network techniques. 
+In the quantum-many-body community such a tensor train  with two physical legs per site is known as a \textit{Matrix Product Operator} (\textit{MPO}) \cite{Hubig2017, McCulloch2008, vonDelftTNNotes, Schollwock2011}. In numerical mathematics the same object appears under the name \textit{Tensor-Train Operator} (\textit{TTO}) \cite{Oseledets2011}. Each four-legged core $M_\ell$ carries two virtual indices and two physical indices, and the largest virtual dimension, $\chi = \max_\ell m_\ell$, is called the rank of the MPO, mirroring the definition for matrix-product states (MPSs). MPOs are routinely built to encode operators—Hamiltonians, density matrices, transfer matrices, projectors—that act on an MPS \cite{Hubig2017, Verstraete2008}. They underpin modern DMRG algorithms, time-evolution schemes, finite-temperature purification, and many other tensor-network techniques. 
 
 The emergence of cross–approximation techniques has extended the relevance of MPOs to high–dimensional quadrature and convolution problems. A key property is that \emph{any} matrix-product state (MPS) can be recast as an MPO simply by fusing pairs (or groups) of physical indices. For an MPS comprising \(2\mathcal{L}\)
 sites, the transformation is schematically
@@ -49,7 +49,7 @@ Consider two MPOs of identical bond dimensions~\(\chi\) (cf. \prettyref{eq:2MPOs
 \begin{figure}[ht!]
     \centering
     \includegraphics{figures/ZipUp.pdf}
-    \caption{The zip-up MPO-MPO contraction algorithm. Each step is labelled with its computational cost. Refer to the main manuscript for additional details.}
+    \caption{The zip-up MPO-MPO contraction algorithm. Each step is labelled with its computational cost. At each iteration the indices coloured green indicate the next contraction to be performed. Refer to the main manuscript for additional details.}
     \label{fig:zipupalg}
 \end{figure}
 
@@ -64,7 +64,7 @@ Consider two MPOs of identical bond dimensions~\(\chi\) (cf. \prettyref{eq:2MPOs
   The resulting left isometry
   \(\raisebox{-0.1mm}{\includegraphics{figures/LeftIsometry.pdf}}\) becomes the first core of the product MPO, while the residual
   (the diagonal and right singular tensors) is contracted into a single “left-over” tensor.
-  Truncate the SVD either by setting a maximum rank or by discarding singular values below a local tolerance $\varepsilon_{\text{loc}}$.
+  Truncate the SVD either by setting a maximum rank or by discarding singular values below a local tolerance $\tau_{\text{loc}}$.
 
 \item Move one site to the right.  
   Contract the left-over tensor with two new site tensors out of the factor MPOs, fuse the indices
@@ -73,7 +73,7 @@ Consider two MPOs of identical bond dimensions~\(\chi\) (cf. \prettyref{eq:2MPOs
 
 \end{enumerate}
 \endgroup
-At each iteration the indices coloured green in \prettyref{fig:zipupalg} indicate the next contraction to be performed. After each SVD step the row index of the singular value matrix will constitute the new bond dimension $c_\ell$ for the product MPO. The zip-up procedures scales as \begin{equation}
+ After each SVD step the row index of the singular value matrix will constitute the new bond dimension $c_\ell$ for the product MPO. The zip-up procedures scales as \begin{equation}
     \order(\chi^4d^4\mL)
 \end{equation}
 with the parameters of our input MPOs.  
@@ -127,12 +127,12 @@ Suppose we promote this patched MPS to an MPO so that it can enter some contract
         \end{cases}  
 \end{align}
 
-Whenever we are contracting two patched MPOs, which may be folded from MPSs of the type in \prettyref{eq:patchedMPS}, the product is non--vanishing only if the projected indices coincide on \emph{all} internal legs. Consider, for example, the two MPOs
+Whenever we are contracting two patched MPOs, which may be folded from MPSs of the type in \prettyref{eq:patchedMPS}, the product is non--the vanishing only if for those sites on which both internal indices are projected, say $\sigma_\ell^{\prime A} = p_\ell^{\prime A}$ and $\sigma_\ell^{\prime B} = p_\ell^{\prime B}$, they are projected to the same value, i.e. if $p_\ell^{\prime A} = p_\ell^{\prime B}$. Consider the following patched MPOs
 \begin{equation}
     \label{eq:patchMPOs}
     \begin{aligned}
-        \widetilde{A}^{p_2,p'_2,p_3,p'_4}_{\bsigma\bsigma'} &= \raisebox{-5.5mm}{\includegraphics{figures/AProjMPO.pdf}} \\ 
-        \widetilde{B}^{p''_3,p''_4}_{\bsigma'\bsigma''} &= \raisebox{-7mm}{\includegraphics{figures/BProjMPO.pdf}}.
+        \widetilde{B}^{p''_3,p''_4}_{\bsigma'\bsigma''} &= \raisebox{-7mm}{\includegraphics{figures/BProjMPO.pdf}}.\\
+        \widetilde{A}^{p_2,p'_2,p_3,p'_4}_{\bsigma\bsigma'} &= \raisebox{-5.5mm}{\includegraphics{figures/AProjMPO.pdf}} 
     \end{aligned}  
 \end{equation}
 They always yield a result of the form
@@ -146,11 +146,10 @@ By contrast, two MPOs shaped as
 \begin{equation}
     \label{eq:patchMPOsMaybe}
     \begin{aligned}
-         \widetilde{A}^{p_2,p'_2,p'_3}_{\bsigma\bsigma'} &= \raisebox{-5.5mm}{\includegraphics{figures/AProjMPO_vanish.pdf}} \\ 
-        \widetilde{B}^{p'_2,p'_3,p''_3}_{\bsigma'\bsigma''}  &= \raisebox{-7mm}{\includegraphics{figures/BProjMPO_vanish.pdf}}
+      \widetilde{B}^{p'_2,p'_3,p''_3}_{\bsigma'\bsigma''}  &= \raisebox{-7mm}{\includegraphics{figures/BProjMPO_vanish.pdf}}\\
+         \widetilde{A}^{p_2,p'_2,p'_3}_{\bsigma\bsigma'} &= \raisebox{-5.5mm}{\includegraphics{figures/AProjMPO_vanish.pdf}}
     \end{aligned}  
 \end{equation}
-
 produce a non--zero contraction only when the projected internal indices match, \textit{i.e.} $p'^{A}_{2}=p'^{B}_{2}$ and $p'^{A}_{3}=p'^{B}_{3}$.  In other words, to obtain a non--vanishing outcome, any internal index that is projected must be projected onto the \emph{same} value in both factors; the external indices ($\bsigma,\bsigma''$ in \prettyref{eq:patchMPOs}) place no such restriction. All the tensors in \prettyref{eq:patchMPOs}, \prettyref{eq:resultPatchContr} and \prettyref{eq:patchMPOsMaybe} will be hereafter referred to as \textit{patched MPOs} or \textit{patch MPOs}.
 
 Assume that two tensors \(A_{\boldsymbol{\sigma}}\) and
@@ -208,7 +207,7 @@ Every \(A\)-patch is then paired with every \emph{compatible} \(B\)-patch and co
 The collection of contraction results tiles the square
 \([0,1]^{2}\), furnishing a patched representation of the product tensor~\(C\).
 
-As highlighted by the first row of the canvas in \prettyref{fig:2DPatchContrRepr}, this patchwise contraction behaves as a ``matrix multiplication'' of patches:  
+As highlighted by the first row of \prettyref{fig:2DPatchContrRepr}, this patchwise contraction behaves as a ``matrix multiplication'' of patches:  
 \begin{itemize}
     \item the patching depth along the \emph{columns} (\(x\)-direction) of the final
   object is inherited from the row patching of the left factor \(A\);  
@@ -220,7 +219,7 @@ Although the schematic in \prettyref{fig:2DPatchContrRepr} employs a simple, reg
 The diagrammatic picture introduced in \prettyref{fig:2DPatchContrRepr} is not restricted to MPOs that come
 from a two–dimensional, interleaved quantics TT unfolding.  
 It extends naturally to higher physical dimensions.  
-Suppose to have a set of $\mR$ indices each of dimension $d$, then we can assign to it real variable $x$ discretised in base~\(d\) such as
+Suppose that we have a set of $\mR$ indices each of dimension $d$, then we can assign to it real variable $x$ discretised in base~\(d\) such as
 \begin{equation}
   x \;\mapsto\; x(\boldsymbol{\sigma})
   \;=\;
@@ -229,7 +228,8 @@ Suppose to have a set of $\mR$ indices each of dimension $d$, then we can assign
   \sigma_{r}\in\{1,\dots,d\}.
 \end{equation}
 The corresponding axis will then be partitioned into \(d\) intervals at each digit (rather than two), and the same two–dimensional patch contraction picture can be drawn.  
-In fact, the internal indices \(\boldsymbol{\sigma}'\) and the external indices \(\boldsymbol{\sigma}\), \(\boldsymbol{\sigma}''\) may even carry different local dimensions $d, d'$ and $d''$. Provided that the local dimensions remain uniform along the tensor chain (\(d_{\ell}=d\), \(d'_{\ell}=d\), and \(d''_{\ell}=d\) for all~\(\ell\)), the two–dimensional representation retains its generality.
+In fact, the internal indices \(\boldsymbol{\sigma}'\) and the external indices \(\boldsymbol{\sigma}\), \(\boldsymbol{\sigma}''\) may even carry different local dimensions $d, d'$ and $d''$. Provided that the internal local dimensions are equal for the two factors, i.e. $\text{dim}(\sigma_\ell^{\prime A}) =
+\text{dim}(\sigma_\ell^{\prime B})$ $\forall \ell$, the two–dimensional representation retains its generality.
 
 This grid view is especially convenient when modelling convolution–type integrals—\emph{i.e.}, “matrix multiplications” of two-dimensional functions—such as
 \begin{equation}
@@ -251,8 +251,8 @@ meaning that every entry of $C$ is obtained by multiplying the corresponding ent
 To carry out the element-wise product with TTs we first need to embed each tensor train unfolding of the factors in a \emph{diagonal} MPO:
 \begin{equation}
     \begin{aligned}
-       \widetilde{A}_{\bsigma} &= \raisebox{-7mm}{\includegraphics{figures/ADiagMPO.pdf}} := \widetilde{A}^D_{\bsigma'\bsigma''}\\
-       \widetilde{B}_{\bsigma} &= \raisebox{-7mm}{\includegraphics{figures/BDiagMPO.pdf}} := \widetilde{B}^D_{\bsigma\bsigma'}
+      \widetilde{B}_{\bsigma} &= \raisebox{-7mm}{\includegraphics{figures/BDiagMPO.pdf}} := \widetilde{B}^D_{\bsigma\bsigma'}\\
+       \widetilde{A}_{\bsigma} &= \raisebox{-7mm}{\includegraphics{figures/ADiagMPO.pdf}} := \widetilde{A}^D_{\bsigma'\bsigma''}
     \end{aligned}
     \label{eq:diagMPOs}
 \end{equation}
@@ -262,13 +262,13 @@ where each local tensor is defined by
 \begin{equation}
     \label{eq:diagSiteTensors}
     \begin{aligned}
-        \raisebox{-6mm}{\includegraphics{figures/ADiag_SiteTensor.pdf}} = \begin{cases}
-            [A^{\sigma'_\ell}_\ell]_{a_{\ell-1},a_\ell} \quad &\text{if}\ \sigma_\ell = \sigma'_\ell \\
-            [0]_{a_{\ell-1},a_\ell} \quad &\text{otherwise}
-        \end{cases}\\
         \raisebox{-6mm}{\includegraphics{figures/BDiag_SiteTensor.pdf}} = \begin{cases}
             [B^{\sigma_\ell}_\ell]_{b_{\ell-1},b_\ell} \quad &\text{if}\ \sigma'_\ell = \sigma''_\ell \\
             [0]_{b_{\ell-1},b_\ell} \quad &\text{otherwise}.
+        \end{cases}\\
+        \raisebox{-6mm}{\includegraphics{figures/ADiag_SiteTensor.pdf}} = \begin{cases}
+            [A^{\sigma'_\ell}_\ell]_{a_{\ell-1},a_\ell} \quad &\text{if}\ \sigma_\ell = \sigma'_\ell \\
+            [0]_{a_{\ell-1},a_\ell} \quad &\text{otherwise}
         \end{cases}
     \end{aligned}
 \end{equation}
@@ -282,7 +282,7 @@ From this contraction we read off the resulting tensor-train
     \widetilde{C}_{\sigma} = \raisebox{-5.5mm}{\includegraphics{figures/CTensorTrain.pdf}} \quad \text{with} \quad \raisebox{-6.5mm}{\includegraphics{figures/UnDiag_SiteTensor.pdf}}.
 \end{equation}
 Hence $\widetilde{C}$ represents the Hadamard product
-$C_{\boldsymbol{\sigma}}=A_{\boldsymbol{\sigma}}B_{\boldsymbol{\sigma}}$ in TT form. The MPO-MPO contraction in \prettyref{eq:diagMPOcontr} can be performed using the standard Tensor Network toolkit, however if we apply the patching scheme upon the factor tensors $A$ and $B$, the patched contraction routine can be employed.
+$C_{\boldsymbol{\sigma}}=A_{\boldsymbol{\sigma}}B_{\boldsymbol{\sigma}}$ in TT form. The MPO-MPO contraction in \prettyref{eq:diagMPOcontr} can be performed using the standard MPS-toolkit \cite{ITensors.jl, QSpace}, however if we apply the patching scheme upon the factor tensors $A$ and $B$, the patched contraction routine can be employed.
 
 \prettyref{eq:diagSiteTensors} shows that a \emph{diagonalised} MPO can sensibly be patched only along \emph{identical} input and output indices, because each site tensor is non–zero solely when \(\sigma''_{\ell}=\sigma'_{\ell}\) (or, equivalently, when \(\sigma'_{\ell}=\sigma_{\ell}\)).
 Hence, it is unnecessary to unfold the diagonal MPOs of \prettyref{eq:diagMPOs} and \prettyref{eq:diagMPOcontr} into yet another MPS representation.  
@@ -293,7 +293,7 @@ introduced earlier particularly transparent in this setting. We now illustrate t
 
 Consider two tensor trains \(\widetilde{A}_{\boldsymbol{\sigma}}\) and \(\widetilde{B}_{\boldsymbol{\sigma}}\) that represent two-dimensional functions on the unit square, both obtained via the pQTCI routine.  
 As before we map the interleaved index string
-\(\boldsymbol{\sigma}=(\sigma_{1},\sigma_{2},\dots)\) to the auxiliary variables
+\(\boldsymbol{\sigma}=(\sigma_{1},\sigma_{2},\dots \sigma_{2\mR})\) to the auxiliary variables
 \begin{equation}
     x \mapsto \sum_{r=1}^{\mR}\sigma_{2r-1}2^{-r}, \quad y \mapsto \sum_{r=1}^{\mR}\sigma_{2r}2^{-r}, \quad \sigma_{2r}, \sigma_{2r-1} \in \{0,1\}
 \end{equation}
@@ -310,7 +310,7 @@ the result, as sketched in \prettyref{fig:patchElemContr}.
 \end{figure}
 
 Assume that both \(A\) and \(B\) are decomposed into the same number of patches, \(\Np\), and that every patch has a capped bond dimension \(\chip\).  
-The patched routine therefore executes approximately
+The patched routine executes approximately
 \(\Np \) MPO–MPO contractions.  
 Employing the zip-up algorithm (or an equivalent
 \(\mathcal{O}(\chi^{4}d^{4}\mathcal L)\) scheme) for each local contraction, the total arithmetic cost of element-wise MPS multiplication scales as
@@ -334,9 +334,9 @@ Within this window patch-wise element-wise multiplication delivers a net computa
 Let \(\widetilde{L}_{\boldsymbol{\sigma}}\) and \(\widetilde{R}_{\boldsymbol{\sigma}}\) be two generic matrix-product states (MPS).  The first carries index sets \(\boldsymbol{\sigma}^{R},\boldsymbol{\sigma}^{S}\), the second \(\boldsymbol{\sigma}^{S},\boldsymbol{\sigma}^{C}\).  
 Using the mapping of Eq.~\eqref{eq:MPStoMPO}, each MPS can be reshaped into an MPO:
 \begin{align}
-       \nonumber\widetilde{L}_{\bsigma} &= \raisebox{-7mm}{\includegraphics{figures/LeftMPO.pdf}} := \widetilde{L}_{\bsigma^R\bsigma^S}\\
-       {}\\
-        \nonumber\widetilde{R}_{\bsigma} &= \raisebox{-7mm}{\includegraphics{figures/RightMPO.pdf}} := \widetilde{R}_{\bsigma^S\bsigma^C}
+        \nonumber\widetilde{R}_{\bsigma} &= \raisebox{-7mm}{\includegraphics{figures/RightMPO.pdf}} := \widetilde{R}_{\bsigma^S\bsigma^C}\\
+        {}\\
+        \nonumber\widetilde{L}_{\bsigma} &= \raisebox{-7mm}{\includegraphics{figures/LeftMPO.pdf}} := \widetilde{L}_{\bsigma^R\bsigma^S}
         \label{eq:matMulMPOs}
 \end{align}
     
@@ -350,7 +350,6 @@ With this interpretation, the standard MPO-MPO contraction between $\widetilde{L
     \label{eq:matMulConntr}
     \widetilde{M}_{\bsigma^R\bsigma^C} = \sum_{\bsigma^S} \widetilde{L}_{\bsigma^R\bsigma^S}\widetilde{R}_{\bsigma^S\bsigma^C} = \raisebox{-10mm}{\includegraphics{figures/MatMulMPOContr.pdf}}
 \end{equation}
-
 acts exactly like a \emph{matrix multiplication} between two tensor-train–style objects, producing an MPO indexed by
 \(\boldsymbol{\sigma}^{R}\) and \(\boldsymbol{\sigma}^{C}\). The labeling becomes then much clearer: $\bsigma^R$, $\bsigma^C$ and $\bsigma^S$ represent the row, column and shared indices of our ``matrices'' $L$ and $R$.
 
@@ -361,7 +360,7 @@ approximations of two multivariate functions,
     L(\boldsymbol{x}(\bsigma^R), \boldsymbol{s}(\bsigma^S)) = L_{\bsigma^R, \bsigma^S}, \quad  R(\boldsymbol{s}(\bsigma^S), \boldsymbol{y}(\bsigma^C)) = R_{\bsigma^S, \bsigma^R}
 \end{equation}
 
-respectively, so that their contraction realises the convolution 
+respectively, their contraction realises the convolution 
 \begin{equation}
     M(\boldsymbol{x},\boldsymbol{y}) =\int d\boldsymbol{s} L(\boldsymbol{x}, \boldsymbol{s})R(\boldsymbol{s}, \boldsymbol{y}).
     \label{eq:convTypeInt}
@@ -375,7 +374,7 @@ respectively, so that their contraction realises the convolution
 \label{fig:2DPatchMatMul}
 \end{figure}
 
-\prettyref{fig:2DPatchMatMul} visualises three patching patterns for this “MPO–matrix multiplication,” assuming each factor is decomposed into \(\Np \) patches of equal bond dimension \(\chip\). There the first column corresponds to the $L$ patched tensor, the second column to the $R$ and the last column to the patched contraction result $M$. The possible scenarios are the following:
+\prettyref{fig:2DPatchMatMul} visualises three patching patterns for this “MPO–matrix multiplication,” assuming each factor is decomposed into \(\Np \) patches of equal bond dimension \(\chip\). There the first column corresponds to the $L$ patched tensor, the second column to the $R$ and the last column of panels to the patched contraction result $M$. The possible scenarios are the following:
 
 \begingroup
 \renewcommand{\labelenumi}{(\alph{enumi})}
@@ -419,7 +418,7 @@ respectively, so that their contraction realises the convolution
       After \(\bar\ell\) subdivision steps on a uniform \(d\)-ary grid the
       number of admissible patch pairs is
       \(d^{\bar\ell}\,d^{\bar\ell( D-1)/D}
-       =\Np^{(2D-1)/D}\), where $D=\mN$ for the interleaved ordering (\textit{i.e.} the dimensionality of the functions $L(x_1,\dots,x_{\mN/2},s_1,\dots,s_{\mN/2})$ and $R(s_1,\dots,s_{\mN/2},y_1,\dots,y_{\mN/2})$) and \(D=2\) for fused.
+       =\Np^{(2D-1)/D}\), where $d^{\ellb}= \Np$ for a uniform grid and $D=\mN$ for the interleaved ordering (\textit{i.e.} the dimensionality of the functions $L(x_1,\dots,x_{\mN/2},s_1,\dots,s_{\mN/2})$ and $R(s_1,\dots,s_{\mN/2},y_1,\dots,y_{\mN/2})$) and \(D=2\) for fused.
       The overall cost becomes
       \begin{equation}
         \mathcal{O}\bigl(
@@ -465,7 +464,7 @@ The key technical ingredient is an MPO analogue of the MPS \emph{slicing} operat
     \caption{Slicing of an MPO}
     \label{fig:MPOSlicing}
 \end{figure}
-
+The slicing procedure illustrated in \prettyref{fig:MPOSlicing} lets our algorithm reuse the TT-projection routines of pQTCI for MPOs. In addition, retaining each patch as an MPS instead simplifies site-tensor manipulation and index bookkeeping; each patched MPS is converted into an MPO only immediately before a contraction step.
 
 \subsection{The algorithm}
 Given two MPOs \(\widetilde{A}_{\bsigma\bsigma'}\) and \(\widetilde{B}_{\bsigma'\bsigma''}\) (cf. \prettyref{eq:2MPOs}), the adaptive patched contraction attempts to compute the ``matrix multiplication'':
@@ -478,7 +477,7 @@ as follows
 \renewcommand{\labelenumi}{(\arabic{enumi})}
 \begin{enumerate}
     \item
-  Fix a bond–dimension cap \(\chip\) and a target accuracy \(\varepsilon\).  
+  Fix a bond–dimension cap \(\chip\) and a target accuracy \(\tau\).  
   Attempt a \emph{single} MPO–MPO contraction.  
   If the product \(\widetilde{C}_{\bsigma\bsigma''}\) converges to tolerance with rank \(\chi<\chip\), terminate.
 \item Otherwise, slice both MPOs along their first external physical indices,
@@ -506,7 +505,7 @@ as follows
     \centering
     \includegraphics{figures/AdaptivePatchContr.pdf}
     \caption{Adaptive patched MPO–MPO contraction. $(a)$ Convergence test for a patch
-    \(\widetilde{C}^{\,p_1,p''_1,\dots,p_{\bar\ell},p''_{\bar\ell}}\), governed by the bond–dimension cap \(\chip\) and the accuracy tolerance \(\varepsilon\). $(b)$ Flowchart of the algorithm.
+    \(\widetilde{C}^{\,p_1,p''_1,\dots,p_{\bar\ell},p''_{\bar\ell}}\), governed by the bond–dimension cap \(\chip\) and the accuracy tolerance \(\tau\). $\varepsilon_{\text{contr}}$ represents the error of the contraction result. $(b)$ Flowchart of the algorithm.
     The global MPO product is recursively broken into smaller sub-problems via \emph{MPO slicing}
     (\prettyref{fig:MPOSlicing}).
     Each subtensor pair is contracted under the bond cap $\chip$; converged patches are moved to \texttt{results}, while the remaining ones are
@@ -515,7 +514,7 @@ as follows
     \label{fig:adaptiveMatMul}
 \end{figure}
 
-A few remarks are in order. At first sight the adaptive routine might seem more expensive than a single MPO--MPO contraction.  In practice this overhead is negligible: for a fixed tolerance~$\varepsilon$ each local contraction is \emph{aborted} as soon as its bond dimension hits the cap~$\chip$ (e.g.\ by truncating 
+A few remarks are in order. At first sight the adaptive routine might seem more expensive than a single MPO--MPO contraction.  In practice this overhead is negligible: for a fixed tolerance~$\tau$ each local contraction is \emph{aborted} as soon as its bond dimension hits the cap~$\chip$ (e.g.\ by truncating 
 the SVD step at the desired cutoff in the zip--up sweep, \prettyref{fig:zipupalg}). Although up to
 \(\mathcal{O} \bigl(d^{\bar\ell}(d'')^{\bar\ell}\bigr)\) patched MPO pairs may be
 processed---\(\bar\ell\) being the deepest slicing level of the MPS unfolded factors $\widetilde{A}$ and $\widetilde{B}$---each individual multiply is cheap thanks to the tight rank bound $\chip$.
@@ -527,7 +526,7 @@ however, deliberate:
 \begin{enumerate}
   \item the arithmetic cost remains
         \(\mathcal{O} \bigl(N\,\chip^{4}\,d^{4}\,\mL \bigr)\), so memory is still controlled by~\(\chip\), which is fixed and therefore independent of the particular slicing choice;
-  \item the refinement is in this way \emph{feature--adaptive}: whenever a patch  \(\widetilde{C}^{p_1,p''_1,\dots}\) fails to converge (its local rank exceeds \(\chip\)) the algorithm subdivides exactly, that output confuration space $(\bsigma, \bsigma'')$ region, yielding a finer discretisation where the product tensor \(\widetilde{C}_{\bsigma \bsigma''}\) is most intricate. Slicing the internal indices \(\bsigma'\) instead of the external ones would also reduce the contraction cost by capping the bond dimension at $\chip$, but at the expense of this adaptive focus.
+  \item the refinement is in this way \emph{feature--adaptive}: whenever a patch  \(\widetilde{C}^{p_1,p''_1,\dots}\) fails to converge (its local rank exceeds \(\chip\)) the algorithm subdivides exactly that output configuration space $(\bsigma, \bsigma'')$ region, yielding a finer discretisation where the product tensor \(\widetilde{C}_{\bsigma \bsigma''}\) is most intricate. Slicing the internal indices \(\bsigma'\) instead of the external ones would also reduce the contraction cost by capping the bond dimension at $\chip$, but at the expense of this adaptive focus.
 \end{enumerate}
 \endgroup
 

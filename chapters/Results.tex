@@ -19,7 +19,6 @@ We begin with the toy Green’s function
        {\;\omega+\mu-\varepsilon_{\mathbf{k}}+i\delta\,},
   \label{eq:2DGreen}
 \end{equation}
-
 where the non-interacting dispersion is taken as
 \(\varepsilon_{\mathbf{k}}=-2\cos k_{x}-2\cos k_{y}\)  
 and we set the chemical potential to \(\mu=0\).
@@ -32,7 +31,6 @@ and we set the chemical potential to \(\mu=0\).
   \frac{1}
        {\,i\nu+\mu-\varepsilon_{\mathbf{k}}-\Sigma(\bk,i\nu)},
 \end{equation}
-
 with two deliberate simplifications:
 \(\omega\) plays the role of the (real) self-energy
 \(\Sigma\), while \(\delta\) mimics the Matsubara frequency
@@ -60,12 +58,12 @@ We discretise \(G(\mathbf{k})\) by quantics rebasing,
 \end{equation}
 with bit string
 \(\boldsymbol{\sigma}=(\sigma_{1},\dots,\sigma_{\mathcal R})\) in the fused
-ordering, or \(\boldsymbol{\sigma}=(\sigma_{x1},\dots,\sigma_{y\mathcal R})\) in the interleaved ordering.  
+ordering, or \(\boldsymbol{\sigma}=(\sigma_{k_x1},\dots,\sigma_{k_y\mathcal R})\) in the interleaved ordering.  
 Throughout we use \(\mathcal R=15\) bits per \(\bk\)-component.
 
 After setting a patch bond–dimension cap \(\chi_{\text{patch}}\) and a global tolerance \(\tau=10^{-7}\), we monitor convergence of pQTCI via the pointwise error
 \begin{equation}
-  \varepsilon(\mathbf{k})
+  \varepsilon_{\text{log}}(\mathbf{k})
   = \log_{10}\!
       \frac{\bigl|\operatorname{Re}\widetilde G(\mathbf{k})
                 -\operatorname{Re}G(\mathbf{k})\bigr|}
@@ -73,11 +71,6 @@ After setting a patch bond–dimension cap \(\chi_{\text{patch}}\) and a global 
   \label{eq:localError2DGreen}
 \end{equation}
 where \(\|\operatorname{Re}\widetilde G\|_{\infty}\) is the maximum of \(|\operatorname{Re}\widetilde G|\) over all sampling points \(\bk(\bsigma)\) used in every patch \(\operatorname{Re} \widetilde{G}^{p_1,\dots,p_{\bar\ell}}\) produced by the patched QTCI routine.
-
-\prettyref{fig:2DGreenErrorHeatmap} compares the patched QTCI approximation with the exact real part of the Green’s function for three values of the
-broadening parameter \(\delta\).  The top row shows
-\(\operatorname{Re}G(\bk)\) reconstructed from the patched tensor trains, while the bottom row plots the local error \(\varepsilon(\bk)\) defined in \prettyref{eq:localError2DGreen} over the entire Brillouin zone \([-\pi,\pi]^{2}\). To evaluate the approximate tensor
-\(\operatorname{Re}\widetilde{G}_{\bsigma}\) on a uniform \(\bk\)-grid we first invert the mapping \(\bsigma\mapsto\bk(\bsigma)\) and then, after resumming the whole patches set $\text{Re}\bigl(\widetilde{G}^{p_1,\dots,p_{\ellb}}\bigr)$ to a single TT approximation $\text{Re}\bigl(\widetilde{G}_{\bsigma}^{+}\bigr)$, we evaluate the correspondent $\bsigma(\bk)$ tensor value for each $\bk$ point of the domain. \prettyref{fig:2DGreenErrorHeatmap}  also displays the bond–dimension distributions for both the patched and the single-TT approximations of \(\operatorname{Re}G(\bk)\)  at the three caps $\chip=48,118,277$ (corresponding to  $\delta=10^{-1},10^{-2},10^{-3}$). The patches shows a marked rank reduction compared to the QTCI TT. Moreover we can distiguish two patch groupings: large, low-rank patches span the ``trivial'' regions of the Brillouin zone, while smaller patches—carrying the higher bond dimensions—track the non-trivial, sharply structured areas. The bond dimensions in show this patch separation.
 
 \begin{figure}[htbp]
     \centering 
@@ -91,6 +84,13 @@ broadening parameter \(\delta\).  The top row shows
            $(c)$ Comparison of the bond-dimension profiles for the pQTCI and standard QTCI representations of \(\operatorname{Re}G(\bk)\). Every patch in the pQTCI result adheres to the prescribed cap $\chip$.}
     \label{fig:2DGreenErrorHeatmap}
 \end{figure}
+
+\prettyref{fig:2DGreenErrorHeatmap} compares the patched QTCI approximation with the exact real part of the Green’s function for three values of the
+broadening parameter \(\delta\).  The top row shows
+\(\operatorname{Re}G(\bk)\) reconstructed from the patched tensor trains, while the bottom row plots the local error \(\varepsilon(\bk)\) defined in \prettyref{eq:localError2DGreen} over the entire Brillouin zone \([-\pi,\pi]^{2}\). To evaluate the approximate tensor
+\(\operatorname{Re}\widetilde{G}_{\bsigma}\) on a uniform \(\bk\)-grid we first invert the mapping \(\bsigma\mapsto\bk(\bsigma)\) and then, after resumming the whole patches set $\text{Re}\bigl(\widetilde{G}^{p_1,\dots,p_{\ellb}}\bigr)$ to a single TT approximation $\text{Re}\bigl(\widetilde{G}_{\bsigma}^{+}\bigr)$, we evaluate the correspondent $\bsigma(\bk)$ tensor value for each $\bk$ point of the domain. \prettyref{fig:2DGreenErrorHeatmap}  also displays the bond–dimension distributions for both the patched and the single-TT approximations of \(\operatorname{Re}G(\bk)\)  at the three caps $\chip=48,118,277$ (corresponding to  $\delta=10^{-1},10^{-2},10^{-3}$). The patches shows a marked rank reduction compared to the QTCI TT. Moreover we can distiguish two patch groupings: large, low-rank patches span the ``trivial'' regions of the Brillouin zone, while smaller patches—carrying the higher bond dimensions—track the non-trivial, sharply structured areas. The bond dimensions in show this patch separation.
+
+
 Despite the fact that \(\varepsilon(\bk)\) does not drop everywhere below the target tolerance \(\tau=10^{-7}\), its \emph{spatial average} error is of that
 order. For the same parameters the conventional (Q)TCI routine attains comparable accuracy, as illustrated in \prettyref{fig:TCI2DGreenerror} for \(\delta=10^{-1}\).
 \begin{figure}[htbp]
@@ -110,7 +110,7 @@ A one–dimensional cut at \(k_{y}=\pi/2\) (\prettyref{fig:lineError2DGreen}) co
            function (dotted blue) for
            \(\delta=10^{-1}\) (a),
            \(\delta=10^{-2}\) (b),
-           and \(\delta=10^{-3}\) (c).}
+           and \(\delta=10^{-3}\) (c). Zoomings centered on the peaks are shown.}
     \label{fig:lineError2DGreen}
 \end{figure}
 
@@ -179,12 +179,12 @@ In summary, adaptively partitioning the domain allows one to focus bond dimensio
 Consider the two model functions 
 
 \begin{align}
-f(\bx) = \sum_{j=1}^4 e^{-(\bx - \bx_j)^2/\sigma^2_j}, \quad  
-g(\bx) = \sum_{j=1}^4 e^{-|\bx - \bx'_j|/\sigma_j}, 
+f(\bx) = \sum_{j=1}^4 e^{-(\bx - \bx_j)^2/w^2_j}, \quad  
+g(\bx) = \sum_{j=1}^4 e^{-|\bx - \bx'_j|/w_j}, 
 \label{eq:linearGauss}
 \end{align}
-with $\bx_j = (\cos \phi_j, \sin \phi_j )$, $\phi_j = (j-\frac{1}{2}) \frac{\pi}{2}$, $\sigma_j =  2^{-(j+1)}$, and $\bx'_j =\bx_j + (2\sigma_j,
-\sigma_j)$. \prettyref{fig:factorsHeatmaps} shows heatmaps of \(f\) and \(g\).
+with $\bx_j = (\cos \phi_j, \sin \phi_j )$, $\phi_j = (j-\frac{1}{2}) \frac{\pi}{2}$, $w_j =  2^{-(j+1)}$, and $\bx'_j =\bx_j + (2w_j,
+w_j)$. \prettyref{fig:factorsHeatmaps} shows heatmaps of \(f\) and \(g\).
 
 \begin{figure}[htbp]
     \centering
@@ -374,7 +374,7 @@ The feature–aware tiling reduces the parameter count—analogous to the saving
 \section{Bare Susceptibility Calculation}
 \label{sec:bubbleCalc}
 
-We consider now the momentum dependence in the case of the single-orbital Hubbard model on the square lattice at half filling. 
+We consider now the momentum dependence in the case of the single-orbital two-dimensional Hubbard model on the square lattice at half filling. 
 The Hamiltonian of the Hubbard model reads
 \begin{equation}
     \mathcal{H} = \sum_{\langle ij \rangle, \sigma} \hat{c}^\dag_{i\sigma}\hat{c}_{\sigma} + U \sum_{i} \hat{n}_{i\uparrow}\hat{n}_{i\downarrow} - \mu\sum_{i,\sigma}\hat{n}_{i\sigma}
@@ -405,7 +405,7 @@ where the Green's function in the Matsubara axis is given by
 \end{equation}
 with $\varepsilon_{\bk} = -2 \cos (k_x) - 2 \cos (k_y)$ and $\mu=0$. Hence the bare susceptibility $\chi_{0}(\bq, i\omega)$ is a crucial ingredient in the self-consistent FLEX scheme, where one repeatedly updates the self-energy $\Sigma(\bk, i\nu)$. Therefore, the convolution in \prettyref{eq:bareSusceptibility} quickly becomes the dominant cost, in particular at low temperatures ($\beta \to \infty$). This is because the fermionic Matsubara grid \(\nu_n=(2n+1)\pi/\beta\) grows denser while, at the same time, the Green’s function $G(\mathbf{k}, i\nu)$ develops increasingly sharp, localized peaks (cf. \prettyref{sec:2DGreen}); direct numerical evaluation is both memory- and time-intensive. These characteristics suggest that a domain-adaptive strategy--specifically, the pQTCI-based patched contraction routines introduced above--can alleviate the cost of the convolution by concentrating bond dimension only where the integrand is genuinely singular.
 
-A direct tensor‐train treatment of the convolution in \prettyref{eq:bareSusceptibility} would require handling a six-dimensional integrand-- a challenging task even for QTCI. The remedy is to migrate the calculation to “real” space–time, where the
+A direct tensor‐train treatment of the convolution in \prettyref{eq:bareSusceptibility} would require handling a six-legged tensor $G(\bk + \bq, i\nu + i\omega)=G_{\bsigma_{k_x}\bsigma_{k_y}\bsigma_{q_x}\bsigma_{q_x}\bsigma_{i\nu}\bsigma_{i\omega}}$, a challenging task even for QTCI. The remedy is to migrate the calculation to “real” space–time, where the
 convolution becomes an \emph{element-wise} product of two functions, after Fourier transform (FT) (cf. Ref.~\cite{Rakhuba2015}).
 We define the forward and inverse transforms of the Green’s function as
 \begin{align}
@@ -421,7 +421,7 @@ With these conventions the bare susceptibility reads
 \begin{equation}
     \chi_{0}(\bq, i\omega) = \text{FT}\left[ \chi(\boldsymbol{r}, \tau) \right] = \text{FT}\left[ G(\br, \tau)G(-\br, -\tau)\right]
 \end{equation}
-where  $G(-\br, -\tau)$  is obtained from \prettyref{eq:invFTGreensFunc} by reversing the signs in the exponent. Thus, the six-dimensional convolution is replaced by a pointwise product in $(\br, \tau)$ space -- well suited for the patched element-wise contraction routines introduced earlier.
+where  $G(-\br, -\tau)$  is obtained from \prettyref{eq:invFTGreensFunc} by reversing the signs in the exponent. Thus, the convolution is replaced by a pointwise product in $(\br, \tau)$ space -- well suited for the patched element-wise contraction routines introduced earlier.
 
 The complete workflow for evaluating the bare susceptibility \(\chi_{0}(\mathbf q,i\omega)\) is depicted in the flowchart of \prettyref{fig:bubbleFlowchart}.  
 
@@ -469,7 +469,7 @@ Figure \prettyref{fig:heatmapBubble} tracks the steps of the FLEX ``bubble'' $\c
   \([-\pi,\pi]^{2}\) together with the bond dimension profile of its QTCI representation.
 \item Resulting bare susceptibility
   \(\chi_{0}(\mathbf q,\omega\!=\!0)\) and the bond dimensions of its single-TT compression after the final $\text{QFT}^{-1}$.
-\item Patch layout produced by pQTCI for the real-space Green’s function \(G(\mathbf r,\tau=\beta)\). Colours indicate distinct patches; correspondent color coding is used for the bond dimensionsof each TT patch, contrasted with those of a global non-patched TT approximation of the real space Green's function.
+\item Patch layout produced by pQTCI for the real-space Green’s function \(G(\mathbf r,\tau=\beta)\). Colours indicate distinct patches; corresponding color coding is used for the bond dimensionsof each TT patch, contrasted with those of a global non-patched TT approximation of the real space Green's function.
 \end{enumerate}
 \endgroup 
 
@@ -496,7 +496,6 @@ Panel $(a)$ of \prettyref{fig:bubbleResults} plots the configuration-space error
       -\chi_{0, \bsigma_{\bq},\bsigma_{i\omega}}^{(13, 10^{-9})}
     \bigr|^2}
 \end{equation}
-
 as a function of $\mR$, for $N_{\text{err}}$ points extracted randomly from the configuration space.  While the curve indicates that \(\chi_{0}\) has not reached the desired precision, the residual error suffices for the present comparative study.
 
 Panel $(b)$ compares the total parameter count of the patched QTCI representation of \(G(\mathbf r,\tau)\) (the same holds for
@@ -534,11 +533,11 @@ Within numerical scatter the data follow an \emph{approximately linear} growth, 
 In this prototype calculation we applied pQTCI and patched contractions \emph{only} to the element-wise multiplication step, which is the dominant bottleneck.
 A fully patched treatment of the momentum-space Green’s function \(G(\bk,i\nu)\) would in principle yield an additional speed-up, but was not necessary to demonstrate the merits of the method: even this partial application suppresses the \(\chi^{4}\) scaling, delivers
 order-of-magnitude run-time gains, and keeps the memory footprint below that of the traditional approach. These results underline the practicality of the patched QTCI
-toolkit for low-temperature perturbative many-body calculations.
+toolkit for low-temperature many-body calculations.
 
 \section{Bethe-Salpeter equations with pQTCI} 
 \label{sec:patchBSE}
-The many-body Hubbard lattice can be reduced to a single, isolated site whose Hamiltonian is
+The Hubbard atom is a reduction of the Hubbard lattice to a single, isolated site whose Hamiltonian is
 \begin{equation}
     \mathcal{H} = U\hat{n}_{\uparrow}\hat{n}_{\downarrow} - \mu(\hat{n}_{\uparrow} - \hat{n}_{\downarrow})
 \end{equation}

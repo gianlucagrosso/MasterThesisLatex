@@ -78,67 +78,71 @@ For classical Harmonic Oscillator 1D chain mode-like vectors:
 
 \[
 \begin{alignedat}{2}      
-	\boldsymbol{v} = \frac{\boldsymbol{1}_5}{\sqrt{5}} \qquad \boldsymbol{w} = \frac{(-2,-1,\dots,2)}{2\sqrt{5}}
+	\boldsymbol{v} = \left(v_1,v_3,\dots,v_5\right) \qquad \boldsymbol{w} = \left(w_1,w_3,\dots,w_5\right)
 \end{alignedat}
 \]
-the corresponding position-position correlation matrix can be ``cross interpolated'' as 
+such that $\boldsymbol{v}\boldsymbol{w}^{T} = 0$, the corresponding position-position correlation matrix can be ``cross interpolated'' as 
 
 \begin{gather}
-	\nonumber \begin{aligned}
-		& C  \;=\; \sigma^2 \boldsymbol{v}^T \boldsymbol{v} + \tilde{\sigma}^2 \boldsymbol{w}^T\boldsymbol{w} = \\[.4em]
-		& =\frac{1}{115}%
+	\begin{aligned}
+		 &C  \;=\; \sigma^2 \boldsymbol{v}^T \boldsymbol{v} + \tilde{\sigma}^2 \boldsymbol{w}^T\boldsymbol{w} = \\[2em]
+		&=
 		\begin{tikzpicture}[baseline=-0.5ex,
 			every node/.style={inner sep=1pt,font=\small}]
 			\matrix (M) [matrix of math nodes,
-			nodes={text width=1.8cm, align=center,
-			minimum height=1.5em, anchor=center},
-			column 1/.style= {nodes={fill=red!30}},
-			column 5/.style= {nodes={fill=red!30}},
-			row 1/.style= {nodes={fill=yellow!30}},
-			row 5/.style= {nodes={fill=yellow!30}},
-			row 1 column 1/.style={nodes={fill=orange!30}},
-			row 1 column 5/.style={nodes={fill=orange!30}},
-			row 5 column 1/.style={nodes={fill=orange!30}},
-			row 5 column 5/.style={nodes={fill=orange!30}},
-			left delimiter={[},right delimiter={]}, text width=1.8cm,
-			ampersand replacement=\&] {
-				23\sigma^{2}+72\tilde\sigma^{2} \& 23\sigma^{2}-18\tilde\sigma^{2}
-				\& 23\sigma^{2}+12\tilde\sigma^{2}
-				\& 23\sigma^{2}-18\tilde\sigma^{2}
-				\& 23\sigma^{2}-48\tilde\sigma^{2}\\
-				\cdots \& 23\sigma^{2}+{\tfrac92}\tilde\sigma^{2}
-				\& 23\sigma^{2}-3\tilde\sigma^{2}
-				\& 23\sigma^{2}+{\tfrac92}\tilde\sigma^{2}
-				\& 23\sigma^{2}+12\tilde\sigma^{2}\\
-				\cdots \& \cdots
-				\& 23\sigma^{2}+2\tilde\sigma^{2}
-				\& 23\sigma^{2}-3\tilde\sigma^{2}
-				\& 23\sigma^{2}-8\tilde\sigma^{2}\\
-				\cdots \& \cdots \& \cdots
-				\& 23\sigma^{2}+{\tfrac92}\tilde\sigma^{2}
-				\& 23\sigma^{2}+12\tilde\sigma^{2}\\
-				\cdots \& \cdots \& \cdots \& \cdots
-				\& 23\sigma^{2}+32\tilde\sigma^{2}\\
+  %––– default: narrow columns –––
+  nodes     = {text width=1cm, align=center, minimum height=2em, anchor=center},
+  %––– wide columns (1, 3, 5) –––
+  column 1/.style = {nodes={fill=red!30 , text width=2.5cm}},
+  column 3/.style = {nodes={text width=2.5cm}},
+  column 5/.style = {nodes={fill=red!30, text width=2.5cm}},
+  %––– coloured rows / corners –––
+  row 1/.style          = {nodes={fill=yellow!30}},
+  row 5/.style          = {nodes={fill=yellow!30}},
+  row 1 column 1/.style = {nodes={fill=orange!30}},
+  row 1 column 5/.style = {nodes={fill=orange!30}},
+  row 5 column 1/.style = {nodes={fill=orange!30}},
+  row 5 column 5/.style = {nodes={fill=orange!30}},
+  left delimiter={[}, right delimiter={]},
+  ampersand replacement=\&
+]{
+	\sigma^{2}v_1v_1+ \tilde\sigma^{2}w_1w_1 \& \cdots
+				\& \sigma^{2}v_1v_j+ \tilde\sigma^{2}w_1w_j
+				\& \cdots
+				\& \sigma^{2}v_1v_5+ \tilde\sigma^{2}w_1w_5\\
+				 {} \& \ddots
+				\& 
+				\& \&{}\\
+				\vdots \& {}
+				\& \sigma^{2}v_iv_j+ \tilde\sigma^{2}w_iw_j
+				\& {}
+				\& \vdots \\
+				{} \&  \& 
+				\& \ddots
+				\& {}\\
+				 \sigma^{2}v_5v_1+ \tilde\sigma^{2}w_5w_1 \& \cdots \& \cdots \& \cdots
+				\& \sigma^{2}v_5v_5+ \tilde\sigma^{2}w_5w_5\\
 				};
 			\draw [decorate, line width=1.5pt,
 				decoration = {calligraphic brace,mirror,raise=5pt, amplitude=5pt}] (M.south west) --  (M.south east) node[pos=0.5, below=12pt]{\normalsize $5 \times 5$};
 		\end{tikzpicture}
 	\end{aligned}
 	 \\[1.2em]
+	 \nonumber
+	 \hspace*{-0.6cm}%
 	  \approx
 	   \underbrace{%
 	  C[\mathds{I} , \mathcal{J}]}_{\displaystyle 5 \times 2}
 	\,
 	\underbrace{%
 	  \left[ \begin{array}{>{\columncolor{orange!30}}c>{\columncolor{orange!30}}c}
-		\frac{23\sigma^2 + 72\tilde{\sigma}^2}{115} & \frac{23\sigma^2  -48 \tilde{\sigma}^2}{115} \\[0.2em]
-		\frac{23\sigma^2 - 48\tilde{\sigma}^2}{115} & \tikzmark{m2}{\frac{23\sigma^2 + 32\tilde{\sigma}^2}{115}}
+		\sigma^{2}v_1v_1+ \tilde\sigma^{2}w_1w_1 & \sigma^{2}v_1v_5+ \tilde\sigma^{2}w_1w_5 \\[0.2em]
+		\sigma^{2}v_5v_1+ \tilde\sigma^{2}w_5w_1 & \sigma^{2}v_5v_5+ \tilde\sigma^{2}w_5w_5
 	  \end{array}\right]^{-1}}_{\displaystyle 2 \times 2}
 	  \,
 	  \underbrace{%
-	  C[\mathcal{I} , \mathds{J}]}_{\displaystyle 5 \times 2}
+	  C[\mathcal{I} , \mathds{J}]}_{\displaystyle 5 \times 2} 
 \end{gather}
-
 with $\sigma$ and $\tilde{\sigma}$ the variances of the two modes and $\mathcal{I} = \{ 1,5\}$ and $\mathcal{J} = \{ 1,5\}$. From the definition of $C$ we can recognize that $\rank{C} = 2$. This property is correctly highlighted by its CI decomposition ($\dim \mathcal{I} = \dim \mathcal{J} = 2$), since, in this particular case, the approximation is exact (cf. \prettyref{prop:CI}.\hyperlink{cond:rankexact}{3}). The total number of floating point numbers necessary to store the whole matrix in memory is $5 \times 5 = 25$, while for the CI decomposition $5\times 2 \times 2 + 2\times 2 = 24$ are sufficient. It is easy to deduce that the reduction in memory costs becomes more important for modes of generic dimension $N$ ($N\times N \gg N \times 2 \times 2 + 2\times 2$ when $N \gg 1$).
 \end{example}
 
@@ -290,11 +294,12 @@ By iteratively applying \prettyref{eq:SchurLU} on the lower-right block of the i
 	\end{bmatrix} = \tilde{A} + \textrm{err.},
 	\label{eq:prrLUCI}
 \end{equation}
-perfectly equivalent to \prettyref{eq:MCI} (cf. Ref. \cite{Fernandez2024}). In \prettyref{eq:prrLUCI}  $D$ is a diagonal matrix containing -- after iterative permutations -- the first $\tchi$ optimal pivots of $A$.
+equivalent to \prettyref{eq:MCI} (cf. Ref. \cite{Fernandez2024}). In \prettyref{eq:prrLUCI}  $D$ is a diagonal matrix containing -- after iterative permutations --  $\tchi$ pivots of $A$. 
 Some remarks about \prettyref{alg:prrLU} are in order
 \begin{itemize}
-	\item The implementation of prrLU is based upon the search of a good \textit{pivot} (\texttt{findBestPivot}). Through the \textit{maxvol principle}, a good pivot is defined as one that maximises the volume of the submatrix $A[\mathcal{I}, \mathcal{J}]$ ($\equiv A_{11}$ after permutations). The iterative application of \prettyref{eq:SchurLU} reduces the optimal pivot to the largest element of the submatrix $A[n\!:\!N,n\!:\!M]$ at iteration $n$;
-	\item Different strategies can be implemented for pivot searching; a naive approach consists in a \textit{full search} scheme scanning the entire submatrix $A[n\!:\!N,n\!:\!M]$. $\order(MN)$ poor scaling of the naive implementation renders prrLU computationally inefficient. \textit{Rook search} \cite{Poole2000} and \textit{block rook search} \cite{Fernandez2024} are cleverer and cheaper approaches, with comparable robutstness and convergence features, but reduced computational cost $\order(\max\left(M,N\right))$.  
+	\item \texttt{findBestPivot}, \texttt{LowerTriangular} and \texttt{strictlyUpperTriangular} are merely renamed counterparts of the $\julia$ routines used in the prrLU implementation of Ref. \cite{Fernandez2024,TensorCrossInterpolation.jl}. The first routine proposes a suitable pivot for the current iteration (often one among several equally valid options), while the latter two return, respectively, the lower-triangular portion and the strict upper-triangular portion of the input matrix.
+	\item The implementation of prrLU is based upon the search of a good \textit{pivot} (\texttt{findBestPivot}). Following the \textit{maxvol principle}, a good pivot is defined as one that attempts to maximise the volume of the submatrix $A[\mathcal{I}, \mathcal{J}]$ ($\equiv A_{11}$ after permutations). Hence, the iterative application of \prettyref{eq:SchurLU} reduces the optimal pivot to the largest element of the submatrix $A[n\!:\!N,n\!:\!M]$ at iteration $n$. Such iterative approach, however, does not necessarily extract the pivot matrix $A[\mathcal{I}, \mathcal{J}]$ with larger determinants. This is due to the facto that maximum volume submatrices of larger sizes are not guarantedeed to contain the maximum volume submatrices for smaller sizes. Nonetheless, the algorithm attempts to reach the ideal configuration for $A[\mathcal{I}, \mathcal{J}]$, often with great success. 
+	\item Different strategies can be implemented for pivot searching; a naive approach consists in a \textit{full search} scheme scanning the entire submatrix $A[n\!:\!N,n\!:\!M]$. \textit{Rook search} \cite{Poole2000} and \textit{block rook search} \cite{Fernandez2024} are cleverer and cheaper approaches, with comparable robutstness and convergence features, but reduced computational cost $\order(\max\left(M,N\right))$.  
 	\item The matrix elements explored during \textit{rook search} are sufficient to perform prrLU of $A$. Therefore, prrLU yields compressibility traits similar to those of CI (see Example \ref{ex:CIcorrmat}). For this reason, prrLU can also be applied to 2-dimensional continuous functions discretized on a grid, whose full structure is uknown a priori. 	
 	\item The absolute error of the prrLU approximation is reduced to the modulus of the last inserted pivot, as one can understand from \prettyref{alg:prrLU}. The reason behind this is that we intend to minimize $\parallel\! A - \tilde{A}\!\parallel_{\infty} = \parallel\![A/A[\mathcal{I}, \mathcal{J}]] \!\parallel_{\infty}$ which is bounded by $\parallel\! A[n\!:\!N, n\!:\!M]\!\parallel_{\infty}$ at iteration step $n$.  
 \end{itemize}
@@ -302,7 +307,7 @@ Some remarks about \prettyref{alg:prrLU} are in order
 
 \subsection{Tensor Cross Interpolation}
 
-Tensor Cross Interpolation is a generalization of matrix Cross Interpolation -- and therefore prrLU (see \prettyref{eq:prrLUCI}) -- to $\mathcal{L}$-dimensional tensors $\mathcal{T}$. Similarly to prrLU, TCI progressively uncovers the \textit{low rank} structure of a given tensor, rendering a very functional approximation of the input. The main struggle of TCI routines revolves around bookkeeping of tensor indices -- the \textit{pivots} -- necessary for a correct approximation. 
+Tensor Cross Interpolation is a generalization of matrix Cross Interpolation -- and therefore prrLU (see \prettyref{eq:prrLUCI}) -- to $\mathcal{L}$-dimensional tensors $\mathcal{T}$. Similarly to prrLU, TCI progressively uncovers the \textit{low rank} structure of a given tensor, ultimately rendering a compressed approximation of the input. The main difficulty in the implementation of TCI revolves around bookkeeping of tensor indices -- the \textit{pivots} -- necessary for a correct approximation. 
 Hence, let us introduce some useful notation: 
 \begin{itemize}
 	\item $\mathcal{T}_{\boldsymbol{\sigma}} \in \mathds{K}^{d_1\times d_2\times \dots \times d_\mathcal{L}}$ is the TCI input tensor, with indices $\bsigma \in I_1\times I_2\times \dots \times I_\mathcal{L} := \text{Ind}\left(\mT\right)$ ($|I_i| = d_i\, \footnotemark$); $\mathcal{\widetilde{T}}_{\boldsymbol{\sigma}} \in \mathds{K}^{d_1\times d_2\times \dots \times d_\mathcal{L}}$ is the resulting interpolated tensor:
@@ -324,7 +329,7 @@ Hence, let us introduce some useful notation:
 	= \raisebox{-5mm}{\includegraphics{figures/PiTensorWithLegsNoell.pdf}} \, ,
 	\label{eq:Tslices} 
 	\end{gather}
-	where $\oplus$ is the index \textit{concatenation operation}, i.e. $i\oplus j \equiv (\sigma_1, \dots, \sigma_\mathcal{L})$, for $i\in \mathds{I}_\ell$ and $j \in \mathds{J}_{\ell+1}$. 
+	where $\oplus$ is the index \textit{concatenation operation}, i.e. $i\oplus j \equiv (\sigma_1, \dots, \sigma_\mathcal{L})$, for fixed $i\in \mathds{I}_\ell$ and $j \in \mathds{J}_{\ell+1}$. 
 
 \end{itemize}
 
@@ -333,14 +338,14 @@ Hence, let us introduce some useful notation:
 The main purpose of TCI is perform the decomposition of a given tensor using only few elements of (few calls to) the tensor $\mathcal{T}_{\boldsymbol{\sigma}}$. \prettyref{fig:TCIalg} below summarizes the main steps 
 of the TCI routine. 
 
-\begin{figure}[ht!]
+\begin{figure}[htbp]
 	\centering
 	\includegraphics[width=\textwidth]{figures/TCI.pdf}
-	\caption{Main steps of the TCI algorithm. $a)$ A set of indices such that $\mathcal{T}_{\hat \sigma} \neq 0$ is chosen randomly from the configuration space $\text{Ind}\left(\mT\right)$. Pivot lists are constructed from the initial multi-indices set. $b)$ A first sweep is performed for an initial Matrix Product State representation of our tensor $\mathcal{T}$. At sites $\ell$ and $\ell+1$, $\Pi_\ell$ tensor slices of the form in \prettyref{eq:Tslices} are constructed from the initial pivot lists $\mathcal{I}_{\ell-1}$ and $\mathcal{J}_{\ell+2}$. prrLU is then perfomed on the ``matricized'' version of $\Pi_\ell$ -- $\bigl[\Pi_\ell\bigr]_{(i_{\ell -1}, \sigma_\ell) (\sigma_{\ell+1}, j_{\ell +2})}$ -- and new pivots $\mathcal{I}'_\ell$ and $\mathcal{J}'_{\ell+1}$ are added to the initial lists $\mathcal{I}_\ell$ and $\mathcal{J}_{\ell+1}$. This first sweep resembles the naive approach introduced in Ref. \cite{Fernandez2022} for pedagogical purposes, as well as the well-established SVD-based MPS tensor unfolding (cf. Ref. \cite{vonDelftTNNotes}). $c)$ Sweeping back and forth through index pairs -- $\sigma_\ell, \sigma_{\ell +1}$ -- the 2-dimensional slices $\Pi_\ell$ are reconstructed from the current local pivot lists and prrLU-compressed again. The purpose is to improve the choice of the initial \textit{pivots} and the approximation $\widetilde{\mathcal{T}}$. This last step is performed until convergence.}
+	\caption{Main steps of the TCI algorithm. $a)$ A set of indices such that $\mathcal{T}_{\hat \sigma} \neq 0$ is chosen randomly from the configuration space $\text{Ind}\left(\mT\right)$. Pivot lists are constructed from the initial multi-indices set. $b)$ A first sweep is performed for an initial Matrix Product State representation of our tensor $\mathcal{T}$. At sites $\ell$ and $\ell+1$, $\Pi_\ell$ tensor slices of the form in \prettyref{eq:Tslices} are constructed from the initial pivot lists $\mathcal{I}_{\ell-1}$ and $\mathcal{J}_{\ell+2}$. prrLU is then perfomed on the ``matricized'' version of $\Pi_\ell$, namely $\bigl[\Pi_\ell\bigr]_{(i_{\ell -1}, \sigma_\ell) (\sigma_{\ell+1}, j_{\ell +2})}$, and newly found pivots $\mathcal{I}'_\ell$ and $\mathcal{J}'_{\ell+1}$ are added to the initial lists $\mathcal{I}_\ell$ and $\mathcal{J}_{\ell+1}$. This first sweep might resemble the naive approach introduced in Ref. \cite{Fernandez2022}, as well as SVD-based MPS tensor unfoldings (cf. Ref. \cite{vonDelftTNNotes}), however it is not different from subsequent iterations of the algorithm. We illustrated it as above to highlight the initial tensor-to-TT transformation. $c)$ Sweeping back and forth through index pairs -- $\sigma_\ell, \sigma_{\ell +1}$ -- the 2-dimensional slices $\Pi_\ell$ are reconstructed from the current local pivot lists and prrLU-compressed again. The purpose is to improve the choice of the initial \textit{pivots} and the approximation $\widetilde{\mathcal{T}}$. This last step is performed until convergence.}
 	\label{fig:TCIalg}
 \end{figure}
 
-The algorithm depicted in \prettyref{fig:TCIalg} represents what is usually referred to as the \textit{2-site TCI algorithm} \cite{Fernandez2024}. The \textit{2-site} annotation underlies the fact that the approximation $\widetilde{\mT}$ is only built through two-dimensional slices of $\mT$. This variant alone enables the recursive extension of the pivot lists and with it the improvement of the approximation, conversely to the \textit{0-site} and \textit{1-site} TCI (see below). The \textit{2-site} implementation relies on two main ingredients: the partial rank-revealing LU and the \textit{interpolation} properties of TCI. Whilst we extensively described the former in the previous section, a few comments are necessary about the latter. Let us first take a step back and briefly introduce the concept of \textit{nesting conditions}. 
+The algorithm depicted in \prettyref{fig:TCIalg} represents what is usually referred to as the \textit{2-site TCI algorithm} \cite{Fernandez2024}. The naming \textit{2-site} refers to the fact that the approximation $\widetilde{\mT}$ is only built through two-dimensional slices of $\mT$. This variant alone enables the recursive extension of the pivot lists and with it the improvement of the approximation, contrarily to the \textit{0-site} and \textit{1-site} that by focusing, respectively, on prrLU optimization of the $T$ and $P$ slices (\prettyref{eq:Tslices}) simply restore full nesting properties (see below) and remove ill-conditioned pivots. The \textit{2-site} implementation relies on two main ingredients: the partial rank-revealing LU and the \textit{interpolation} properties of TCI. Whilst we extensively described the former in the previous section, a few comments are necessary about the latter. Let us first take a step back and briefly introduce the concept of \textit{nesting conditions}. 
 
 The list of pivot rows (columns) is said be \textit{left- (right-) nested} if the following condition holds \cite{Oseledets2011, Dolgov2020}:
 
@@ -348,11 +353,10 @@ The list of pivot rows (columns) is said be \textit{left- (right-) nested} if th
 	\label{eq:Nesting}
 	\mI_0 <  \mI_1  < \ldots < \mI_{\ell} ,\quad (\mJ_{\ell} > \mJ_{\ell+1} > \ldots > \mJ_{\mL+1} ,)
 \end{equation}
-
 where $\mI_{\ell -1 } <\mI_\ell$,  if
 $\mI_\ell \subseteq \mI_{\ell -1 } \times 
 I_\ell $ ($\mJ_{\ell} > \mJ_{\ell +1}$,  if
-$\mJ_\ell \subseteq J_\ell \times \mJ_{\ell + 1 }$). The pivot lists are \textit{fully left- (right-) nested} if $\ell = \mL - 1 (=2)$. \textit{Full nesting} is achieved when both full right- and left-nesting is respected.
+$\mJ_\ell \subseteq J_\ell \times \mJ_{\ell + 1 }$). The pivot lists are \textit{fully left- (right-) nested} if $\ell = \mL - 1 (=2)$. \textit{Full nesting} is achieved when the pivots lists are fully left- and right-nested.
 
 The benefit of nesting condition is the already mentioned interpolation characteristics of TCI (we refer the reader to Ref. \cite{Fernandez2022, Fernandez2024} for proofs and a more detailed explanation). In fact, when pivots are right-nested up to $\ell -1$ and left-nested from $\ell +2$ on, then we can define the local error $\varepsilon_\Pi$ 
 \begin{equation}
@@ -369,16 +373,17 @@ where
 		 \raisebox{-5mm}{\includegraphics{figures/Pi_FactorizationRightPrime.pdf}} = \widetilde{\Pi}_\ell.
 	\label{eq:Piapprox}
 \end{equation}
-In \prettyref{eq:ErrorPiIsErrorT} and \prettyref{eq:Piapprox} (and also \prettyref{fig:TCIalg}), $\Pi_\ell$ is the exact slicing of $\mT$, reconstructed from the current set of local pivots $\mI_{\ell -1}$ and $\mJ_{\ell +2}$; $\widetilde{\Pi}_\ell$ is its approximation through prrLU. \prettyref{eq:ErrorPiIsErrorT} allows us to define a consitent local error concept, granting the TCI algorithm of a form error control. In fact, step $c)$ in \prettyref{fig:TCIalg} is performed until the \textit{bare error} $\bigl| \Pi_\ell - \widetilde{\Pi}_\ell\bigr|_{i_{\ell-1}\sigma_\ell \sigma_{\ell +1} j_{\ell +2 }}$ is below a fixed tolerance $\varepsilon$. Minimizing the local error means, according to \prettyref{alg:prrLU} and the \textit{maxvol principle} \cite{Dolgov2020}, searching for the largest elements of the tensor $\bigl| \Pi_\ell - \widetilde{\Pi}_\ell\bigr|$, in order add new pivots that yields the largest improvement to the local accuracy according to the $\|\cdot \|_{\infty}$ norm. The TCI routine is stopped when the condition $\|\mT - \widetilde{\mT}\|_{\infty} < \varepsilon$ (or $\|\mT - \widetilde{\mT}\|_{\infty}/\|\widetilde{\mT}\|_{\infty} < \varepsilon_{\textrm{rel}}$) is met in each local slice, for the minimal set of pivots possible. 
+In \prettyref{eq:ErrorPiIsErrorT} and \prettyref{eq:Piapprox} (and also \prettyref{fig:TCIalg}), $\Pi_\ell$ is reconstructed from the current set of local pivots $\mI_{\ell -1}$ and $\mJ_{\ell +2}$; $\widetilde{\Pi}_\ell$ is its approximation through prrLU. \prettyref{eq:ErrorPiIsErrorT} allows us to define a error concept consistent along the TT chain ($\forall \ell$), granting the TCI algorithm of a form error control. In fact, step $(c)$ in \prettyref{fig:TCIalg} is performed until the \textit{error} $\bigl| \Pi_\ell - \widetilde{\Pi}_\ell\bigr|_{i_{\ell-1}\sigma_\ell \sigma_{\ell +1} j_{\ell +2 }}$ is below a fixed tolerance $\varepsilon$. Minimizing the local error means, according to \prettyref{alg:prrLU} and the \textit{maxvol principle} \cite{Dolgov2020}, searching for the largest elements of the tensor $\bigl| \Pi_\ell - \widetilde{\Pi}_\ell\bigr|$, adding new pivots that yield the largest improvement to the local accuracy according to the $\|\cdot \|_{\infty}$ norm. The TCI routine is stopped when the condition $\bigl| \Pi_\ell - \widetilde{\Pi}_\ell\bigr| < \tau_{\Pi}$ is met $\forall \ell \in \{1,\dots,\mL\}$, for the minimal set of pivots possible and a fixed local tolerance $\tau_{\Pi}$. The last equality in \prettyref{eq:ErrorPiIsErrorT} in not trivial (cf. Ref.~\cite{Fernandez2024}) and allows to relate the local error $\bigl| \Pi_\ell - \widetilde{\Pi}_\ell\bigr|$ to the accuracy of the global approximation $\widetilde{T}$.
 
-TCI representation is defined by the selected lists $\mI_\ell$ and $\mJ_\ell$ $\forall \ell$, so an accurate interpolation amounts to optimizing this selection. The TCI routine, as mentioned at the beginning of this work, belongs to the class of ``active machine learning'' algorithms \cite{Settles2012}, as it tries to uncover the low-rank structure of a given tensor $\mT$ by actively requesting configurations that will better improve its MPS unfolding. Similar to machine learning (ML), different strategies exist to improve the modelling of our ``data set'' (e.g. for ML: data augmentation, weighting, prompt engineering etc.).
-In our case, alongside the local pivot searching strategies -- \textit{rook search}, \textit{block rook search} and \textit{full search} -- higher level techniques exist to improve the global approximation of our tensor. The 2-site TCI can be run in \textit{reset mode} that, in contrast to the \textit{accumulative mode} only adding new pivots to the local lists, recomputes the full lists $\mI_\ell$ and $\mJ_{\ell+1}$ at each prrLU step. This allows us to discard sub-optimal pivots that were inserted in the pivots lists during the initial exploration of the configuration space. \textit{Global pivot proposals}, similar to multi-start approaches in ML \cite{Loshchilov2017}, allow to incorporate prior information about the tensor $\mT$ through a clever choice of the initial configurations $\boldsymbol{\hat  \sigma}$ (see \prettyref{fig:TCIalg}$.a$), such that the whole configuration space is uniformly explored. \textit{0-site} and \textit{1-site TCI} focused on prrLU optimization of the $T$ and $P$ slices (\prettyref{eq:Tslices}) help restoring full nesting and removing ill-conditioned pivots, respectively.
+The TCI representation is defined by the selected lists $\mI_\ell$ and $\mJ_\ell$ $\forall \ell$, so an accurate interpolation amounts to optimizing this selection. The TCI routine, as mentioned at the beginning of this work, belongs to the class of ``active machine learning'' algorithms \cite{Settles2012}, as it tries to uncover the low-rank structure of a given tensor $\mT$ by actively requesting configurations that will better improve its MPS unfolding. Similar to other machine learning (ML) methods, different strategies exist to improve the modelling of our ``data set'' (e.g. for ML: data augmentation, weighting, prompt engineering etc.).
+In our case, alongside the local pivot searching strategies -- \textit{rook search}, \textit{block rook search} and \textit{full search} -- other techniques exist to improve the global approximation of our tensor. The 2-site TCI can be run in \textit{reset mode} or \textit{accumulative mode}. The former recomputes the full lists $\mI_\ell$ and $\mJ_{\ell+1}$ at each prrLU step of the TCI routine, while the latter only adds new pivots to the alredy-existing local lists $\mI_\ell$ and $\mJ_{\ell+1}$. This allows us to discard sub-optimal pivots that were inserted in the pivots lists during the initial exploration of the configuration space, necessary to avoid the pivot matrices $P$ becoming singular. \textit{Global pivot proposals}, similar to multi-start approaches in ML \cite{Loshchilov2017}, allows the user to incorporate prior information about the tensor $\mT$ through a clever choice of the initial configurations $\boldsymbol{\hat  \sigma}$ (see \prettyref{fig:TCIalg}$.a$), such that all the relevant regions of configuration space are explored.
 
-The above procedures all try to target TCI \textit{ergodicity} issues that arise in different implementations. Although most common TCI applications don't require any further resolution method on top of the ones we just mentioned, as we will understand in the rest of this work, there exist many other, especially if modelling very extreme-conditioned physical systems, that call for additional improvements. In particular, \textit{sparse or symmetric tensors} and \textit{narrow peaked multivariate} functions are the main weaknesses for TCI.
+The above techniques all try to target TCI \textit{ergodicity} issues that arise in different implementations. Although most common TCI applications don't require any further expedient on top of the ones we just mentioned, as we will understand in the rest of this work, there exist many other, especially if modelling very extreme-conditioned physical systems, that call for additional improvements. In particular, \textit{sparse or symmetric tensors} and \textit{narrow peaked multivariate} functions are the main weaknesses for TCI.
 
-\begin{table}[ht!]
+\begin{table}[htbp]
 	\centering
-	\small                       % shrink the font a bit (optional)
+	\renewcommand{\arraystretch}{1.2} 
+	\small      % shrink the font a bit (optional)
 	\setlength{\tabcolsep}{4pt}  % tighter column separation (optional)
   
 \begin{adjustbox}{max width=\textwidth} 
@@ -408,15 +413,14 @@ The above procedures all try to target TCI \textit{ergodicity} issues that arise
 	\end{tabular}
 \end{adjustbox}
 
-\caption{Computational cost of the main TCI routines. Full nesting routines are fundamental to restore  interpolation properties for our Tensor Train approximation. Rook pivoting and full pivoting are different possible choices for the pivot search in prrLU/CI subroutines. $n_{rook}$ corresponds to the average number of rook search moves necessary to find an optimal local pivot ($n_{rook} < 5$ for most applications). The table is taken directly from Ref. \cite{Fernandez2024}.}
+\caption{Computational cost of the main TCI routines. Full nesting routines are useful to restore interpolation properties for our Tensor Train approximation. Rook pivoting and full pivoting are different possible choices for the pivot search in prrLU/CI subroutines. $n_{rook}$ corresponds to the maximum number of rook search moves necessary to find an optimal local pivot ($n_{\text{rook}} < 5$ for most applications). The table is taken directly from Ref. \cite{Fernandez2024}.}
 \label{tab:cost}
 \end{table}	
 
-Tensor Cross Interpolation, as the $\mL$-dimensional extension of CI, conserves its compression properties. The number of elements of $\mT$ necessary for its TT decomposition is limited to the $\bsigma$ configurations obtained out of concatenation of the pivots in the \textit{pivot lists} -- $\mI_\ell$,$\mJ_{\ell +1}$ $\forall \ell$. Hence, the approximation is systematically controlled by $\chi$, where $\chi = \max_{\ell} \chi_\ell$ is the \textit{rank} of the tensor $\mT$ with $\chi_\ell = \dim \mI_\ell = \dim \mJ_{\ell +1}$ rank of the local pivot matrix $P_\ell$. As a consequence TCI computational resources' scaling strongly depends on $\chi$.
+Tensor Cross Interpolation, as the $\mL$-dimensional extension of CI, conserves its compression properties. The number of elements of $\mT$ necessary for its TT decomposition is limited to the $\bsigma$ configurations obtained out of concatenation of the pivots in the \textit{pivot lists} -- $\mI_\ell$,$\mJ_{\ell +1}$ $\forall \ell$. Hence, the approximation is systematically controlled by $\chi$, where $\chi = \max_{\ell} \chi_\ell$ is the \textit{rank} of the tensor $\mT$ with $\chi_\ell = \dim \mI_\ell = \dim \mJ_{\ell +1}$ rank of the local pivot matrix $P_\ell$. As a consequence, the resources necessary to perform TCI scale strongly with $\chi$.
 
-The number of function calls necessary for the MPS unfolding $\widetilde{\mathcal{T}}$ of $\mathcal{T}$ is $\order (\chi^2d^2\mathcal{L})$ compared to the $d^\mathcal{L}$ ($= |\text{Ind}\left(\mT\right)|$) of its SVD counterpart, where $d$ is the local configuration space dimensionality. Such an exponential advantage is obtained by fully specifying only $\order (\chi^2\mathcal{L})$ number of \textit{pivots} from the original tensor. The algebra cost ($\sim$ computational time) of the algorithm scales then as $\order (\chi^3d^2\mathcal{L})$. Scaling of the main TCI routines provided by the \texttt{TensorCrossInterpolation.jl} $\julia$ library \cite{TensorCrossInterpolation.jl} is detailed in \prettyref{tab:cost}. From this analysis, as well as from Example \ref{ex:Ldimfunc}, we can understand that TCI possess incredible memory saving power, compared to other MPS building routines.
-\begin{example}[$\mL$-dimensional function]
-Inspiring ourselves from \cite{Fernandez2024}, we construct an example to exhibit TCI compression capabilities. Let us consider the following $\mL$-dimensional function: 
+The number of function calls necessary for the MPS unfolding $\widetilde{\mathcal{T}}$ of $\mathcal{T}$ is $\order (\chi^2d^2\mathcal{L})$ compared to the $d^\mathcal{L}$ ($= |\text{Ind}\left(\mT\right)|$) of its SVD counterpart, where $d$ is the configuration space dimension. Such an exponential advantage is obtained by fully specifying only $\order (\chi^2\mathcal{L})$ number of \textit{pivots} from the original tensor. The algebra cost ($\sim$ computational time) of the algorithm scales as $\order (\chi^3d^2\mathcal{L})$. Table \ref{tab:cost} summarises the scaling of the core TCI routines implemented in the \texttt{TensorCrossInterpolation.jl} library \cite{TensorCrossInterpolation.jl}. As illustrated in Example \ref{ex:Ldimfunc}, these scalings underscore the pronounced memory efficiency inherent to TCI.
+\begin{example}[$\mL$-dimensional function] Let us consider the following $\mL$-dimensional function, inspired by \cite{Fernandez2024}
 
 \begin{equation}
 	f(\boldsymbol{x}) = 
@@ -424,39 +428,39 @@ Inspiring ourselves from \cite{Fernandez2024}, we construct an example to exhibi
    \label{eq:Ldimfunc}
 \end{equation}
 
-As one can easily understand, such a continuous function can be numerically represented by a tensor $\mathcal{F}_{\bsigma}$ through grid discretization over a preferred domain. For this exercise, we take a 61 point Gauss-Kronod type of grid, over the $[0,1]^\mL$ hypercube. What this means in practice is that $\mathcal{F}_{\bsigma} \in \mathds{R}^{I_1\times\dots\times I_\mL}$ \footnotemark and $\dim I_i = d = 61$. TCI approximation of $\mathcal{F}_{\bsigma}$ renders a tensor $\widetilde{\mathcal{F}}_{\bsigma}$ with only a limited number of calls to the original function $f(\boldsymbol{x})$, as depicted in \prettyref{fig:TCIscaling} below. 
+Such a continuous function can be numerically represented by a tensor $\mathcal{F}_{\bsigma}$ through grid discretization over a preferred domain. For this exercise, we take a 61 point Gauss-Kronrod type of grid, over the $[0,1]^\mL$ hypercube. What this means in practice is that $\mathcal{F}_{\bsigma} \in \mathds{R}^{d_1\times\dots\times d_\mL}$ \footnotemark\; and $\dim I_i = d = 61$. The TCI approximation of $\mathcal{F}_{\bsigma}$, namely $\widetilde{\mathcal{F}}_{\bsigma}$, is obtained through a limited number of calls to the original function $f(\boldsymbol{x})$, as depicted in \prettyref{fig:TCIscaling} below. 
 
 \footnotetext{From this point onward, $\mF$ will refer to the tensor discretization of a continuous function, while $\mT$ will be the notation for a generic $\mL$-dimensional tensor.}
 
-\prettyref{fig:TCIscaling} perfectly documents the reduced memory footprint required from the TCI representation of functions up to 20 dimensions. Exponential scaling of memory requirements, necessary to store the total $61^\mL$ number of tensor elements of $\mathcal{F}_{\bsigma}$, is replaced by an $\chi$-dependent polynomial scaling. Moreover, as one can understand from the bottom right plot in \prettyref{fig:TCIscaling}, out of the total $61^2$ ($\mL=2$) Gauss-Kronod grid points, only $49$ are actually required for a nearly optimal approximation of $f$, therefore limiting the bond dimension $\chi$ of our tensor train to $\chi = 7$ and with that the number of total stored parameters. 
+\prettyref{fig:TCIscaling} documents the reduced memory footprint required from the TCI representation of functions up to 20 dimensions. Exponential scaling of memory requirements, necessary to store the total $61^\mL$ number of tensor elements of $\mathcal{F}_{\bsigma}$, is replaced by a $\order \bigl(\chi^2\bigr)$ scaling. Moreover, as one can understand from the bottom right plot in \prettyref{fig:TCIscaling}, out of the total $61^2$ ($\mL=2$) Gauss-Kronod grid points, only $49$ are actually required for a nearly optimal approximation of $f$, therefore limiting the bond dimension $\chi$ of our tensor train to $\chi = 7$ and with that the number of total stored parameters. 
 \begin{figure}[ht!]
 		\centering
 		\includegraphics[width=0.9\textwidth]{figures/TCI_memory_scaling+heatmap.pdf}
-		\caption{TCI approximation of $f(\boldsymbol{x})$ in \prettyref{eq:Ldimfunc} after discretization on a $\mL$-dimensional 61 point Gauss-Kronod grid. \textit{On the left}: number of total floating point elements stored in the compressed tensor $\widetilde{\mathcal{F}}_{\bsigma}$ as a function of $\mL$ (blue line). The ``worst-case-scenario'' scaling $d^\mL$ and the theoretical scaling $\order (\chi^2d^2\mathcal{L})$ are also represented (green and red dashed line, respectively). \textit{Top right:} heatmap of the $\mL = 2$ approximation $\widetilde{\mathcal{F}}_{\bsigma}$ over the $61\times61$ Gauss-Kronod grid, subset of $[0,1]\times[0,1]$, with absolute tolerance $\epsilon = 10^{-8}$. \textit{Bottom right:} heatmap of the $\mL = 2$ original function  $f(\boldsymbol{x})$ over the domain $[0,1]\times[0,1]$. The red dots represent the location of the \textit{pivot} values exploited for the TCI approximation above.
+		\caption{TCI approximation of $f(\boldsymbol{x})$ in \prettyref{eq:Ldimfunc} after discretization on a $\mL$-dimensional 61 point Gauss-Kronod grid. \textit{On the left}: number of total floating point elements stored in the compressed tensor $\widetilde{\mathcal{F}}_{\bsigma}$ as a function of $\mL$ (blue line). The ``worst-case-scenario'' scaling $d^\mL$ and the theoretical scaling $\order (\chi^2d^2\mathcal{L})$ are also represented (green and red dashed line, respectively). \textit{Top right:} heatmap of the $\mL = 2$ approximation $\widetilde{\mathcal{F}}_{\bsigma}$ over the $61\times61$ Gauss-Kronod grid, subset of $[0,1]\times[0,1]$, with absolute tolerance $\epsilon = 10^{-8}$. \textit{Bottom right:} heatmap of the $\mL = 2$ original function  $f(\boldsymbol{x})$ over the domain $[0,1]\times[0,1]$. The red dots represent the location of the \textit{pivot} values for the TCI approximation above.
 		}
 		\label{fig:TCIscaling}
 	\end{figure}
 \label{ex:Ldimfunc}
 \end{example}
 
-The advantages of the TCI algorithm are not purely limited to function approximation. A very obvious application of TCI reduces to the computation of very large and complex integrals. Detailed examples of this particular usage of TCI are provided in Ref. \cite{Fernandez2022, Fernandez2024, Dolgov2020}. TCI-based integration significantly outperform Monte-Carlo and quasi-Monte-Carlo methods in many occasions and the reasons behind it are diverse. 
+TCI is not only useful for function approximation. A very obvious application of TCI is the computation of integrals in high-dimensional spaces. Detailed examples of this particular usage of TCI are provided in Ref. \cite{Fernandez2022, Fernandez2024, Dolgov2020}. TCI-based integration outperform Monte-Carlo and quasi-Monte-Carlo methods in many occasions and the reasons behind it are diverse. 
 
-Condider, for example, the following integral
+Consider, for example, the following integral
 \begin{equation}
 	I \equiv \int d\boldsymbol{x} \ f(x_1,\dots,x_\mL),
 	\label{eq:LdimIntegral}
 \end{equation}
-through numerical discretization it can be reduced to 
+which can be approximated as a Riemann sum,
 \begin{equation}
 	I \approx \sum_{\bsigma} \mathcal{F}_{\bsigma}  ,\quad \; \mathcal{F}_{\bsigma} = f(\boldsymbol{x}(\bsigma))\;
 	\label{eq:LdimapproxIntegral}
 \end{equation}
-where $\boldsymbol{x}(\bsigma)$ is our discretization grid (cf. Example \ref{ex:Ldimfunc}). If we decide to perform TCI unfolding of our numerical tensor $\mathcal{F}_{\bsigma}$ before the integration, \prettyref{eq:LdimapproxIntegral} then reads
+where $\boldsymbol{x}(\bsigma)$ is our discretization grid (cf. Example \ref{ex:Ldimfunc}). If we decide to perform TCI unfolding of our numerical tensor $\mathcal{F}_{\bsigma}$ before the integration, \prettyref{eq:LdimapproxIntegral} then reads\footnotemark
 \begin{equation}
-	\sum_{\bsigma} \mathcal{F}_{\bsigma} \approx \prod_{\ell=1}^\mL \sum^{d_\ell}_{\sigma_\ell = 1} T^{\sigma_\ell}_\ell P^{-1}_\ell \; \;\footnotemark
+	\sum_{\bsigma} \mathcal{F}_{\bsigma} \approx \prod_{\ell=1}^\mL \sum^{d_\ell}_{\sigma_\ell = 1} T^{\sigma_\ell}_\ell P^{-1}_\ell
 	\label{eq:LdimTCIIntegral}
 \end{equation}
-replacing one $\mL$-dimensional integral by $\chi^2\mL$ exponentially easier 1-dimensional problems. Moreover, if the rank of the MPS unfolding of the integrand remains roughly constant as the number of dimensions increases, then the gain in favor of TCI increases exponentially. Given the numerical simplicity of the algebra operations in \prettyref{eq:LdimTCIIntegral}, the bottleneck of integration operations is limited to finding the right TCI approximation of the integrand, bounding the parameter scaling to a \textit{polynomial} cost of $\order (\chi^2d\mathcal{L})$. 
+replacing one $\mL$-dimensional integral by $\chi^2\mL$ exponentially easier 1-dimensional integrals. Moreover, if the rank of the MPS unfolding of the integrand remains roughly constant as the number of dimensions increases, then the advange provided by TCI increases exponentially. Given the numerical simplicity of the algebra operations in \prettyref{eq:LdimTCIIntegral}, the bottleneck of integration operations is limited to finding the right TCI approximation of the integrand, bounding the parameter scaling to a \textit{polynomial} cost of $\order (\chi^2d\mathcal{L})$. 
 
 \footnotetext{$P$ and $T$ slices are here considered as ($\sigma_\ell$-dependent) matrices. Summation over common indices is therefore implied. $P_{\mL} = [1]$.}
 
@@ -466,24 +470,26 @@ The above achievement of TCI relies on the following property of continuous func
 	\label{def:separfunc}
 \end{definition}
 
-For this class of functions the numerical advantage of TCI integration over more standard approaches -- like Monte Carlo sampling -- is incomparable (cf. $1/N_{\text{eval}}^4$ vs. $1/\sqrt{N_{\text{eval}}}$ convergence for $N_{\text{eval}}$ function evaluations in Fig. 2 of Ref. \cite{Fernandez2024}). On top of that, for computations revolving around quantum mechanical systems, TCI does not suffer from the \textit{``sign problem''} \cite{Loh1990} that always goes along with sampling methods, such as Quantum Monte Carlo, when they try to deal with integration of highly-oscillating functions. TCI performs extremely well even when dealing with functions oscillating simultaneously on very different scales. Consequently, we can understand that the limiting factor of TCI (rank of the $\varepsilon$-factorization) is entirely orthogonal
+For this class of functions the numerical advantage of TCI integration over more standard approaches -- like Monte Carlo sampling -- is remarkable (cf. $1/N_{\text{eval}}^4$ vs. $1/\sqrt{N_{\text{eval}}}$ convergence for $N_{\text{eval}}$ function evaluations in Fig. 2 of Ref. \cite{Fernandez2024}). In addition, TCI does not suffer from the \textit{``sign problem''} \cite{Loh1990} of Monte Carlo methods, \textit{i.e.} slow convergence of the integral error with the number of samples when ingrating over strongly oscillating functions. On the other hand, TCI performs well even when integrating functions oscillating simultaneously on very different scales. The limiting factor of TCI (rank of the $\varepsilon$-factorization) is entirely orthogonal
 to that of sampling methods.
 
-If the user intends to employ TCI purely to perform complex integrations, the definition of an \textit{environment-aware error} (from \prettyref{eq:ErrorPiIsErrorT} and \prettyref{eq:LdimTCIIntegral}) might turn out to be very useful
+If the user intends to employ TCI purely to perform integrations, the definition of an \textit{environment-aware error} (from \prettyref{eq:ErrorPiIsErrorT} and \prettyref{eq:LdimTCIIntegral}) might turn out to be very useful. It is defined as
 
 \begin{gather}
 	\nonumber\bigl[\varepsilon^{\text{env}}_\Pi\bigr]_{i_{\ell-1}\sigma_\ell \sigma_{\ell +1} j_{\ell +2 }}\equiv |L_\ell R_\ell| \bigl[\varepsilon_\Pi\bigr]_{i_{\ell-1}\sigma_\ell \sigma_{\ell +1} j_{\ell +2 }} \\
 	L_\ell = \prod_{\bar{\ell}=1}^{\ell -1} \sum^{d_{\bar{\ell}}}_{\sigma_{\bar{\ell}} = 1} T^{\sigma_{\bar{\ell}}}_{\bar{\ell}} P^{-1}_{\bar{\ell}} \quad R_\ell = \prod_{\bar{\ell}=\ell +2}^{\mL} \sum^{d_{\bar{\ell}}}_{\sigma_{\bar{\ell}} = 1}  P^{-1}_{\bar{\ell}-1}T^{\sigma_{\bar{\ell}}}_{\bar{\ell}}.
 	\label{eq:envError}
 \end{gather}
-Substituting the usual definition of local  error $\varepsilon_\Pi$ with the environment error function $\varepsilon^{\text{env}}_\Pi$ allows the TCI routine to be more integral-focused, outperforming the standard implementation when it comes to integral error convergence. By selecting pivots not only based on the absolute value of the integrand but also taking into account a specific point's volume contribution to the integral,  $\varepsilon^{\text{env}}_\Pi$ allows for more precise computations of complex integrals particularly for multi-scaled functions \cite{Fernandez2022}.   
+
+The environment error function $\varepsilon^{\text{env}}_\Pi$, by readjusting 
+Substituting the usual definition of local  error $\varepsilon_\Pi$ ot be the error of the inegrand, allows the TCI routine to be more integral-focused, outperforming the standard implementation when it comes to integral error convergence. By selecting pivots not only based on the absolute value of the integrand but also taking into account a specific point's volume contribution to the integral,  $\varepsilon^{\text{env}}_\Pi$ allows for more precise computations of complex integrals particularly for multi-scaled functions \cite{Fernandez2022}.   
 
 \subsection{The Quantics Representation: QTCI}
-TCI is a powerful tool that can be used ``out-of-the-box'' for a huge variety of applications. Improvements to such an already versatile instrument are, however, always possible. Let us consider \prettyref{fig:TCIscaling} in Example \ref{ex:Ldimfunc}: the more observational reader might have noticed that the plot depicting the TCI approximation of function in \prettyref{eq:Ldimfunc} exhibits some non-indifferent visual imperfections. These imperfections arise naturally when discretization errors become dominant in our TCI representation. A naive solution to this issue would be to increase the number of total grid points $d\times d$ used to discretize our 2D function. Despite solving our discretization troubles, such an easy fix will render TCI scaling strongly dependent on the number of grid points $d$, reducing the compression capabilities of the TT unfolding (e.g. for our specific example with $\mL = 2$ and, let's say, $d=1000$ grid points we would obtain a 2-sited MPS with site dimension $1000$). 
+TCI is a powerful tool that can be used ``out-of-the-box'' for most applications. The standard implementation however lacks the capabilities of reaching very high resolutions for the approximatino of function of lower dimensions. Let us consider \prettyref{fig:TCIscaling} in Example \ref{ex:Ldimfunc}: one might have noticed that the plot depicting the TCI approximation of \prettyref{eq:Ldimfunc} shows some subtle visual imperfections. These imperfections arise naturally when discretization errors become dominant in our TCI representation. A naive solution to this issue would be to increase the number of total grid points $d\times d$ used to discretize our 2D function. Despite solving our discretization troubles, such an easy fix will make the number of grid points $d$ the main contributor to TCI scaling, reducing the compression capabilities of the TT unfolding (e.g. for our specific example with $\mL = 2$ and, let's say, $d=1000$ grid points we would obtain a 2-sited MPS with site dimension $1000$). 
 
 Given a function $f(\boldsymbol{x})$ which we intend to resolve at very high resolution -- or more ambitiously at \textit{superhigh resolution} -- the \textit{quantics tensor representation} could turn out to be very advantageous. Quantics representation has been a standard approach -- not limited to TT approximations -- to target resolution issues, well-established in the literature \cite{Oseledets2009, Khoromskij2011, Hiroshi2023, Takahashi2025, Murray2024, Ritter2024}. Applications revolving around this type of representation are quite diverse in the many-body physics community, ranging from computations of correlation functions for quantum many body systems \cite{Hiroshi2023} to diagrammatic non-equilibrium many-body Green’s function-based calculations \cite{Murray2024} and compression of imaginary-time propagators in the Frobenious norm \cite{Takahashi2025}.
 
-Discretization errors are often a consequence of poor scaling of our numerical approximation tool or of a suboptimal grid choice. While the former is definitely not an issue in the context of TCI, the latter can definitely be better addressed.
+Discretization errors are often a consequence of poor scaling of our numerical approximation tool or of a suboptimal grid choice. While the former is definitely not an issue in the context of TCI \cite{Fernandez2024}, the latter can definitely be better addressed.
 
 Given a function of $\mathcal{N}$ variables $f(\boldsymbol{x})$ we discretize each variable through a dyadic grid with \(M=2^{\mR}\) points per variable, 
 \begin{equation}
@@ -498,63 +504,64 @@ where each index \(m_n\in\{0,\dots,M-1\}\) is written in binary form with $\mR$ 
 \end{equation}
 so that the \(\mathcal{N}\)-variate function \(f\) is represented by the binary tensor \(\mathcal{F}_{\boldsymbol{\sigma}}:=f\!\bigl(x_1(\bsigma_1),\dots,x_\mN(\bsigma_\mN)\bigr)\) on such a grid \cite{Khoromskij2011, Hiroshi2023}.
 
-A well-defined tensor \(\mathcal{F}_{\boldsymbol{\sigma}}\) requires us to unambiguously specify the \textit{order} of the tensor indices so that an MPS representation can be constructed. The possibilities are multiple:
+A well-defined tensor \(\mathcal{F}_{\boldsymbol{\sigma}}\) requires us to unambiguously specify the \textit{order} of the tensor indices so that an MPS representation can be constructed These aer multiple possible orderings
 \begin{itemize}
 	\item \textit{natural ordering}: $\mathcal{F}_{\boldsymbol{\sigma}} \equiv \mathcal{F}_{(\sigma_{11},\dots,\sigma_{1\mR},\sigma_{21},\dots,\sigma_{2\mR}, \dots\dots,\sigma_{\mN1},\dots,\sigma_{\mN\mR})}$ combining dimensions;
 	\item \textit{interleaved ordering}: $\mathcal{F}_{\boldsymbol{\sigma}} \equiv \mathcal{F}_{(\sigma_{11},\dots,\sigma_{\mN1},\sigma_{12},\dots,\sigma_{\mN2}, \dots\dots,\sigma_{1\mR},\dots,\sigma_{\mN\mR})}$ combining scales;
 	\item \textit{fused ordering}: $\mathcal{F}_{\tilde \bsigma} \equiv \mathcal{F}_{({\tilde \bsigma}_{1},\dots,{\tilde \bsigma}_{\mR})}$ fusing scales, where ${\tilde \bsigma}_r = \sum_{n=1}^\mN 2^{n-1}\sigma_{nr}$.
 \end{itemize} 
-Once the \textit{index ordering} is established, cross interpolation of the tensor \(\mathcal{F}_{\boldsymbol{\sigma}}\), renders a TT approximation of our initial function $f$. 
+Once the \textit{index ordering} is established, cross interpolation of the tensor \(\mathcal{F}_{\boldsymbol{\sigma}}\) yields a TT approximation of our initial function $f$. 
 
-Combining TCI with the quantics representation allows us to represent a given function $f$ through an MPS and resolve it up to a scale of order $1/2^{\mR}$, all at once; we will name this routine \textit{Quantics Tensor Cross Interpolation} or \textit{QTCI}. 
+Combining TCI with the quantics representation allows us to represent a given function $f$ through an MPS and resolve it up to a scale of order $1/2^{\mR}$; we will name this routine \textit{Quantics Tensor Cross Interpolation} or \textit{QTCI}. 
 
-QTCI constructs the local tensors \(T^{\sigma_\ell}_\ell\) and \(P^{-1}_\ell\) with a compuational cost of \(\order(\mL d\chi^{2})\), similar to TCI, {\emph i.e.} linear in the number of bits $\mR$ and logarithmic in the grid size $\order( \chi^2 d \log M)$ (recovering Khoromskij’s \(O(d\log n)\) scaling), where $\mL = \mN \mR$ or $\mL = \mR$ depending on the index ordering choice. On the other hand, because the mesh width is \(\Delta=2^{-R}\), analytic \(f\) satisfy a spectral
+QTCI constructs the local tensors \(T^{\sigma_\ell}_\ell\) and \(P^{-1}_\ell\) with a cost of \(\order(\mL d\chi^{2}) = \order( \chi^2 d \log M)\), similar to TCI, i.e. linear in the number of bits $\mR$ and logarithmic in the grid size (recovering Khoromskij’s \(O(d\log n)\) scaling \cite{Khoromskij2011}), where $\mL = \mN \mR$ or $\mL = \mR$ depending on the index ordering choice. On the other hand, because the mesh width is \(\Delta=2^{-R}\), analytic \(f\) satisfy a spectral
 error bound
 \begin{equation}
 	\|f-\tilde f_R\|_\infty\;\le\;C\,e^{-cR}=C\,\Delta^{c/\ln 2},
 \end{equation}
-so that the discretization error decays exponentially with $\mR$ while storage and CPU time grow only linearly with it \cite{Khoromskij2011}.
+so that the discretization error decays exponentially with $\mR$ while storage and CPU time grow only linearly with it \cite{Khoromskij2011, Lindsey2024}.
 
 Interleaving (fusing) the bits as \(\sigma_{\ell(n,r)}\) -- where $\ell = n + (r-1)\mN$ ($\ell = r$) -- arranges (fuses) all sites that resolve the \emph{same} length‑scale \(2^{-r}\) next to (with) one another. Whenever cross‑scale correlations are weak this ordering yields a tensor‑train (TT) of small, \(\mR\)-independent rank \(\chi\) \cite{Hiroshi2023, Khoromskij2011}. QTCI has no problem uncovering such an underlying structure, discarding the weak entanglement betweeen different scales. Let us discuss this further in the following example. 
 
 \begin{example}[2D scale separated function]
 	Consider the following 2D function 
 	\begin{equation}
-		f(x,y) = g(x,y) + \frac{ h(x/2^4,y/2^4)}{2^4} + \frac{i(x/2^8,y/2^8)}{2^8}
+		\begin{aligned}
+		f(x,y) &= \exp(-0.4(x^2 + y^2)) + 1 + \sin(xy)\exp(-x^2)\\
+		&+ \cos(3xy)\exp(-y^2) + \cos(x + y)\\ 
+		&+2^{-4}\cos(2^{-4}(0.2x - 0.4y))+
+          2^{-8}\cos(2^{-4}(-0.2x + 0.7y))
+		\end{aligned}
 		\label{eq:scaleSepFunc}
 	\end{equation}
-
-	where $h,g,i$ are linear combinations of trigonometric and exponential functions (the analytic formulas are not important in this context). It is easy to understand how $f$ possesses a very high level of scale separation, where each individual function scale, of order $\order(1)$, $\order(1/2^4)$ and $\order(1/2^8)$ respectively, sees the rest of the function either as a summing constant or as some irrelevant small-magnitude noise. Performing QTCI compression of this function, with interleaved ordering, should render a low-ranked TT, given this separation. The level of entanglement between different bit bipartitions can give us an intuition of the amount of scale disconnection present in the function. 
+	The $f$ might present a very high level of scale separation, where each individual function scale, of order $\order(1)$, $\order(1/2^4)$ and $\order(1/2^8)$ respectively, sees the rest of the function either as a summing constant or as some irrelevant small-magnitude noise. We may expect that performing a QTCI compression of this function, with interleaved ordering, would render a low-ranked TT, given this separation. The level of entanglement between different bit bipartitions can give us an intuition of the amount of scale disconnection present in the function. 
 	
-	An entanglement measure can be achieved through the \textbf{Von Neumann} -- or \textbf{entanglement} -- \textbf{entropy} -- $S$. Given a generic tensor representation of the form $F_{\sigma_1\dots\sigma_\mL}$, the Von Neumann entropy at site $\ell$ can be evaluated through singular value decomposition (SVD) of the matrix 
+	An entanglement measure can be achieved through the \textbf{Von Neumann} -- or \textbf{entanglement entropy} $S$. Given a generic tensor representation of the form $F_{\sigma_1\dots\sigma_\mL}$, the Von Neumann entropy at site $\ell$ can be evaluated through singular value decomposition (SVD) of the matrix 
 	
-	\begin{equation}\rho_\ell = \rho_{(\sigma_1\dots\sigma_\ell),(\sigma'_1\dots\sigma'_\ell)} = \sum_{\sigma_{\ell +1}\dots\sigma_\mL}F_{(\sigma_1\dots\sigma_\ell),(\sigma_{\ell+1}\dots\sigma_\mL)}F^\dag_{(\sigma_{\ell+1}\dots\sigma_\mL),(\sigma'_1\dots\sigma'_\ell)},\end{equation}
-	whose singular values $s_\ell$ can then be used, after normalisation, to calculate the local Von Neumann entropy 
+	\begin{equation}\rho_\ell = \rho_{(\sigma_1\dots\sigma_\ell),(\sigma'_1\dots\sigma'_\ell)} = \sum_{\sigma_{\ell +1}\dots\sigma_\mL}F_{(\sigma_1\dots\sigma_\ell),(\sigma_{\ell+1}\dots\sigma_\mL)}F^\dag_{(\sigma_{\ell+1}\dots\sigma_\mL),(\sigma'_1\dots\sigma'_\ell)}.\end{equation}
+	The  singular values of $\rho_\ell$, namely $s_\ell$, can then be used, after normalisation, to calculate the local Von Neumann entropy 
 	\begin{equation}
 		S_\ell = - \sum_{\alpha=1}^{\chi_\ell} s_\ell^2 \log s_\ell^2
 	\end{equation}
 	as entanglement measure between the bipartions $(\sigma_1\dots\sigma_\ell)$ and $(\sigma_{\ell+1}\dots\sigma_\mL)$ of the system.
 	
-Since bits $\ell = 2(r-1)$ and $\ell = 2(r-1) + 1$ (interleaved representation with  $\mN = 2$) resolve scale $2^{-r}$ of our function, entanglement measure around these sites can give us an intuition of the amount of information that needs to be propagated from scale $2^{-r}$ to the other scales for a correct TT representation of $f$. \prettyref{fig:QTCIEntanglement} depicts this entanglement measure for the QTCI compression with $\mR = 10$ of $f(x,y)$ and of $\texttt{rand(}x,y\texttt{)}$, that generates random noise. $\texttt{rand(}x,y\texttt{)}$ is the perfect example of non-compressible function: no hidden low-rank structure and absolutely no scale separation. In the case of $f$ we can observe very low entanglement for all the different bit bipartions, proving once agan its scale separation. On the contrary, the random noise function is strongly entangled along its whole MPS chain and the entire discretized tensor is necessary to represent it as an MPS, rendering both TCI and QTCI useless for its unfolding. The results are confirmed by the local bond dimensions of the system along the MPS.
+Since bits $\ell = 2(r-1)$ and $\ell = 2(r-1) + 1$ (interleaved representation with  $\mN = 2$) resolve scale $2^{-r}$ of our function, entanglement measure around these sites can give us an intuition of the amount of information that needs to be propagated from scale $2^{-r}$ to the other scales for a correct TT representation of $f$. \prettyref{fig:QTCIEntanglement} depicts this entanglement measure for the QTCI compression with $\mR = 10$ of $f(x,y)$ in \prettyref{eq:scaleSepFunc} and of $\texttt{rand(}x,y\texttt{)}$, that generates random noise. $\texttt{rand(}x,y\texttt{)}$ is the perfect example of non-compressible function: no hidden low-rank structure and absolutely no scale separation. In the case of $f$ we can observe very low entanglement for all the different bit bipartions, proving once agan its scale separation. On the contrary, the random noise function is strongly entangled along its whole MPS chain and the entire discretized tensor is necessary to represent it as an MPS, such that no compression is achieved by (Q)TCI. Accordingly, the bond dimensions are much larger for \texttt{rand()} than for $f(x,y)$
 	
-	\begin{figure}[ht!]
+\begin{figure}[htbp]
 		\centering
 		\includegraphics[width=0.9\textwidth]{figures/QTCI_ent_entropy+bonddims.pdf}
-		\caption{ \textit{Left:} entanglement entropy per site $S_\ell$ vs site $\ell$ for the function in \prettyref{eq:scaleSepFunc} and a 2D random noise function. The vertical dashed lines indicate the bonds where the bits $(\sigma_{1r'}, \sigma_{2r'})$, for $r' \in [1,4,8]$, are next to the bipartition cut. \textit{Right:} bond dimension per site $\chi_\ell$ for the same two functions.}
+		\caption{ \textit{Left:} entanglement entropy per site $S_\ell$ vs site $\ell$ for the function of \prettyref{eq:scaleSepFunc} and a 2D random noise function. The vertical dashed lines indicate the bonds where the bits $(\sigma_{1r'}, \sigma_{2r'})$, for $r' \in [1,4,8]$, are next to the bipartition cut. \textit{Right:} bond dimension per site $\chi_\ell$ for the same two functions.}
 		\label{fig:QTCIEntanglement}
 	\end{figure}
 \end{example}
-
-
-Numerical computations with multivariate functions typically involve a compromise between two contrary desiderata: accurate resolution of the functional dependence, versus parsimonious memory usage. Employing the quantics representation together with TCI compression, however, allows us to realise \emph{arbitrarily high resolution}
-(\(\Delta\!\to\!0\)) at essentially optimal computational cost, making QTCI the
-method of choice whenever scale‑separation permits a bounded TT rank, which will be surely uncovered by TCI. 
+When computing numerically with multivariate functions, one must usually balance two opposing aims: faithfully capturing the function's detail and minimising the memory required for it. Employing the quantics representation together with TCI compression, however, allows us to realise \emph{high resolutions} (\(\Delta\!\to\!0\)) at limited computational cost, making QTCI the
+method of choice whenever scale-separation permits a small TT rank.
 
 \subsection{\texttt{TensorCrossInterpolation.jl} library}
 
 In the previous sections we introduced technical details and different applications of the TCI and QTCI algorithms. As briefly mentioned, all of the examples we presented rely on a $\julia$ implementation of the algorithm, namely \texttt{TensorCrossInterpolation.jl} \cite{TensorCrossInterpolation.jl, tensor4all.org}.  We will not dive into this details of the library however, as reference for the rest of the work, we will mention its main functionality: the \texttt{crossinterpolate2} function.
 
-\texttt{crossinterpolate2}, described in the Listing \ref{code:crossinterpolate2} below, performs TCI of a given numerical function \texttt{f}; in our context, \texttt{f} is either represented by the discretized version of a multi-variate continuous function -- $f(\boldsymbol{x}(\bsigma))$ -- or by any tensor-like numerical function -- $\mF_{\bsigma}$. Given the definition of our tensor $\mF_{\bsigma}$ as a \texttt{function} type, we can understand that its elements don't need to be known and stored beforehand, suitably for TCI. 
+\texttt{crossinterpolate2}, described in the Listing \ref{code:crossinterpolate2} below, performs TCI of a given numerical function \texttt{f}; in our context, \texttt{f} is either represented by the discretized version of a multi-variate continuous function -- $f(\boldsymbol{x}(\bsigma))$ -- or by any tensor-like numerical function -- $\mF_{\bsigma}$. Given the definition of our tensor $\mF_{\bsigma}$ as a \texttt{function} type, we can understand that its elements don't need to be known and stored beforehand. 
 The output of the computation is an object containing the site tensors of the TT-unfolding, together with the lists of pivots necessary to realize the cross approximation.
 
 \begin{lstlisting}[language = julia, caption={Main TCI routine of the \texttt{TensorCrossInterpolation.jl} library \texttt{crossinterpolate2}. The details of each input variable are described in the relative inline comments.}, label={code:crossinterpolate2}]
@@ -564,8 +571,8 @@ The output of the computation is an object containing the site tensors of the TT
   localdims::Union{Vector{Int},NTuple{N,Int}},  # Local dimensions $\color{Maroon} (d_1, \ldots, d_\mL)$
   initialpivots::Vector{MultiIndex};  # List of initial pivots $\color{Maroon} \{\hat\bsigma\}$. 
   									  # Default: $\color{Maroon} \{(1, \ldots, 1)\}$
-  tolerance::Float64,       # Global error tolerance $\color{Maroon} \varepsilon$ for TCI. Default: $\color{Maroon} 10^{-8}$
-  pivottolerance::Float64,  # Local error tolerance $\color{Maroon} \varepsilon_{\Pi}$ for prrLU. Default: $\color{Maroon} \varepsilon$
+  tolerance::Float64,       # Global error tolerance $\color{Maroon} \tau$ for TCI. Default: $\color{Maroon} 10^{-8}$
+  pivottolerance::Float64,  # Local error tolerance $\color{Maroon} \tau_{\Pi}$ for prrLU. Default: $\color{Maroon} \tau$
   maxbonddim::Int,          # Maximum bond dimension $\color{Maroon} \chi_{\max}$. Default: no limit
   maxiter::Int,             # Maximum number of half-sweeps. Default: $\color{Maroon} 20$
   pivotsearch::Symbol,      # Full or rook pivot search? Default: :full
@@ -576,49 +583,48 @@ The output of the computation is an object containing the site tensors of the TT
 \end{lstlisting}
 
 
-\section{Computational Fallbacks of QTCI}
+\section{QTCI approximation of functions with narrow peaks}
 \label{sec:TCIFallbacks}
-Tensor Cross Interpolation is a very powerful and adaptable tool. In \prettyref{sec:TCIalgorithm} we presented all the advantages that employing TCI can bring to different applications. TCI performs superbly for tensor compression, integration and function approximation in most relevant cases. Nonetheless, TCI is not free from ``flaws'', which make its use inefficient in specific contexts. Sparse and symmetric tensors, for tensor compression, and multivariate functions with narrow peaks, for function approximation, are declared enemies of the TCI approach. 
+Sparse or symmetry-constrained tensors, and--more relevant here--multivariate
+functions that contain a few sharp local peaks, expose two latent weaknesses of standard TCI.
+First, the informative regions of the configuration space occupy only a tiny fraction of the full domain; random or purely local pivot searches can miss them, revealing TCI's \emph{ergodicity} problem.
+Second, fitting the entire (mostly trivial) domain with a \emph{single} tensor train forces one global bond dimension, even though different parts of the domain in fact require widely different ranks. The result is often an over-ranked representation of the function, which mostly traslates to an unnecessary increase in memory costs.
 
-In this brief section we will try to address the latter of the two struggles. We will point out the computational fallbacks of TCI, when it deals with this type of application and we will propose a naive solution to it. An example is employed to present our variant of TCI specialized for localized functions, with the aim of introducing the content of upcoming chapters.
+To illustrate these limitations—and to motivate the distributed strategy developed in the following chapters—we introduce a minimal variant of TCI tailored to sharply localised functions.
 
 
-\subsection{A ``naive'' solution to Localised Function approximation }
+\subsection{A ``naive'' solution}
 
-
-The TCI algorithm involves a form of parameter sampling and as a sampling method is not immune from missing some features of the tensor to approximate. Hence, \textit{ergodicity} problems render TCI -- and QTCI as well -- a deficient tool when we attempt to approximate functions with very local and sharp features. 
-A solution to this problem is available in the TCI toolset, \emph{i.e.} global pivot insertion. Proposing clever initial configurations $\hat{\bsigma}$ (see \prettyref{fig:TCIalg}) to the TCI routine -- similar to prompt engineering in deep learning algorithms -- can help TCI uncover all the relevant features of the function of interest. Two are the main weaknesses of this approach; first, the target function we intend to TCI compress might not be known \emph{a priori}, so no information can be used to improve its approximation; second, ``scattering the focus'' of the algorithm on different local features of the function, especially if they have very different scales, might render an imperfect representation and require more computational effort from TCI. 
+\textit{Ergodicity} problems render TCI -- and QTCI as well -- a deficient tool when we attempt to approximate functions with very local and sharp features. 
+This can be solved by \textit{global pivot insertion}, where additional sampling points $\hat{\bsigma}$ are inputted by an external source. Proposing clever initial configurations $\hat{\bsigma}$ (see \prettyref{fig:TCIalg}) to the TCI routine -- similar to prompt engineering in deep learning algorithms -- can help TCI uncover all the relevant features of the function of interest. The main weakness of this approach is that the target function we intend to TCI compress might not be known \emph{a priori}, so no information can be used to improve its approximation.
 Let us consider the following function 
 \begin{gather}
-	\begin{aligned}
-		f(\boldsymbol{r}) &={\color{mymagenta}f_1(\boldsymbol{r})} + {\color{green} f_2(\boldsymbol{r})} =\\ 
-		&={\color{mymagenta} A_1\, e^{-\frac{(\boldsymbol{r} - \boldsymbol{r}_1)^2}{2\sigma^2_1}} \sin(k_1\boldsymbol{r})} + {\color{green} A_2\, e^{-\frac{(\boldsymbol{r} - \boldsymbol{r}_2)^2}{2\sigma^2_2}} \sin(k_2\boldsymbol{r})},
+		f(\boldsymbol{r}) ={\color{mymagenta} \underbrace{A_1\, e^{-\frac{(\boldsymbol{r} - \boldsymbol{r}_1)^2}{2\sigma^2_1}} \sin(k_1\boldsymbol{r})}_{f_1(\boldsymbol{r})}} + {\color{green} \underbrace{A_2\, e^{-\frac{(\boldsymbol{r} - \boldsymbol{r}_2)^2}{2\sigma^2_2}} \sin(k_2\boldsymbol{r})}_{f_2(\br)}},
 		\label{eq:localFunc}
-	\end{aligned}
 \end{gather}
 	where
 \[
 \begin{gathered}
 	\boldsymbol{r} = (x,y), \quad \boldsymbol{r}_{1/2} = \pm( 0.5, 0.5),\\[6pt]
-	A_1 = 10^{3}\, A_2 = 10^6, \quad \sigma_1 = 10^{2}\, \sigma_2 = 10^{-3}, \quad k_1 = 10\, k_2 = 10^3. 
+	A_1 = 10^{3}, A_2 = 10^6, \quad \sigma_1 = 10^{-1}, \sigma_2 = 10^{-3}, \quad k_1 = 10^4, k_2 = 10^3. 
 \end{gathered}
 \]
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.7\textwidth]{figures/Heatmap_localised_func.pdf}
-	\caption{Heatmap of the function $f(\boldsymbol{r})$ within the domain $[0,1]^2$. Zoomings of the two main local features of the function, framed inside the colored square boxes are depicted. The color of the frame  -- {\color{mymagenta} magenta} and {\color{green} lime} -- reflects the one of each summand in \prettyref{eq:localFunc}.}
+	\caption{ $(a)$ Heatmap of the function $f(\boldsymbol{r})$ within the domain $[0,1]^2$. Zoomings into the enviroment of $(b)$ $\br_1$ and $(c)$ $\br_2$, which are the peak positions of ${\color{mymagenta} f_1}$ and ${\color{green} f_2}$, respectively. \prettyref{eq:localFunc}.}
 	\label{fig:localFunc}
 \end{figure}
 
-We can infer that the use of QTCI to approximate $f(\boldsymbol{r})$ at high accuracy could likely trigger the \textit{ergodicity} issues of the algorithm, given the extremity of the application. In fact, $f(\boldsymbol{r})$ is composed by two, almost indipendent terms, with very different absolute scales. $f_1(\boldsymbol{r})$ is wider spread but smaller in absolute value and slower oscillating, whereas $f_2(\boldsymbol{r})$ is fast oscillating but more localised and of larger absolute value. Hence, the two terms possess very different values of the maximum norm $\| \cdot \|_\infty$ when tensorized, triggering different pivoting processes during QTCI. After quantics discretization, the tensor $f(\boldsymbol{r}(\bsigma)) = \mF_{\bsigma}$ can be TCI compressed to $\widetilde{\mF}_{\bsigma}$. 
+$f(\boldsymbol{r})$ is composed by two, almost indipendent terms, with very different absolute scales. $f_1(\boldsymbol{r})$ has wider support but it smaller in absolute value and more slowly oscillating, whereas $f_2(\boldsymbol{r})$ is quickly oscillating but more localised and of larger absolute value. After quantics discretization, the tensor $f(\boldsymbol{r}(\bsigma)) = \mF_{\bsigma}$ can be TCI compressed to $\widetilde{\mF}_{\bsigma}$. 
 
 The absolute quality of the local approximation can be measured through 
 \begin{equation}
-	\varepsilon(\boldsymbol{r}(\bsigma)) = \log_{10}\left|\mF_{\bsigma} - \widetilde{\mF}_{\bsigma}\right|, \quad \boldsymbol{r}(\bsigma) \in [0,1]^2
+	\varepsilon_{\text{log}}(\boldsymbol{r}(\bsigma)) = \log_{10}\left|\mF_{\bsigma} - \widetilde{\mF}_{\bsigma}\right|, \quad \boldsymbol{r}(\bsigma) \in [0,1]^2
 	\label{eq:logTCIerror}
 \end{equation}
-where a smaller value indicates a better precision. 
-We show this error measure in the \textit{top central} plot in \prettyref{fig:errorLocalFunc}, for a QTCI of $f$ with $R=20$, desired absolute tolerance $\varepsilon = 10^{-7}$ and fused quantics index ordering. The image suggests that -- as expected from \prettyref{fig:localFunc} -- most of the function domain is easy to represent, while the computational effort is focused around the centers of our local features $\boldsymbol{r}_1$ and $\boldsymbol{r}_2$. From this, we get the impression that dividing the domain into computationally simple and complex subdomains -- or \textit{patches} -- could benefit the overall cost and, to some degree, accuracy of the QTCI representation. Other arguments support this strategy, as follows. 
+where a smaller value indicates better precision. 
+We show this error measure in the \textit{top central} plot in \prettyref{fig:errorLocalFunc}, for a QTCI of $f$ with $R=20$, desired absolute tolerance $\tau = 10^{-7}$ and fused quantics index ordering. The image suggests that -- as expected from \prettyref{fig:localFunc} -- most of the function domain is easy to represent, while the computational effort is focused around the centers of our local features $\boldsymbol{r}_1$ and $\boldsymbol{r}_2$. Dividing the domain into computationally simple and complex subdomains -- or \textit{patches} -- could benefit the overall cost and, to some degree, accuracy of the QTCI representation. Other arguments support this strategy, as follows. 
 
 \begin{figure}[ht!]
 	\centering
@@ -627,22 +633,20 @@ We show this error measure in the \textit{top central} plot in \prettyref{fig:er
 	\label{fig:errorLocalFunc}
 \end{figure}
 
-Given two indipendent tensors $A_{\bsigma}$ and 
-$B_{\bsigma}$, defined on the same configuration space $\bsigma$, the element-wise sum tensor $S_{\bsigma} = A_{\bsigma} + B_{\bsigma}$, can be obtained through direct sum -- or partial direct sum -- of the two tensors. The same operation can be performed for Tensor Trains, by direct summing each site tensor (cf. \prettyref{sec:patchAlg} and Ref. \cite{Lee2018}). 
+Given two tensors $A_{\bsigma}$ and 
+$B_{\bsigma}$ on the same configuration space $\bsigma$, we define the element-wise sum tensor $S_{\bsigma} = A_{\bsigma} + B_{\bsigma}$ as the direct sum -- or partial direct sum -- of the two tensors. The same operation can be performed for Tensor Trains, by direct summing each site tensor (cf. \prettyref{sec:patchAlg} and Ref. \cite{Lee2018}). 
 In our particular example, if we decide to approximate each summand $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$ in \prettyref{eq:localFunc} with TTs -- $\widetilde{\mF}_1$ and $\widetilde{\mF}_2$ -- then 
 \begin{equation}
 	f(\boldsymbol{r}(\bsigma)) = \mF_{\bsigma} \approx \widetilde{\mF}_{1\bsigma} + \widetilde{\mF}_{2\bsigma} = \widetilde{\mF}^+_{\bsigma}
 	\label{eq:localTermsSum}
 \end{equation}
-with negligible error, due to the independency of the two terms. The bottom matrix of canvas, in \prettyref{fig:errorLocalFunc}, supports this argument. The first pair of plots \textit{a.1)} and \textit{b.1)} portray the error function of the QTCI approximation \textit{focused} on the support region of $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$. The second pair \textit{a.2)} and \textit{b.2)}, on the other hand, measures the error for the QTCI approximations -- $\widetilde{\mF}_{2\bsigma}$ and $\widetilde{\mF}_{1\bsigma}$ -- \textit{limited} \footnotemark to the support of $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$.
+with negligible error, due to the independency of the two terms. \prettyref{fig:errorLocalFunc}, supports this argument. The first pair of plots \textit{(a.1)} and \textit{(b.1)} portray the error function of the QTCI approximation \textit{focused} on the support region of $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$. The second pair \textit{(a.2)} and \textit{(b.2)}, on the other hand, measures the error for the QTCI approximations -- $\widetilde{\mF}_{2\bsigma}$ and $\widetilde{\mF}_{1\bsigma}$ -- \textit{limited} \footnotemark to the support of $f_1(\boldsymbol{r})$ and $f_2(\boldsymbol{r})$.
 
 \footnotetext{When limiting the QTCI approximation, in order to produce results with similar resolution to the standard application, we reduce the number of bits to $\mR_1 = 17$ and $\mR_2 = 16$, while keeping the other parameters unchanged.}
 
+We can observe a slight improvement in the local approximation error in the last row of plots compared to the first one. Whenever QTCI is constricted to each local feature of $f$ it is able to resolve the target with better precision. Nevertheless, the main advantage of this naive solution is not this small accuracy improvement \textit{per se}. 
 
-
-We can observe a slight improve in the local approximation error in the last row of plots compared to the first one. It seems easy to understand that when when QTCI is constricted to each local feature of $f$ it is able to resolute the target with better precision, due to a more specified pivot selection. Nevertheless, the main advantage of this naive solution is not this small accuracy improvement \textit{per se}. 
-
-The computational effort of this \textit{``divide and conquer''} variant of QTCI -- apart from being very well suited for parallelization -- frees the algorithm from the constraint of representing a single object, made of different independent components, with a single tensor train. The improvement in numerical resources requirement is non-negligible. The bond dimension development along the chains of the MPS unfoldings $\widetilde{\mF}_{\bsigma}$, $\widetilde{\mF}_{2\bsigma}$ and $\widetilde{\mF}_{1\bsigma}$ is a witness of that, as shown in \prettyref{fig:bondDimLocalFunc}. 
+The computational effort of this \textit{``divide and conquer''} variant of QTCI -- apart from being very well suited for parallelization -- frees the algorithm from the constraint of representing a single object, made of different independent components, using a single tensor train. The improvement in numerical resources requirement is non-negligible. The bond dimension development along the chains of the MPS unfoldings $\widetilde{\mF}_{\bsigma}$, $\widetilde{\mF}_{2\bsigma}$ and $\widetilde{\mF}_{1\bsigma}$ is a witness of that, as shown in \prettyref{fig:bondDimLocalFunc}. 
 
 \begin{figure}[ht!]
 	\centering
@@ -656,10 +660,9 @@ The rank $\chi^+$ of the direct sum of MPSs -- $\widetilde{\mF}^+_{\bsigma}$ -- 
 \begin{equation}
 	\chi^+ = \chi_1 + \chi_2,
 \end{equation}
-
 where $\chi_1$, $\chi_2$ are the ranks of $\widetilde{\mF}_{1\bsigma}$ and $\widetilde{\mF}_{2\bsigma}$, respectively. 
 
-Due to the different scale at which our two term $f_1$ and $f_2$ are correctly resoluted, the decrease in total bond dimension is quite significant, despite the rank summing operation required to get our final object; as evidence of this, the total number of floating point parameters necessary for the two different implementations is 
+Since $f_1$ and $f_2$ are resolved at markedly different scales, combining them still yields a pronounced drop in the overall bond dimension, despite the extra ranks introduced during the summation that produces the final tensor; as evidence of this, the total number of floating point parameters necessary for the two different implementations is 
 
 \begin{equation}
 	N_{\text{par}}(\widetilde{\mF}_{\bsigma}) \simeq 1.4 \times 10^6 > N_{\text{par}}(\widetilde{\mF}_{2\bsigma} + \widetilde{\mF}_{1\bsigma}) \simeq 5.6 \times 10^5.
